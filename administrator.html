@@ -2,353 +2,495 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
   <title>Admin — Escala Santa Rita</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;900&display=swap" rel="stylesheet"/>
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
-      --bg:      #faf8f5;
-      --bg2:     #ffffff;
-      --bg3:     #f3f0eb;
-      --border:  #e2dbd2;
-      --border2: #ccc4b8;
-      --rose:    #9b2335;
-      --rose2:   #b8304a;
-      --rose-light: #fdf0f2;
-      --rose-mid:   rgba(155,35,53,0.12);
-      --green:   #3a6b45;
-      --text:    #1a1612;
-      --text2:   #6b5f55;
-      --text3:   #a89d94;
-      --white:   #ffffff;
-      --radius:  8px;
-      --sidebar: 240px;
-      --shadow:  0 1px 3px rgba(26,22,18,.08), 0 4px 16px rgba(26,22,18,.06);
+      --rose:       #9b2335;
+      --rose2:      #b8304a;
+      --rose-dim:   rgba(155,35,53,0.08);
+      --rose-light: rgba(155,35,53,0.12);
+      --bg:         #faf8f5;
+      --surface:    #ffffff;
+      --surface2:   #f3f0eb;
+      --border:     #e8e2da;
+      --border2:    #d4ccc2;
+      --text:       #0f0d0b;
+      --muted:      #6b6057;
+      --muted2:     #a89d94;
+      --sidebar-w:  252px;
+      --header-h:   58px;
+      --font:       'Geist', sans-serif;
+      --radius:     10px;
+      --shadow:     0 1px 2px rgba(0,0,0,.06), 0 4px 12px rgba(0,0,0,.04);
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-    /* ── LOGIN ── */
-    #login-screen {
+    body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; font-size: 14px; -webkit-font-smoothing: antialiased; }
+
+    /* ── LOGIN ─────────────────────────────────────────── */
+    #loginScreen {
       min-height: 100vh; display: flex; align-items: center; justify-content: center;
-      background: linear-gradient(135deg, #faf8f5 0%, #f5eeea 100%);
+      padding: 24px; position: relative;
+      background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(155,35,53,0.06) 0%, transparent 65%), var(--bg);
     }
-    .login-card {
-      width: 380px; background: var(--white); border: 1px solid var(--border);
-      border-radius: 20px; padding: 48px 40px; text-align: center;
-      box-shadow: 0 8px 40px rgba(155,35,53,.1);
+    .login-box {
+      width: 100%; max-width: 400px; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 20px; padding: 40px 36px;
+      box-shadow: 0 8px 40px rgba(155,35,53,.08);
+      animation: fadeUp .35s ease both;
     }
-    .login-logo {
-      width: 88px; height: 88px; border-radius: 50%; object-fit: cover;
-      margin: 0 auto 20px; display: block;
-      border: 3px solid var(--border);
-      box-shadow: 0 4px 16px rgba(155,35,53,.15);
-    }
-    .login-card h1 { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--text); margin-bottom: 4px; }
-    .login-card .subtitle { font-size: 13px; color: var(--text2); margin-bottom: 32px; line-height: 1.6; }
-    .field { margin-bottom: 14px; text-align: left; }
-    .field label { display: block; font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 6px; font-weight: 500; }
-    .field input {
-      width: 100%; background: var(--bg); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 11px 14px; color: var(--text); font-size: 14px;
-      font-family: 'Inter', sans-serif; outline: none; transition: border-color .2s;
-    }
-    .field input:focus { border-color: var(--rose); box-shadow: 0 0 0 3px rgba(155,35,53,.08); }
-    .btn-primary {
-      width: 100%; padding: 13px; background: var(--rose); color: white;
-      border: none; border-radius: var(--radius); font-size: 14px; font-weight: 500;
-      font-family: 'Inter', sans-serif; cursor: pointer; transition: background .2s; margin-top: 8px;
-    }
-    .btn-primary:hover { background: var(--rose2); }
-    .login-error { color: var(--rose); font-size: 13px; margin-top: 12px; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
 
-    /* ── APP ── */
-    #app { display: none; min-height: 100vh; }
+    .login-brand { display:flex; align-items:center; gap:12px; margin-bottom:28px; }
+    .login-brand img { width:52px; height:52px; border-radius:50%; object-fit:cover; border:2px solid var(--border); }
+    .login-brand-text strong { display:block; font-size:15px; font-weight:700; color:var(--text); }
+    .login-brand-text span   { font-size:11px; color:var(--muted); letter-spacing:.06em; text-transform:uppercase; }
 
+    .login-title    { font-size:24px; font-weight:700; letter-spacing:-.5px; margin-bottom:4px; }
+    .login-subtitle { font-size:13px; color:var(--muted); margin-bottom:28px; }
+
+    .field { margin-bottom:14px; }
+    .field label { display:block; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); margin-bottom:6px; }
+    .field input, .field select, .field textarea {
+      width:100%; background:var(--surface2); border:1px solid var(--border);
+      border-radius:var(--radius); padding:11px 13px; font-size:14px; font-family:var(--font);
+      color:var(--text); outline:none; transition:border-color .18s, box-shadow .18s; appearance:none;
+    }
+    .field input:focus, .field select:focus { border-color:var(--rose); box-shadow:0 0 0 3px rgba(155,35,53,.1); }
+    .field input::placeholder { color:var(--muted2); }
+
+    .btn-login {
+      width:100%; margin-top:6px; padding:13px; background:var(--rose); color:#fff;
+      border:none; border-radius:var(--radius); font-family:var(--font); font-size:15px;
+      font-weight:600; cursor:pointer; transition:background .18s, transform .1s;
+    }
+    .btn-login:hover   { background:var(--rose2); }
+    .btn-login:active  { transform:scale(.98); }
+    .msg-err  { margin-top:12px; font-size:13px; color:var(--rose); text-align:center; min-height:18px; }
+
+    /* ── SHELL ─────────────────────────────────────────── */
+    #appScreen { display:none; min-height:100vh; }
+    #appScreen.visible { display:flex; }
+
+    /* ── SIDEBAR ───────────────────────────────────────── */
     .sidebar {
-      position: fixed; top: 0; left: 0; width: var(--sidebar); height: 100vh;
-      background: var(--text); display: flex; flex-direction: column; z-index: 100;
+      width:var(--sidebar-w); min-height:100vh; background:var(--text); display:flex;
+      flex-direction:column; position:fixed; top:0; left:0; z-index:200;
+      transition:transform .28s cubic-bezier(.4,0,.2,1);
     }
     .sidebar-brand {
-      padding: 22px 20px; border-bottom: 1px solid rgba(255,255,255,.08);
-      display: flex; align-items: center; gap: 12px;
+      display:flex; align-items:center; gap:12px; padding:20px 20px 16px;
+      border-bottom:1px solid rgba(255,255,255,.08);
     }
-    .brand-logo { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 2px solid rgba(155,35,53,.5); }
-    .brand-text h2 { font-family: 'Playfair Display', serif; font-size: 13px; color: #fff; line-height: 1.4; }
-    .brand-text p  { font-size: 10px; color: rgba(255,255,255,.35); margin-top: 2px; }
+    .sidebar-brand img { width:38px; height:38px; border-radius:50%; object-fit:cover; border:1.5px solid rgba(155,35,53,.5); flex-shrink:0; }
+    .sidebar-brand-name { font-size:14px; font-weight:700; color:#fff; }
+    .sidebar-brand-sub  { font-size:10px; color:rgba(255,255,255,.35); text-transform:uppercase; letter-spacing:.08em; }
 
-    nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
-    .nav-section { font-size: 10px; color: rgba(255,255,255,.25); text-transform: uppercase; letter-spacing: .1em; padding: 0 10px; margin: 16px 0 6px; }
+    .sidebar-user { padding:14px 20px; border-bottom:1px solid rgba(255,255,255,.08); }
+    .sidebar-user-label { font-size:10px; color:rgba(255,255,255,.3); text-transform:uppercase; letter-spacing:.08em; margin-bottom:3px; }
+    .sidebar-user-name  { font-size:13px; font-weight:600; color:#fff; }
+
+    .sidebar-nav { flex:1; padding:10px 0; overflow-y:auto; }
+    .nav-section { font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:rgba(255,255,255,.25); padding:14px 20px 4px; font-weight:700; }
     .nav-item {
-      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
-      border-radius: var(--radius); color: rgba(255,255,255,.5); font-size: 13px;
-      cursor: pointer; transition: all .15s; margin-bottom: 2px; border: none;
-      background: none; width: 100%; text-align: left; font-family: 'Inter', sans-serif;
+      display:flex; align-items:center; gap:11px; padding:10px 20px;
+      cursor:pointer; border-left:3px solid transparent; color:rgba(255,255,255,.5);
+      font-size:13px; font-weight:500; transition:background .15s, color .15s; user-select:none;
     }
-    .nav-item:hover { background: rgba(255,255,255,.07); color: rgba(255,255,255,.85); }
-    .nav-item.active { background: var(--rose); color: white; }
-    .nav-icon { font-size: 15px; width: 20px; text-align: center; }
+    .nav-item:hover  { background:rgba(255,255,255,.05); color:rgba(255,255,255,.9); }
+    .nav-item.active { background:var(--rose-dim); border-left-color:var(--rose); color:#fff; background:rgba(155,35,53,.18); }
+    .nav-icon { font-size:16px; width:22px; text-align:center; flex-shrink:0; }
 
-    .sidebar-bottom { padding: 14px 12px; border-top: 1px solid rgba(255,255,255,.08); }
-    .user-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; margin-bottom: 8px; }
-    .user-avatar { width: 30px; height: 30px; border-radius: 50%; background: rgba(155,35,53,.35); color: #f9a8b4; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
-    .user-email { font-size: 11px; color: rgba(255,255,255,.4); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .btn-logout { width: 100%; padding: 8px; background: none; border: 1px solid rgba(255,255,255,.12); border-radius: var(--radius); color: rgba(255,255,255,.4); font-size: 12px; font-family: 'Inter', sans-serif; cursor: pointer; transition: all .15s; }
-    .btn-logout:hover { border-color: rgba(155,35,53,.6); color: #f9a8b4; }
-
-    .main { margin-left: var(--sidebar); padding: 36px 40px; min-height: 100vh; }
-    .page { display: none; }
-    .page.active { display: block; animation: fadeIn .2s ease; }
-    @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
-
-    .page-header { margin-bottom: 28px; display: flex; align-items: flex-start; justify-content: space-between; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
-    .page-header h1 { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--text); }
-    .page-header p  { font-size: 13px; color: var(--text2); margin-top: 4px; }
-
-    /* stats */
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap: 16px; margin-bottom: 28px; }
-    .stat-card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; box-shadow: var(--shadow); }
-    .stat-card .num { font-family: 'Playfair Display', serif; font-size: 40px; color: var(--rose); line-height: 1; }
-    .stat-card .lbl { font-size: 12px; color: var(--text2); margin-top: 6px; }
-
-    /* card / table */
-    .card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); }
-    .card-header { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-    .card-header h3 { font-size: 14px; font-weight: 500; color: var(--text); }
-    table { width: 100%; border-collapse: collapse; }
-    th { text-align: left; padding: 12px 24px; font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .07em; background: var(--bg); border-bottom: 1px solid var(--border); }
-    td { padding: 14px 24px; font-size: 13px; color: var(--text); border-bottom: 1px solid var(--border); vertical-align: middle; }
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: var(--bg); }
-    .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; background: var(--rose-light); color: var(--rose); border: 1px solid rgba(155,35,53,.2); }
-    .empty-state { text-align: center; padding: 48px 20px; color: var(--text3); font-size: 13px; }
-    .empty-state .icon { font-size: 32px; margin-bottom: 12px; display: block; }
-
-    /* buttons */
-    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; border-radius: var(--radius); font-size: 13px; font-family: 'Inter', sans-serif; cursor: pointer; transition: all .15s; border: none; font-weight: 500; }
-    .btn-rose  { background: var(--rose); color: white; }
-    .btn-rose:hover { background: var(--rose2); }
-    .btn-ghost { background: none; border: 1px solid var(--border); color: var(--text2); }
-    .btn-ghost:hover { border-color: var(--border2); color: var(--text); }
-    .btn-danger { background: none; border: 1px solid transparent; color: #c0392b; font-size: 12px; padding: 6px 10px; }
-    .btn-danger:hover { background: rgba(155,35,53,.07); border-color: rgba(155,35,53,.2); }
-    .btn-sm { padding: 6px 12px; font-size: 12px; }
-
-    /* modal */
-    .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(26,22,18,.45); z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
-    .modal-backdrop.open { display: flex; }
-    .modal { background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 32px; width: 500px; max-width: 95vw; max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 60px rgba(26,22,18,.2); }
-    .modal-head { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; }
-    .modal-head .icon { font-size: 18px; }
-    .modal h2 { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--text); }
-    .modal .field { margin-bottom: 16px; }
-    .modal .field label { display: block; font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 6px; font-weight: 500; }
-    .modal .field input,
-    .modal .field select {
-      width: 100%; background: var(--bg); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 11px 14px; color: var(--text); font-size: 14px;
-      font-family: 'Inter', sans-serif; outline: none; transition: border-color .2s; appearance: none;
+    .sidebar-footer { padding:14px; border-top:1px solid rgba(255,255,255,.08); }
+    .btn-sair {
+      width:100%; display:flex; align-items:center; gap:10px; padding:10px 14px;
+      background:transparent; border:1px solid rgba(255,255,255,.1); border-radius:var(--radius);
+      color:rgba(255,255,255,.4); font-size:13px; font-weight:600; cursor:pointer;
+      font-family:var(--font); transition:border-color .18s, color .18s;
     }
-    .modal .field input:focus,
-    .modal .field select:focus { border-color: var(--rose); box-shadow: 0 0 0 3px rgba(155,35,53,.08); }
-    .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
-    .msg { font-size: 13px; padding: 10px 14px; border-radius: var(--radius); margin-top: 12px; }
-    .msg.success { background: rgba(58,107,69,.1); color: var(--green); border: 1px solid rgba(58,107,69,.25); }
-    .msg.error   { background: rgba(155,35,53,.08); color: var(--rose); border: 1px solid rgba(155,35,53,.2); }
+    .btn-sair:hover { border-color:rgba(155,35,53,.6); color:rgba(255,120,120,.8); }
 
-    /* escala */
-    .escala-controls { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
-    .escala-controls select { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 9px 14px; color: var(--text); font-size: 13px; font-family: 'Inter', sans-serif; outline: none; min-width: 180px; }
-    .escala-list { display: flex; flex-direction: column; gap: 8px; }
-    .escala-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow); }
-    .escala-card:hover { border-color: var(--border2); }
-    .esc-date { text-align: center; min-width: 48px; }
-    .esc-date .day   { font-family: 'Playfair Display', serif; font-size: 26px; color: var(--rose); line-height: 1; }
-    .esc-date .month { font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: .05em; margin-top: 2px; }
-    .esc-divider { width: 1px; height: 44px; background: var(--border); flex-shrink: 0; }
-    .esc-info { flex: 1; min-width: 0; }
-    .esc-meta  { font-size: 11px; color: var(--text2); margin-bottom: 3px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-    .esc-min   { font-size: 14px; font-weight: 500; color: var(--text); }
-    .esc-mus   { font-size: 12px; color: var(--text2); margin-top: 3px; }
-    .esc-obs   { font-size: 11px; color: var(--text3); margin-top: 2px; font-style: italic; }
-    .wkd-tag   { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; background: var(--rose-light); color: var(--rose); }
+    /* ── TOPBAR ────────────────────────────────────────── */
+    .main-area { margin-left:var(--sidebar-w); flex:1; display:flex; flex-direction:column; min-height:100vh; }
+    .topbar {
+      height:var(--header-h); background:var(--bg); border-bottom:1px solid var(--border);
+      display:flex; align-items:center; padding:0 28px; gap:14px;
+      position:sticky; top:0; z-index:100;
+    }
+    .btn-menu { display:none; background:none; border:none; color:var(--text); font-size:20px; cursor:pointer; padding:4px; }
+    .topbar-title { font-size:15px; font-weight:600; color:var(--text); flex:1; }
+
+    .content { flex:1; padding:32px 28px; }
+
+    /* ── BUTTONS ───────────────────────────────────────── */
+    .btn {
+      display:inline-flex; align-items:center; gap:6px; padding:9px 18px;
+      border-radius:var(--radius); font-size:13px; font-family:var(--font);
+      font-weight:600; cursor:pointer; transition:all .18s; border:none;
+    }
+    .btn-rose  { background:var(--rose); color:#fff; }
+    .btn-rose:hover { background:var(--rose2); }
+    .btn-ghost { background:none; border:1px solid var(--border); color:var(--muted); }
+    .btn-ghost:hover { border-color:var(--border2); color:var(--text); }
+    .btn-danger { background:none; border:1px solid transparent; color:var(--rose); font-size:12px; padding:6px 10px; }
+    .btn-danger:hover { background:rgba(155,35,53,.07); border-color:rgba(155,35,53,.2); }
+    .btn-sm { padding:6px 12px; font-size:12px; }
+
+    /* ── PAGES ─────────────────────────────────────────── */
+    .page { display:none; }
+    .page.active { display:block; animation:fadeUp .2s ease; }
+
+    .page-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:28px; padding-bottom:20px; border-bottom:1px solid var(--border); }
+    .page-header h1 { font-size:28px; font-weight:700; letter-spacing:-.6px; }
+    .page-header p  { font-size:13px; color:var(--muted); margin-top:4px; }
+
+    /* ── STATS ─────────────────────────────────────────── */
+    .stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:24px; }
+    .stat-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:20px 22px; box-shadow:var(--shadow); }
+    .stat-num  { font-size:36px; font-weight:700; color:var(--rose); letter-spacing:-1px; line-height:1; }
+    .stat-lbl  { font-size:12px; color:var(--muted); margin-top:5px; font-weight:500; }
+
+    /* ── TABLE CARD ────────────────────────────────────── */
+    .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; box-shadow:var(--shadow); }
+    .card-head { padding:16px 22px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .card-head h3 { font-size:13px; font-weight:600; }
+
+    table { width:100%; border-collapse:collapse; }
+    th { text-align:left; padding:11px 22px; font-size:11px; font-weight:700; color:var(--muted2); text-transform:uppercase; letter-spacing:.07em; background:var(--surface2); border-bottom:1px solid var(--border); }
+    td { padding:13px 22px; font-size:13px; border-bottom:1px solid var(--border); vertical-align:middle; }
+    tr:last-child td { border-bottom:none; }
+    tr:hover td { background:var(--surface2); }
+
+    .badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; background:rgba(155,35,53,.1); color:var(--rose); border:1px solid rgba(155,35,53,.2); }
+    .empty { text-align:center; padding:48px 20px; color:var(--muted2); font-size:13px; }
+    .empty-icon { font-size:28px; margin-bottom:10px; display:block; }
+
+    /* ── ESCALA GRID ───────────────────────────────────── */
+    .escala-toolbar { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:24px; }
+    .escala-toolbar select { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:9px 13px; font-size:13px; font-family:var(--font); color:var(--text); outline:none; min-width:160px; appearance:none; cursor:pointer; }
+    .escala-toolbar select:focus { border-color:var(--rose); }
+
+    /* Tabela da escala */
+    .escala-table-wrap { overflow-x:auto; }
+    .escala-table { width:100%; border-collapse:collapse; min-width:700px; }
+    .escala-table th {
+      text-align:left; padding:10px 14px; font-size:11px; font-weight:700;
+      color:var(--muted2); text-transform:uppercase; letter-spacing:.07em;
+      background:var(--surface2); border-bottom:1px solid var(--border);
+      white-space:nowrap;
+    }
+    .escala-table th.col-hor { width:90px; }
+    .escala-table th.col-tipo { width:110px; }
+    .escala-table td {
+      padding:10px 14px; border-bottom:1px solid var(--border);
+      font-size:13px; vertical-align:middle;
+    }
+    .escala-table tr:last-child td { border-bottom:none; }
+    .escala-table tr:hover td { background:var(--surface2); }
+
+    .col-data { font-weight:600; white-space:nowrap; }
+    .col-wkd  { display:inline-block; padding:2px 8px; border-radius:5px; font-size:11px; font-weight:700; background:rgba(155,35,53,.1); color:var(--rose); }
+    .col-min  { font-weight:500; }
+    .col-mus  { font-size:12px; color:var(--muted); }
+    .col-obs  { font-size:11px; color:var(--muted2); font-style:italic; }
+
+    .min-cell {
+      display:inline-flex; align-items:center; gap:6px; padding:4px 10px;
+      border-radius:20px; font-size:12px; font-weight:600;
+      background:rgba(155,35,53,.09); color:var(--rose); border:1px solid rgba(155,35,53,.2);
+      cursor:pointer; transition:background .15s;
+    }
+    .min-cell:hover { background:rgba(155,35,53,.18); }
+    .min-cell.vazio { background:var(--surface2); color:var(--muted2); border-color:var(--border); }
+    .min-cell.vazio:hover { border-color:var(--rose); color:var(--rose); }
+
+    /* ── MODAL ─────────────────────────────────────────── */
+    .backdrop { display:none; position:fixed; inset:0; background:rgba(15,13,11,.45); z-index:300; align-items:center; justify-content:center; backdrop-filter:blur(3px); }
+    .backdrop.open { display:flex; }
+    .modal {
+      background:var(--surface); border:1px solid var(--border); border-radius:18px;
+      padding:32px; width:460px; max-width:95vw; max-height:92vh; overflow-y:auto;
+      box-shadow:0 24px 60px rgba(0,0,0,.15); animation:fadeUp .2s ease;
+    }
+    .modal-head { display:flex; align-items:center; gap:10px; margin-bottom:22px; }
+    .modal-head h2 { font-size:20px; font-weight:700; letter-spacing:-.4px; }
+    .modal-footer { display:flex; gap:8px; justify-content:flex-end; margin-top:22px; padding-top:20px; border-top:1px solid var(--border); }
+    .msg { font-size:13px; padding:10px 13px; border-radius:var(--radius); margin-top:10px; }
+    .msg.ok  { background:rgba(50,120,70,.1); color:#2d7a45; border:1px solid rgba(50,120,70,.25); }
+    .msg.err { background:rgba(155,35,53,.08); color:var(--rose); border:1px solid rgba(155,35,53,.2); }
 
     /* chips */
-    .chips-box { display: flex; flex-wrap: wrap; gap: 6px; min-height: 42px; padding: 8px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); }
-    .chip { padding: 5px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; border: 1px solid var(--border); color: var(--text2); background: var(--white); transition: all .15s; font-family: 'Inter', sans-serif; }
-    .chip:hover { border-color: var(--rose); color: var(--rose); }
-    .chip.on    { background: var(--rose); color: white; border-color: var(--rose); }
+    .chips { display:flex; flex-wrap:wrap; gap:6px; min-height:40px; padding:8px; background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); }
+    .chip { padding:5px 12px; border-radius:20px; font-size:12px; font-weight:500; cursor:pointer; border:1px solid var(--border); color:var(--muted); background:var(--surface); transition:all .15s; font-family:var(--font); }
+    .chip:hover { border-color:var(--rose); color:var(--rose); }
+    .chip.on    { background:var(--rose); color:#fff; border-color:var(--rose); }
 
-    /* grid 2col */
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .custom-hor { display:none; }
+    .custom-hor.show { display:block; }
 
-    /* custom horario */
-    .custom-hor { display: none; }
-    .custom-hor.show { display: block; }
+    /* overlay mobile */
+    .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:199; }
+    .sidebar-overlay.open { display:block; }
 
     /* spinner */
-    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--rose); border-radius: 50%; animation: spin .6s linear infinite; vertical-align: middle; }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin { display:inline-block; width:14px; height:14px; border:2px solid var(--border); border-top-color:var(--rose); border-radius:50%; animation:spinning .6s linear infinite; vertical-align:middle; }
+    @keyframes spinning { to { transform:rotate(360deg); } }
+
+    /* ── RESPONSIVE ────────────────────────────────────── */
+    @media (max-width:768px) {
+      .btn-menu { display:block; }
+      .sidebar  { transform:translateX(-100%); }
+      .sidebar.open { transform:translateX(0); }
+      .main-area { margin-left:0; }
+      .content   { padding:20px 16px; }
+      .topbar    { padding:0 16px; }
+      .stats-row { grid-template-columns:1fr 1fr; }
+      .page-header { flex-direction:column; gap:12px; }
+      .page-header .btn { width:100%; justify-content:center; }
+      .escala-toolbar { flex-direction:column; align-items:stretch; }
+      .escala-toolbar select { width:100%; }
+      table thead { display:none; }
+      table, tbody, tr, td { display:block; width:100%; }
+      tr { background:var(--surface); border:1px solid var(--border); border-radius:12px; margin-bottom:10px; }
+      td { border-bottom:none; padding:8px 16px; }
+      td:first-child { padding-top:14px; font-weight:600; }
+      td:last-child  { padding-bottom:12px; }
+      .modal { padding:24px 18px; border-radius:18px 18px 0 0; position:fixed; bottom:0; left:0; right:0; width:100%; max-width:100%; border-bottom:none; }
+      .backdrop.open { align-items:flex-end; }
+      .grid-2 { grid-template-columns:1fr; }
+    }
+    @media (max-width:400px) {
+      .stats-row { grid-template-columns:1fr; }
+    }
   </style>
 </head>
 <body>
 
 <!-- LOGIN -->
-<div id="login-screen">
-  <div class="login-card">
-    <img src="logo.jpg" class="login-logo" alt="Santa Rita de Cássia"/>
-    <h1>Portal Admin</h1>
-    <p class="subtitle">Santuário Santa Rita de Cássia<br>Ministérios de Música</p>
-    <div class="field"><label>E-mail</label><input type="email" id="login-email" placeholder="seu@email.com"/></div>
-    <div class="field"><label>Senha</label><input type="password" id="login-password" placeholder="••••••••"/></div>
-    <button class="btn-primary" onclick="doLogin()">Entrar</button>
-    <div class="login-error" id="login-error"></div>
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-brand">
+      <img src="logo.jpg" alt="Santa Rita"/>
+      <div class="login-brand-text">
+        <strong>Santa Rita de Cássia</strong>
+        <span>Portal Admin</span>
+      </div>
+    </div>
+    <div class="login-title">Bem-vindo</div>
+    <div class="login-subtitle">Faça login para gerenciar a escala</div>
+    <div class="field"><label>E-mail</label><input type="email" id="login-email" placeholder="seu@email.com" autocomplete="email"/></div>
+    <div class="field"><label>Senha</label><input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"/></div>
+    <button class="btn-login" onclick="doLogin()">Entrar</button>
+    <p class="msg-err" id="login-err"></p>
   </div>
 </div>
 
 <!-- APP -->
-<div id="app">
-  <aside class="sidebar">
+<div id="appScreen">
+  <div class="sidebar-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
+
+  <nav class="sidebar" id="sidebar">
     <div class="sidebar-brand">
-      <img src="logo.jpg" class="brand-logo" alt="Santa Rita"/>
-      <div class="brand-text">
-        <h2>Santa Rita<br>de Cássia</h2>
-        <p>Música Litúrgica</p>
+      <img src="logo.jpg" alt="Santa Rita"/>
+      <div>
+        <div class="sidebar-brand-name">Santa Rita</div>
+        <div class="sidebar-brand-sub">Música Litúrgica</div>
       </div>
     </div>
-    <nav>
+    <div class="sidebar-user">
+      <div class="sidebar-user-label">Usuário</div>
+      <div class="sidebar-user-name" id="sb-user">—</div>
+    </div>
+    <div class="sidebar-nav">
       <div class="nav-section">Geral</div>
-      <button class="nav-item active" data-page="dashboard"><span class="nav-icon">▦</span> Dashboard</button>
+      <div class="nav-item active" data-page="dashboard"><span class="nav-icon">▦</span> Dashboard</div>
       <div class="nav-section">Cadastros</div>
-      <button class="nav-item" data-page="ministerios"><span class="nav-icon">♫</span> Ministérios</button>
-      <button class="nav-item" data-page="musicos"><span class="nav-icon">♪</span> Músicos</button>
+      <div class="nav-item" data-page="ministerios"><span class="nav-icon">♫</span> Ministérios</div>
+      <div class="nav-item" data-page="musicos"><span class="nav-icon">♪</span> Músicos</div>
       <div class="nav-section">Programação</div>
-      <button class="nav-item" data-page="escala"><span class="nav-icon">◷</span> Escala</button>
-    </nav>
-    <div class="sidebar-bottom">
-      <div class="user-row">
-        <div class="user-avatar" id="user-initial">A</div>
-        <div class="user-email" id="user-email-display"></div>
-      </div>
-      <button class="btn-logout" onclick="doLogout()">Sair</button>
+      <div class="nav-item" data-page="escala"><span class="nav-icon">◷</span> Escala</div>
     </div>
-  </aside>
+    <div class="sidebar-footer">
+      <button class="btn-sair" onclick="doLogout()">⬅ Sair da conta</button>
+    </div>
+  </nav>
 
-  <main class="main">
-
-    <!-- DASHBOARD -->
-    <div class="page active" id="page-dashboard">
-      <div class="page-header">
-        <div><h1>Dashboard</h1><p>Visão geral da programação</p></div>
-      </div>
-      <div class="stats-grid">
-        <div class="stat-card"><div class="num" id="stat-min">—</div><div class="lbl">Ministérios</div></div>
-        <div class="stat-card"><div class="num" id="stat-mus">—</div><div class="lbl">Músicos</div></div>
-        <div class="stat-card"><div class="num" id="stat-esc">—</div><div class="lbl">Escalas este mês</div></div>
-      </div>
-      <div class="card">
-        <div class="card-header"><h3>Próximas escalas</h3></div>
-        <div id="proximas-list"><div class="empty-state"><span class="spinner"></span></div></div>
-      </div>
+  <div class="main-area">
+    <div class="topbar">
+      <button class="btn-menu" onclick="toggleSidebar()">☰</button>
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
     </div>
 
-    <!-- MINISTÉRIOS -->
-    <div class="page" id="page-ministerios">
-      <div class="page-header">
-        <div><h1>Ministérios</h1><p>Grupos de música cadastrados</p></div>
-        <button class="btn btn-rose" onclick="openModalMin()">+ Novo ministério</button>
-      </div>
-      <div class="card">
-        <table>
-          <thead><tr><th>Nome</th><th>Responsável</th><th>Músicos</th><th></th></tr></thead>
-          <tbody id="tb-ministerios"><tr><td colspan="4"><div class="empty-state"><span class="spinner"></span></div></td></tr></tbody>
-        </table>
-      </div>
-    </div>
+    <div class="content">
 
-    <!-- MÚSICOS -->
-    <div class="page" id="page-musicos">
-      <div class="page-header">
-        <div><h1>Músicos</h1><p>Membros de cada ministério</p></div>
-        <button class="btn btn-rose" onclick="openModalMus()">+ Novo músico</button>
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-header">
+          <div>
+            <h1 id="dash-greeting">Olá!</h1>
+            <p id="dash-date"></p>
+          </div>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-num" id="st-min">—</div><div class="stat-lbl">Ministérios</div></div>
+          <div class="stat-card"><div class="stat-num" id="st-mus">—</div><div class="stat-lbl">Músicos</div></div>
+          <div class="stat-card"><div class="stat-num" id="st-esc">—</div><div class="stat-lbl">Escalas este mês</div></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Próximas escalas</h3></div>
+          <div id="dash-proximas"><div class="empty"><span class="spin"></span></div></div>
+        </div>
       </div>
-      <div class="card">
-        <table>
-          <thead><tr><th>Nome</th><th>Ministério</th><th>Telefone</th><th></th></tr></thead>
-          <tbody id="tb-musicos"><tr><td colspan="4"><div class="empty-state"><span class="spinner"></span></div></td></tr></tbody>
-        </table>
-      </div>
-    </div>
 
-    <!-- ESCALA -->
-    <div class="page" id="page-escala">
-      <div class="page-header">
-        <div><h1>Escala</h1><p>Programação por ministério e missa</p></div>
-        <button class="btn btn-rose" onclick="openModalEsc()">+ Escalar ministério</button>
+      <!-- MINISTÉRIOS -->
+      <div class="page" id="page-ministerios">
+        <div class="page-header">
+          <div><h1>Ministérios</h1><p>Grupos de música cadastrados</p></div>
+          <button class="btn btn-rose" onclick="openMin()">+ Novo ministério</button>
+        </div>
+        <div class="card">
+          <table>
+            <thead><tr><th>Nome</th><th>Responsável</th><th>Músicos</th><th></th></tr></thead>
+            <tbody id="tb-min"><tr><td colspan="4"><div class="empty"><span class="spin"></span></div></td></tr></tbody>
+          </table>
+        </div>
       </div>
-      <div class="escala-controls">
-        <select id="filtro-mes" onchange="loadEscala()"></select>
-        <select id="filtro-min-escala" onchange="loadEscala()"><option value="">Todos os ministérios</option></select>
-      </div>
-      <div class="escala-list" id="escala-list"><div class="empty-state"><span class="spinner"></span></div></div>
-    </div>
 
-  </main>
-</div>
+      <!-- MÚSICOS -->
+      <div class="page" id="page-musicos">
+        <div class="page-header">
+          <div><h1>Músicos</h1><p>Membros de cada ministério</p></div>
+          <button class="btn btn-rose" onclick="openMus()">+ Novo músico</button>
+        </div>
+        <div class="card">
+          <table>
+            <thead><tr><th>Nome</th><th>Ministério</th><th>Telefone</th><th></th></tr></thead>
+            <tbody id="tb-mus"><tr><td colspan="4"><div class="empty"><span class="spin"></span></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ESCALA -->
+      <div class="page" id="page-escala">
+        <div class="page-header">
+          <div><h1>Escala</h1><p>Clique em uma célula para escalar o ministério</p></div>
+        </div>
+        <div class="escala-toolbar">
+          <select id="sel-mes" onchange="renderEscala()"></select>
+          <select id="sel-min-fil" onchange="renderEscala()"><option value="">Todos os ministérios</option></select>
+        </div>
+        <div class="card">
+          <div class="escala-table-wrap">
+            <table class="escala-table" id="escala-tbl">
+              <thead>
+                <tr>
+                  <th class="col-hor">Horário</th>
+                  <th class="col-tipo">Tipo</th>
+                  <th>Data</th>
+                  <th>Ministério</th>
+                  <th>Músicos</th>
+                  <th>Obs.</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="escala-body">
+                <tr><td colspan="7"><div class="empty"><span class="spin"></span></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main-area -->
+</div><!-- /appScreen -->
 
 <!-- MODAL: Ministério -->
-<div class="modal-backdrop" id="modal-ministerio">
+<div class="backdrop" id="m-min">
   <div class="modal">
-    <div class="modal-head"><span class="icon">♫</span><h2 id="t-min">Novo Ministério</h2></div>
+    <div class="modal-head"><span>♫</span><h2 id="t-min">Novo Ministério</h2></div>
     <input type="hidden" id="min-id"/>
     <div class="field"><label>Nome *</label><input type="text" id="min-nome" placeholder="ex: Vida Nova"/></div>
     <div class="field"><label>Responsável</label><input type="text" id="min-resp" placeholder="Nome do líder"/></div>
     <div class="field"><label>Observações</label><input type="text" id="min-obs" placeholder="Opcional"/></div>
     <div id="min-msg"></div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-ministerio')">Cancelar</button>
-      <button class="btn btn-rose" onclick="saveMinisterio()">Salvar</button>
+      <button class="btn btn-ghost" onclick="closeM('m-min')">Cancelar</button>
+      <button class="btn btn-rose" onclick="saveMin()">Salvar</button>
     </div>
   </div>
 </div>
 
 <!-- MODAL: Músico -->
-<div class="modal-backdrop" id="modal-musico">
+<div class="backdrop" id="m-mus">
   <div class="modal">
-    <div class="modal-head"><span class="icon">♪</span><h2 id="t-mus">Novo Músico</h2></div>
+    <div class="modal-head"><span>♪</span><h2 id="t-mus">Novo Músico</h2></div>
     <input type="hidden" id="mus-id"/>
-    <div class="field"><label>Nome completo *</label><input type="text" id="mus-nome" placeholder="Nome"/></div>
-    <div class="field"><label>Ministério *</label><select id="mus-ministerio"><option value="">Selecione...</option></select></div>
-    <div class="field"><label>Telefone / WhatsApp</label><input type="text" id="mus-tel" placeholder="(19) 99999-9999"/></div>
+    <div class="field"><label>Nome *</label><input type="text" id="mus-nome" placeholder="Nome completo"/></div>
+    <div class="field"><label>Ministério *</label><select id="mus-min"><option value="">Selecione...</option></select></div>
+    <div class="field"><label>Telefone</label><input type="text" id="mus-tel" placeholder="(19) 99999-9999"/></div>
     <div id="mus-msg"></div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-musico')">Cancelar</button>
-      <button class="btn btn-rose" onclick="saveMusico()">Salvar</button>
+      <button class="btn btn-ghost" onclick="closeM('m-mus')">Cancelar</button>
+      <button class="btn btn-rose" onclick="saveMus()">Salvar</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL: Escala -->
-<div class="modal-backdrop" id="modal-escala">
+<!-- MODAL: Célula da Escala -->
+<div class="backdrop" id="m-cell">
   <div class="modal">
-    <div class="modal-head"><span class="icon">◷</span><h2 id="t-esc">Escalar Ministério</h2></div>
-    <input type="hidden" id="esc-id"/>
+    <div class="modal-head"><span>◷</span><h2 id="t-cell">Escalar Ministério</h2></div>
+    <input type="hidden" id="cell-slot-id"/>
 
     <div class="grid-2">
-      <div class="field"><label>Data *</label><input type="date" id="esc-data"/></div>
-      <div class="field">
-        <label>Tipo de dia</label>
-        <select id="esc-tipo">
-          <option>Dia de Semana</option><option>Sábado</option>
-          <option>Domingo</option><option>Festa / Evento especial</option>
-        </select>
-      </div>
+      <div class="field"><label>Data</label><input type="text" id="cell-data" readonly style="background:var(--surface2);cursor:default;"/></div>
+      <div class="field"><label>Horário</label><input type="text" id="cell-hor" readonly style="background:var(--surface2);cursor:default;"/></div>
     </div>
 
     <div class="field">
-      <label>Horário da missa *</label>
-      <select id="esc-horario" onchange="toggleCustomHor()">
+      <label>Ministério</label>
+      <select id="cell-min" onchange="loadCellChips()"><option value="">— Sem ministério —</option></select>
+    </div>
+
+    <div class="field">
+      <label>Músicos <small style="color:var(--muted2);font-weight:400;text-transform:none;letter-spacing:0">(clique para marcar)</small></label>
+      <div class="chips" id="cell-chips"><span style="font-size:12px;color:var(--muted2)">Selecione um ministério</span></div>
+    </div>
+
+    <div class="field"><label>Observações</label><input type="text" id="cell-obs" placeholder="Pe. fulano, evento especial..."/></div>
+
+    <div id="cell-msg"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeM('m-cell')">Cancelar</button>
+      <button class="btn btn-danger btn-sm" id="cell-clear-btn" onclick="clearCell()">Limpar</button>
+      <button class="btn btn-rose" onclick="saveCell()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Adicionar slot -->
+<div class="backdrop" id="m-slot">
+  <div class="modal">
+    <div class="modal-head"><span>＋</span><h2>Novo Horário</h2></div>
+    <div class="grid-2">
+      <div class="field"><label>Data *</label><input type="date" id="slot-data"/></div>
+      <div class="field">
+        <label>Tipo de dia</label>
+        <select id="slot-tipo">
+          <option>Dia de Semana</option><option>Sábado</option>
+          <option>Domingo</option><option>Festa / Evento</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Horário *</label>
+      <select id="slot-hor" onchange="toggleSlotCustom()">
         <option>07h</option><option>07:30h</option><option>08:30h</option>
         <option>10h</option><option>12h</option><option>14h</option>
         <option>15h</option><option>15:30h</option><option>17h</option>
@@ -357,33 +499,14 @@
         <option value="outro">⊕ Outro horário...</option>
       </select>
     </div>
-
-    <div class="field custom-hor" id="custom-hor-wrap">
+    <div class="field custom-hor" id="slot-custom-wrap">
       <label>Horário personalizado</label>
-      <input type="text" id="esc-hor-custom" placeholder="ex: 20h, 09:15h"/>
+      <input type="text" id="slot-hor-custom" placeholder="ex: 20h"/>
     </div>
-
-    <div class="field">
-      <label>Ministério *</label>
-      <select id="esc-ministerio" onchange="loadChips()"><option value="">Selecione o ministério...</option></select>
-    </div>
-
-    <div class="field">
-      <label>Músicos escalados <small style="color:var(--text3);font-weight:400;font-size:10px;text-transform:none;letter-spacing:0">(clique para marcar)</small></label>
-      <div class="chips-box" id="esc-chips">
-        <span style="font-size:12px;color:var(--text3)">Selecione um ministério primeiro</span>
-      </div>
-    </div>
-
-    <div class="field">
-      <label>Observações</label>
-      <input type="text" id="esc-obs" placeholder="Pe. fulano, evento especial..."/>
-    </div>
-
-    <div id="esc-msg"></div>
+    <div id="slot-msg"></div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-escala')">Cancelar</button>
-      <button class="btn btn-rose" onclick="saveEscala()">Salvar escala</button>
+      <button class="btn btn-ghost" onclick="closeM('m-slot')">Cancelar</button>
+      <button class="btn btn-rose" onclick="saveSlot()">Criar horário</button>
     </div>
   </div>
 </div>
@@ -394,11 +517,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
-  getFirestore, collection, doc, addDoc, updateDoc, deleteDoc,
-  getDocs, query, orderBy, where, Timestamp
+  getFirestore, collection, doc, addDoc, setDoc, updateDoc, deleteDoc,
+  getDocs, getDoc, query, orderBy, where, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const fbApp = initializeApp({
+const fb = initializeApp({
   apiKey: "AIzaSyCkLu7SEJ76-SrmEYBCFewG6YQCnOW1z7k",
   authDomain: "escala-santa-rita.firebaseapp.com",
   projectId: "escala-santa-rita",
@@ -406,20 +529,20 @@ const fbApp = initializeApp({
   messagingSenderId: "931972149605",
   appId: "1:931972149605:web:fa716dff0bf0a8abde318c"
 });
-const auth = getAuth(fbApp);
-const db   = getFirestore(fbApp);
+const auth = getAuth(fb);
+const db   = getFirestore(fb);
 
-let ministerios = [], musicos = [], musicosSel = [];
-
-const HORARIOS_PADRAO = ['07h','07:30h','08:30h','10h','12h','14h','15h','15:30h','17h','17:30h','18:30h','19:30h'];
+/* ── STATE ── */
+let ministerios = [], musicos = [], slots = [], selectedMusicosCell = [];
 const MONTHS = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 const WKDAYS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const HOR_PADRAO = ['07h','07:30h','08:30h','10h','12h','14h','15h','15:30h','17h','17:30h','18:30h','19:30h'];
 
-// ── AUTH ─────────────────────────────────────────────
+/* ── AUTH ── */
 window.doLogin = async () => {
   const em = document.getElementById('login-email').value.trim();
-  const pw = document.getElementById('login-password').value;
-  const er = document.getElementById('login-error');
+  const pw = document.getElementById('login-pass').value;
+  const er = document.getElementById('login-err');
   er.textContent = '';
   try { await signInWithEmailAndPassword(auth, em, pw); }
   catch { er.textContent = 'E-mail ou senha incorretos.'; }
@@ -428,18 +551,20 @@ window.doLogout = () => signOut(auth);
 
 onAuthStateChanged(auth, user => {
   if (user) {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    document.getElementById('user-email-display').textContent = user.email;
-    document.getElementById('user-initial').textContent = user.email[0].toUpperCase();
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appScreen').classList.add('visible');
+    document.getElementById('sb-user').textContent = user.email;
+    const now = new Date();
+    document.getElementById('dash-greeting').textContent = 'Olá! 👋';
+    document.getElementById('dash-date').textContent = now.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
     initApp();
   } else {
-    document.getElementById('login-screen').style.display = 'flex';
-    document.getElementById('app').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('appScreen').classList.remove('visible');
   }
 });
 
-// ── NAV ──────────────────────────────────────────────
+/* ── NAV ── */
 document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
   btn.addEventListener('click', () => {
     const p = btn.dataset.page;
@@ -447,65 +572,73 @@ document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
     document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
     document.getElementById('page-'+p).classList.add('active');
     btn.classList.add('active');
-    if (p==='ministerios') loadMinisterios();
-    if (p==='musicos')     loadMusicos();
-    if (p==='escala')      { populateEscalaFilters(); loadEscala(); }
+    document.getElementById('topbar-title').textContent = btn.textContent.trim();
+    if (p==='ministerios') renderMin();
+    if (p==='musicos')     renderMus();
+    if (p==='escala')      { populateEscalaFilters(); renderEscala(); }
+    closeSidebar();
   });
 });
 
-// ── INIT ─────────────────────────────────────────────
+/* ── SIDEBAR MOBILE ── */
+window.toggleSidebar = () => {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sb-overlay').classList.toggle('open');
+};
+window.closeSidebar = () => {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sb-overlay').classList.remove('open');
+};
+
+/* ── INIT ── */
 async function initApp() {
-  await Promise.all([fetchMin(), fetchMus()]);
+  await Promise.all([fetchMin(), fetchMus(), fetchSlots()]);
   loadDashboard();
+  populateMesSel();
 }
-async function fetchMin() {
-  const s = await getDocs(query(collection(db,'ministerios'), orderBy('nome')));
-  ministerios = s.docs.map(d=>({id:d.id,...d.data()}));
-}
-async function fetchMus() {
-  const s = await getDocs(query(collection(db,'musicos'), orderBy('nome')));
-  musicos = s.docs.map(d=>({id:d.id,...d.data()}));
-}
+async function fetchMin()   { const s=await getDocs(query(collection(db,'ministerios'),orderBy('nome'))); ministerios=s.docs.map(d=>({id:d.id,...d.data()})); }
+async function fetchMus()   { const s=await getDocs(query(collection(db,'musicos'),orderBy('nome')));     musicos=s.docs.map(d=>({id:d.id,...d.data()})); }
+async function fetchSlots() { const s=await getDocs(query(collection(db,'escala'),orderBy('data')));      slots=s.docs.map(d=>({id:d.id,...d.data()})); }
 
-// ── DASHBOARD ────────────────────────────────────────
+/* ── DASHBOARD ── */
 async function loadDashboard() {
-  document.getElementById('stat-min').textContent = ministerios.length;
-  document.getElementById('stat-mus').textContent = musicos.length;
-  const now = new Date();
-  const s   = Timestamp.fromDate(new Date(now.getFullYear(),now.getMonth(),1));
-  const e   = Timestamp.fromDate(new Date(now.getFullYear(),now.getMonth()+1,0,23,59,59));
-  const sm  = await getDocs(query(collection(db,'escala'),where('data','>=',s),where('data','<=',e)));
-  document.getElementById('stat-esc').textContent = sm.docs.length;
+  document.getElementById('st-min').textContent = ministerios.length;
+  document.getElementById('st-mus').textContent = musicos.length;
+  const now=new Date();
+  const s=Timestamp.fromDate(new Date(now.getFullYear(),now.getMonth(),1));
+  const e=Timestamp.fromDate(new Date(now.getFullYear(),now.getMonth()+1,0,23,59,59));
+  const sm=await getDocs(query(collection(db,'escala'),where('data','>=',s),where('data','<=',e)));
+  document.getElementById('st-esc').textContent=sm.docs.length;
 
-  const today = Timestamp.fromDate(new Date());
-  const sp    = await getDocs(query(collection(db,'escala'),where('data','>=',today),orderBy('data')));
-  const items = sp.docs.slice(0,10).map(d=>d.data());
-  const cont  = document.getElementById('proximas-list');
-  if (!items.length) { cont.innerHTML='<div class="empty-state"><span class="icon">◷</span>Nenhuma escala futura.</div>'; return; }
-  cont.innerHTML = items.map(e=>{
+  const today=Timestamp.fromDate(new Date());
+  const sp=await getDocs(query(collection(db,'escala'),where('data','>=',today),orderBy('data')));
+  const items=sp.docs.slice(0,10).map(d=>d.data());
+  const el=document.getElementById('dash-proximas');
+  if(!items.length){el.innerHTML='<div class="empty"><span class="empty-icon">◷</span>Nenhuma escala futura cadastrada.</div>';return;}
+  el.innerHTML=items.map(e=>{
     const d=e.data.toDate();
-    return `<div style="display:flex;align-items:center;gap:16px;padding:14px 24px;border-bottom:1px solid var(--border)">
-      <div style="text-align:center;min-width:44px">
-        <div style="font-family:'Playfair Display',serif;font-size:22px;color:var(--rose);line-height:1">${String(d.getDate()).padStart(2,'0')}</div>
-        <div style="font-size:10px;color:var(--text2);text-transform:uppercase">${MONTHS[d.getMonth()]}</div>
+    return `<div style="display:flex;align-items:center;gap:16px;padding:13px 22px;border-bottom:1px solid var(--border)">
+      <div style="text-align:center;min-width:42px">
+        <div style="font-size:22px;font-weight:700;color:var(--rose);line-height:1">${String(d.getDate()).padStart(2,'0')}</div>
+        <div style="font-size:10px;color:var(--muted2);text-transform:uppercase">${MONTHS[d.getMonth()]}</div>
       </div>
-      <div style="min-width:56px;font-size:11px;color:var(--text2)">${WKDAYS[d.getDay()]} · ${e.horario}</div>
-      <div style="flex:1;font-size:13px;font-weight:500">${e.ministerioNome}</div>
-      <div style="font-size:12px;color:var(--text2)">${(e.musicosNomes||[]).join(', ')||'—'}</div>
+      <div style="min-width:56px;font-size:11px;color:var(--muted)">${WKDAYS[d.getDay()]} · ${e.horario}</div>
+      <div style="flex:1;font-size:13px;font-weight:600">${e.ministerioNome||'—'}</div>
+      <div style="font-size:12px;color:var(--muted)">${(e.musicosNomes||[]).join(', ')||'—'}</div>
     </div>`;
   }).join('');
 }
 
-// ── MINISTÉRIOS ──────────────────────────────────────
-window.loadMinisterios = async () => {
-  await Promise.all([fetchMin(), fetchMus()]);
-  const tb = document.getElementById('tb-ministerios');
-  if (!ministerios.length) { tb.innerHTML='<tr><td colspan="4"><div class="empty-state"><span class="icon">♫</span>Nenhum ministério.</div></td></tr>'; return; }
-  tb.innerHTML = ministerios.map(m=>{
+/* ── MINISTÉRIOS ── */
+window.renderMin = async () => {
+  await fetchMin(); await fetchMus();
+  const tb=document.getElementById('tb-min');
+  if(!ministerios.length){tb.innerHTML='<tr><td colspan="4"><div class="empty"><span class="empty-icon">♫</span>Nenhum ministério.</div></td></tr>';return;}
+  tb.innerHTML=ministerios.map(m=>{
     const n=musicos.filter(mu=>mu.ministerioId===m.id).length;
     return `<tr>
       <td><strong>${m.nome}</strong></td>
-      <td style="color:var(--text2)">${m.responsavel||'—'}</td>
+      <td style="color:var(--muted)">${m.responsavel||'—'}</td>
       <td><span class="badge">${n} músico${n!==1?'s':''}</span></td>
       <td style="text-align:right">
         <button class="btn btn-ghost btn-sm" onclick="editMin('${m.id}')">Editar</button>
@@ -514,54 +647,54 @@ window.loadMinisterios = async () => {
     </tr>`;
   }).join('');
 };
-window.openModalMin = () => { clearMin(); document.getElementById('modal-ministerio').classList.add('open'); };
+window.openMin = () => { clearMinForm(); document.getElementById('m-min').classList.add('open'); };
 window.editMin = id => {
-  const m=ministerios.find(x=>x.id===id); clearMin();
+  const m=ministerios.find(x=>x.id===id); clearMinForm();
   document.getElementById('min-id').value=m.id;
   document.getElementById('min-nome').value=m.nome;
   document.getElementById('min-resp').value=m.responsavel||'';
   document.getElementById('min-obs').value=m.observacoes||'';
   document.getElementById('t-min').textContent='Editar Ministério';
-  document.getElementById('modal-ministerio').classList.add('open');
+  document.getElementById('m-min').classList.add('open');
 };
 window.delMin = async id => {
   if(!confirm('Excluir este ministério?')) return;
   await deleteDoc(doc(db,'ministerios',id));
-  await fetchMin(); loadMinisterios();
+  await fetchMin(); renderMin();
 };
-window.saveMinisterio = async () => {
+window.saveMin = async () => {
   const id=document.getElementById('min-id').value;
   const nome=document.getElementById('min-nome').value.trim();
   const resp=document.getElementById('min-resp').value.trim();
   const obs=document.getElementById('min-obs').value.trim();
   const msg=document.getElementById('min-msg');
-  if(!nome){showMsg(msg,'error','Informe o nome.');return;}
+  if(!nome){showMsg(msg,'err','Informe o nome.');return;}
   try {
     const d={nome,responsavel:resp,observacoes:obs};
     if(id) await updateDoc(doc(db,'ministerios',id),d);
     else   await addDoc(collection(db,'ministerios'),d);
-    showMsg(msg,'success','Salvo!');
-    await fetchMin(); await fetchMus(); loadMinisterios();
-    setTimeout(()=>closeModal('modal-ministerio'),700);
-  } catch(e){showMsg(msg,'error','Erro: '+e.message);}
+    showMsg(msg,'ok','Salvo!');
+    await fetchMin(); await fetchMus(); renderMin();
+    setTimeout(()=>closeM('m-min'),700);
+  } catch(e){showMsg(msg,'err','Erro: '+e.message);}
 };
-function clearMin() {
+function clearMinForm() {
   ['min-id','min-nome','min-resp','min-obs'].forEach(i=>document.getElementById(i).value='');
   document.getElementById('min-msg').innerHTML='';
   document.getElementById('t-min').textContent='Novo Ministério';
 }
 
-// ── MÚSICOS ──────────────────────────────────────────
-window.loadMusicos = async () => {
+/* ── MÚSICOS ── */
+window.renderMus = async () => {
   await fetchMus();
-  const tb=document.getElementById('tb-musicos');
-  if(!musicos.length){tb.innerHTML='<tr><td colspan="4"><div class="empty-state"><span class="icon">♪</span>Nenhum músico.</div></td></tr>';return;}
+  const tb=document.getElementById('tb-mus');
+  if(!musicos.length){tb.innerHTML='<tr><td colspan="4"><div class="empty"><span class="empty-icon">♪</span>Nenhum músico.</div></td></tr>';return;}
   tb.innerHTML=musicos.map(m=>{
     const min=ministerios.find(x=>x.id===m.ministerioId);
     return `<tr>
       <td><strong>${m.nome}</strong></td>
       <td>${min?`<span class="badge">${min.nome}</span>`:'—'}</td>
-      <td style="color:var(--text2)">${m.telefone||'—'}</td>
+      <td style="color:var(--muted)">${m.telefone||'—'}</td>
       <td style="text-align:right">
         <button class="btn btn-ghost btn-sm" onclick="editMus('${m.id}')">Editar</button>
         <button class="btn btn-danger btn-sm" onclick="delMus('${m.id}')">Excluir</button>
@@ -569,192 +702,248 @@ window.loadMusicos = async () => {
     </tr>`;
   }).join('');
 };
-window.openModalMus = () => { clearMus(); fillSel('mus-ministerio'); document.getElementById('modal-musico').classList.add('open'); };
+window.openMus = () => { clearMusForm(); fillSel('mus-min'); document.getElementById('m-mus').classList.add('open'); };
 window.editMus = id => {
-  const m=musicos.find(x=>x.id===id); clearMus(); fillSel('mus-ministerio');
+  const m=musicos.find(x=>x.id===id); clearMusForm(); fillSel('mus-min');
   document.getElementById('mus-id').value=m.id;
   document.getElementById('mus-nome').value=m.nome;
-  document.getElementById('mus-ministerio').value=m.ministerioId||'';
+  document.getElementById('mus-min').value=m.ministerioId||'';
   document.getElementById('mus-tel').value=m.telefone||'';
   document.getElementById('t-mus').textContent='Editar Músico';
-  document.getElementById('modal-musico').classList.add('open');
+  document.getElementById('m-mus').classList.add('open');
 };
 window.delMus = async id => {
-  if(!confirm('Excluir este músico?')) return;
+  if(!confirm('Excluir?')) return;
   await deleteDoc(doc(db,'musicos',id));
-  await fetchMus(); loadMusicos();
+  await fetchMus(); renderMus();
 };
-window.saveMusico = async () => {
+window.saveMus = async () => {
   const id=document.getElementById('mus-id').value;
   const nome=document.getElementById('mus-nome').value.trim();
-  const minId=document.getElementById('mus-ministerio').value;
+  const minId=document.getElementById('mus-min').value;
   const tel=document.getElementById('mus-tel').value.trim();
   const msg=document.getElementById('mus-msg');
-  if(!nome){showMsg(msg,'error','Informe o nome.');return;}
-  if(!minId){showMsg(msg,'error','Selecione o ministério.');return;}
+  if(!nome){showMsg(msg,'err','Informe o nome.');return;}
+  if(!minId){showMsg(msg,'err','Selecione o ministério.');return;}
   const minNome=ministerios.find(x=>x.id===minId)?.nome||'';
   try {
     const d={nome,ministerioId:minId,ministerioNome:minNome,telefone:tel};
     if(id) await updateDoc(doc(db,'musicos',id),d);
     else   await addDoc(collection(db,'musicos'),d);
-    showMsg(msg,'success','Salvo!');
-    await fetchMus(); loadMusicos();
-    setTimeout(()=>closeModal('modal-musico'),700);
-  } catch(e){showMsg(msg,'error','Erro: '+e.message);}
+    showMsg(msg,'ok','Salvo!');
+    await fetchMus(); renderMus();
+    setTimeout(()=>closeM('m-mus'),700);
+  } catch(e){showMsg(msg,'err','Erro: '+e.message);}
 };
-function clearMus() {
+function clearMusForm() {
   ['mus-id','mus-nome','mus-tel'].forEach(i=>document.getElementById(i).value='');
-  document.getElementById('mus-ministerio').value='';
+  document.getElementById('mus-min').value='';
   document.getElementById('mus-msg').innerHTML='';
   document.getElementById('t-mus').textContent='Novo Músico';
 }
 
-// ── ESCALA ───────────────────────────────────────────
-function populateEscalaFilters() {
-  fillSel('filtro-min-escala', true);
-  const sel=document.getElementById('filtro-mes');
+/* ── ESCALA ── */
+function populateMesSel() {
+  const sel=document.getElementById('sel-mes');
   const now=new Date();
-  sel.innerHTML='<option value="">Todos os meses</option>';
-  for(let i=-1;i<=5;i++){
+  sel.innerHTML='';
+  for(let i=-1;i<=11;i++){
     const d=new Date(now.getFullYear(),now.getMonth()+i,1);
     const val=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
     const lbl=d.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
-    sel.innerHTML+=`<option value="${val}"${i===0?' selected':''}>${lbl.charAt(0).toUpperCase()+lbl.slice(1)}</option>`;
+    const sel2=i===0?' selected':'';
+    sel.innerHTML+=`<option value="${val}"${sel2}>${lbl.charAt(0).toUpperCase()+lbl.slice(1)}</option>`;
   }
 }
-window.openModalEsc = () => { clearEsc(); fillSel('esc-ministerio'); document.getElementById('modal-escala').classList.add('open'); };
-window.toggleCustomHor = () => {
-  document.getElementById('custom-hor-wrap').classList.toggle('show', document.getElementById('esc-horario').value==='outro');
+function populateEscalaFilters() {
+  fillSel('sel-min-fil', true);
+  fillSel('cell-min', false, true);
+}
+
+window.renderEscala = async () => {
+  await fetchSlots();
+  const mes=document.getElementById('sel-mes').value;
+  const minFil=document.getElementById('sel-min-fil').value;
+  const tbody=document.getElementById('escala-body');
+
+  let items=slots;
+
+  // filtrar pelo mês selecionado
+  if(mes){
+    const [y,mo]=mes.split('-').map(Number);
+    items=items.filter(s=>{
+      const d=s.data.toDate();
+      return d.getFullYear()===y && d.getMonth()===mo-1;
+    });
+  }
+  if(minFil) items=items.filter(s=>s.ministerioId===minFil);
+
+  // ordenar por data+horário
+  items.sort((a,b)=>a.data.toDate()-b.data.toDate());
+
+  if(!items.length){
+    // Mostrar botão para adicionar slot quando não há nenhum
+    tbody.innerHTML=`<tr><td colspan="7">
+      <div class="empty">
+        <span class="empty-icon">◷</span>
+        Nenhum horário para este período.
+        <br><br>
+        <button class="btn btn-rose btn-sm" onclick="openSlot()">+ Adicionar horário</button>
+      </div>
+    </td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML=items.map(s=>{
+    const d=s.data.toDate();
+    const dateStr=`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
+    const wkd=WKDAYS[d.getDay()];
+    const hasMin=!!s.ministerioId;
+    const minLabel=hasMin
+      ? `<span class="min-cell" onclick="openCell('${s.id}')">${s.ministerioNome}</span>`
+      : `<span class="min-cell vazio" onclick="openCell('${s.id}')">+ Escalar</span>`;
+    const musLabel=(s.musicosNomes||[]).join(', ')||'';
+    return `<tr>
+      <td>${s.horario}</td>
+      <td><span style="font-size:11px;color:var(--muted)">${s.tipo||'—'}</span></td>
+      <td class="col-data"><span class="col-wkd">${wkd}</span> ${dateStr}</td>
+      <td>${minLabel}</td>
+      <td class="col-mus">${musLabel||'—'}</td>
+      <td class="col-obs">${s.observacoes||''}</td>
+      <td style="text-align:right;white-space:nowrap">
+        <button class="btn btn-danger btn-sm" onclick="delSlot('${s.id}')">✕</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  // Linha de "adicionar novo" no fim
+  tbody.innerHTML+=`<tr><td colspan="7" style="padding:12px 14px">
+    <button class="btn btn-ghost btn-sm" onclick="openSlot()">+ Adicionar horário</button>
+  </td></tr>`;
 };
-window.loadChips = () => { musicosSel=[]; renderChips(); };
-function renderChips() {
-  const minId=document.getElementById('esc-ministerio').value;
-  const box=document.getElementById('esc-chips');
+
+/* ── CÉLULA: abrir/editar ministério de um slot ── */
+window.openCell = async id => {
+  const slot=slots.find(s=>s.id===id);
+  if(!slot) return;
+  const d=slot.data.toDate();
+  document.getElementById('cell-slot-id').value=id;
+  document.getElementById('cell-data').value=`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+  document.getElementById('cell-hor').value=slot.horario;
+  document.getElementById('cell-obs').value=slot.observacoes||'';
+  fillSel('cell-min', false, true);
+  document.getElementById('cell-min').value=slot.ministerioId||'';
+  selectedMusicosCell=slot.musicosIds||[];
+  document.getElementById('cell-msg').innerHTML='';
+  loadCellChips();
+  document.getElementById('m-cell').classList.add('open');
+};
+window.loadCellChips = () => {
+  const minId=document.getElementById('cell-min').value;
+  const box=document.getElementById('cell-chips');
   const lista=musicos.filter(m=>m.ministerioId===minId);
-  if(!lista.length){box.innerHTML='<span style="font-size:12px;color:var(--text3)">Nenhum músico neste ministério</span>';return;}
-  box.innerHTML=lista.map(m=>`<button class="chip ${musicosSel.includes(m.id)?'on':''}" onclick="toggleChip('${m.id}')">${m.nome}</button>`).join('');
-}
-window.toggleChip = id => {
-  musicosSel=musicosSel.includes(id)?musicosSel.filter(x=>x!==id):[...musicosSel,id];
-  renderChips();
-};
-window.saveEscala = async () => {
-  const id=document.getElementById('esc-id').value;
-  const data=document.getElementById('esc-data').value;
-  const tipo=document.getElementById('esc-tipo').value;
-  const minId=document.getElementById('esc-ministerio').value;
-  const obs=document.getElementById('esc-obs').value.trim();
-  const msg=document.getElementById('esc-msg');
-  let hor=document.getElementById('esc-horario').value;
-  if(hor==='outro'){
-    hor=document.getElementById('esc-hor-custom').value.trim();
-    if(!hor){showMsg(msg,'error','Informe o horário.');return;}
+  if(!minId||!lista.length){
+    box.innerHTML='<span style="font-size:12px;color:var(--muted2)">Selecione um ministério</span>';
+    if(!minId) selectedMusicosCell=[];
+    return;
   }
-  if(!data){showMsg(msg,'error','Informe a data.');return;}
-  if(!minId){showMsg(msg,'error','Selecione o ministério.');return;}
+  box.innerHTML=lista.map(m=>`<button class="chip ${selectedMusicosCell.includes(m.id)?'on':''}" onclick="toggleChip('${m.id}')">${m.nome}</button>`).join('');
+};
+window.toggleChip = id => {
+  selectedMusicosCell=selectedMusicosCell.includes(id)
+    ? selectedMusicosCell.filter(x=>x!==id)
+    : [...selectedMusicosCell,id];
+  loadCellChips();
+};
+window.saveCell = async () => {
+  const slotId=document.getElementById('cell-slot-id').value;
+  const minId=document.getElementById('cell-min').value;
+  const obs=document.getElementById('cell-obs').value.trim();
+  const msg=document.getElementById('cell-msg');
   const minNome=ministerios.find(x=>x.id===minId)?.nome||'';
-  const musicosNomes=musicosSel.map(mid=>musicos.find(m=>m.id===mid)?.nome||'').filter(Boolean);
+  const musicosNomes=selectedMusicosCell.map(mid=>musicos.find(m=>m.id===mid)?.nome||'').filter(Boolean);
+  try {
+    await updateDoc(doc(db,'escala',slotId),{
+      ministerioId:minId||null,
+      ministerioNome:minNome,
+      musicosIds:selectedMusicosCell,
+      musicosNomes,
+      observacoes:obs
+    });
+    showMsg(msg,'ok','Salvo!');
+    await fetchSlots(); renderEscala();
+    setTimeout(()=>closeM('m-cell'),700);
+  } catch(e){showMsg(msg,'err','Erro: '+e.message);}
+};
+window.clearCell = async () => {
+  const slotId=document.getElementById('cell-slot-id').value;
+  const msg=document.getElementById('cell-msg');
+  if(!confirm('Limpar este ministério da escala?')) return;
+  try {
+    await updateDoc(doc(db,'escala',slotId),{
+      ministerioId:null,ministerioNome:'',musicosIds:[],musicosNomes:[],observacoes:''
+    });
+    showMsg(msg,'ok','Limpo!');
+    await fetchSlots(); renderEscala();
+    setTimeout(()=>closeM('m-cell'),600);
+  } catch(e){showMsg(msg,'err','Erro: '+e.message);}
+};
+
+/* ── SLOT: criar novo horário ── */
+window.openSlot = () => {
+  ['slot-data','slot-hor-custom'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('slot-hor').value='19:30h';
+  document.getElementById('slot-tipo').value='Dia de Semana';
+  document.getElementById('slot-custom-wrap').classList.remove('show');
+  document.getElementById('slot-msg').innerHTML='';
+  document.getElementById('m-slot').classList.add('open');
+};
+window.toggleSlotCustom = () => {
+  document.getElementById('slot-custom-wrap').classList.toggle('show', document.getElementById('slot-hor').value==='outro');
+};
+window.saveSlot = async () => {
+  const data=document.getElementById('slot-data').value;
+  const tipo=document.getElementById('slot-tipo').value;
+  let hor=document.getElementById('slot-hor').value;
+  const msg=document.getElementById('slot-msg');
+  if(hor==='outro'){
+    hor=document.getElementById('slot-hor-custom').value.trim();
+    if(!hor){showMsg(msg,'err','Informe o horário.');return;}
+  }
+  if(!data){showMsg(msg,'err','Informe a data.');return;}
   const [y,mo,d2]=data.split('-').map(Number);
   const ts=Timestamp.fromDate(new Date(y,mo-1,d2));
   try {
-    const payload={data:ts,horario:hor,tipo,ministerioId:minId,ministerioNome:minNome,musicosIds:musicosSel,musicosNomes,observacoes:obs};
-    if(id) await updateDoc(doc(db,'escala',id),payload);
-    else   await addDoc(collection(db,'escala'),payload);
-    showMsg(msg,'success','Escala salva!');
-    loadEscala();
-    setTimeout(()=>closeModal('modal-escala'),700);
-  } catch(e){showMsg(msg,'error','Erro: '+e.message);}
+    await addDoc(collection(db,'escala'),{
+      data:ts, horario:hor, tipo,
+      ministerioId:null, ministerioNome:'', musicosIds:[], musicosNomes:[], observacoes:''
+    });
+    showMsg(msg,'ok','Horário criado!');
+    await fetchSlots(); renderEscala();
+    setTimeout(()=>closeM('m-slot'),700);
+  } catch(e){showMsg(msg,'err','Erro: '+e.message);}
 };
-window.loadEscala = async () => {
-  const mes=document.getElementById('filtro-mes')?.value;
-  const minFil=document.getElementById('filtro-min-escala')?.value;
-  const list=document.getElementById('escala-list');
-  list.innerHTML='<div class="empty-state"><span class="spinner"></span></div>';
-  let q;
-  if(mes){
-    const [y,mo]=mes.split('-').map(Number);
-    q=query(collection(db,'escala'),where('data','>=',Timestamp.fromDate(new Date(y,mo-1,1))),where('data','<=',Timestamp.fromDate(new Date(y,mo,0,23,59,59))),orderBy('data'));
-  } else {
-    q=query(collection(db,'escala'),orderBy('data'));
-  }
-  const snap=await getDocs(q);
-  let items=snap.docs.map(d=>({id:d.id,...d.data()}));
-  if(minFil) items=items.filter(e=>e.ministerioId===minFil);
-  if(!items.length){list.innerHTML='<div class="empty-state"><span class="icon">◷</span>Nenhuma escala encontrada.</div>';return;}
-  list.innerHTML=items.map(e=>{
-    const d=e.data.toDate();
-    const nomes=(e.musicosNomes||[]).join(', ')||'Nenhum músico';
-    return `<div class="escala-card">
-      <div class="esc-date"><div class="day">${String(d.getDate()).padStart(2,'0')}</div><div class="month">${MONTHS[d.getMonth()]}</div></div>
-      <div class="esc-divider"></div>
-      <div class="esc-info">
-        <div class="esc-meta"><span class="wkd-tag">${WKDAYS[d.getDay()]}</span><span>${e.horario}</span><span style="color:var(--text3)">·</span><span>${e.tipo}</span></div>
-        <div class="esc-min">${e.ministerioNome}</div>
-        <div class="esc-mus">${nomes}</div>
-        ${e.observacoes?`<div class="esc-obs">📝 ${e.observacoes}</div>`:''}
-      </div>
-      <div style="display:flex;gap:6px;flex-shrink:0">
-        <button class="btn btn-ghost btn-sm" onclick="editEsc('${e.id}')">Editar</button>
-        <button class="btn btn-danger btn-sm" onclick="delEsc('${e.id}')">Excluir</button>
-      </div>
-    </div>`;
-  }).join('');
-};
-window.editEsc = async id => {
-  const all=await getDocs(query(collection(db,'escala'),orderBy('data')));
-  const item=all.docs.find(d=>d.id===id)?.data();
-  if(!item) return;
-  clearEsc(); fillSel('esc-ministerio');
-  document.getElementById('esc-id').value=id;
-  const d=item.data.toDate();
-  document.getElementById('esc-data').value=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-  document.getElementById('esc-tipo').value=item.tipo||'Dia de Semana';
-  document.getElementById('esc-obs').value=item.observacoes||'';
-  if(HORARIOS_PADRAO.includes(item.horario)){
-    document.getElementById('esc-horario').value=item.horario;
-  } else {
-    document.getElementById('esc-horario').value='outro';
-    document.getElementById('esc-hor-custom').value=item.horario;
-    document.getElementById('custom-hor-wrap').classList.add('show');
-  }
-  document.getElementById('esc-ministerio').value=item.ministerioId||'';
-  musicosSel=item.musicosIds||[];
-  renderChips();
-  document.getElementById('t-esc').textContent='Editar Escala';
-  document.getElementById('modal-escala').classList.add('open');
-};
-window.delEsc = async id => {
-  if(!confirm('Excluir esta escala?')) return;
+window.delSlot = async id => {
+  if(!confirm('Excluir este horário da escala?')) return;
   await deleteDoc(doc(db,'escala',id));
-  loadEscala();
+  await fetchSlots(); renderEscala();
 };
-function clearEsc() {
-  ['esc-id','esc-data','esc-obs','esc-hor-custom'].forEach(i=>document.getElementById(i).value='');
-  document.getElementById('esc-ministerio').value='';
-  document.getElementById('esc-horario').value='19:30h';
-  document.getElementById('esc-tipo').value='Dia de Semana';
-  document.getElementById('custom-hor-wrap').classList.remove('show');
-  musicosSel=[];
-  document.getElementById('esc-chips').innerHTML='<span style="font-size:12px;color:var(--text3)">Selecione um ministério primeiro</span>';
-  document.getElementById('esc-msg').innerHTML='';
-  document.getElementById('t-esc').textContent='Escalar Ministério';
-}
 
-// ── HELPERS ──────────────────────────────────────────
-function fillSel(id, addAll=false) {
+/* ── HELPERS ── */
+function fillSel(id, addAll=false, addEmpty=false) {
   const sel=document.getElementById(id);
-  sel.innerHTML=(addAll?'<option value="">Todos os ministérios</option>':'<option value="">Selecione...</option>')+
-    ministerios.map(m=>`<option value="${m.id}">${m.nome}</option>`).join('');
+  let html='';
+  if(addAll)   html='<option value="">Todos os ministérios</option>';
+  if(addEmpty) html='<option value="">— Sem ministério —</option>';
+  sel.innerHTML=html+ministerios.map(m=>`<option value="${m.id}">${m.nome}</option>`).join('');
 }
-window.closeModal = id => document.getElementById(id).classList.remove('open');
+window.closeM = id => document.getElementById(id).classList.remove('open');
 function showMsg(el,type,txt){el.innerHTML=`<div class="msg ${type}">${txt}</div>`;}
 
-document.querySelectorAll('.modal-backdrop').forEach(b=>{
+document.querySelectorAll('.backdrop').forEach(b=>{
   b.addEventListener('click',e=>{if(e.target===b)b.classList.remove('open');});
 });
-document.getElementById('login-password').addEventListener('keydown',e=>{
-  if(e.key==='Enter') doLogin();
-});
+document.getElementById('login-pass').addEventListener('keydown',e=>{if(e.key==='Enter') doLogin();});
 </script>
 </body>
 </html>

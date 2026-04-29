@@ -530,19 +530,32 @@ window.changeMonth = async delta => {
 };
 
 // ── ESCALA ─────────────────────────────────────────────────────────────────
+// ── nth weekday helpers ──────────────────────────────────────────────────
+function nthDow(date) {
+  return { dow: date.getDay(), nth: Math.ceil(date.getDate() / 7) };
+}
+function findDateByNthDow(year, month, dow, nth) {
+  const all = [];
+  const dim = new Date(year, month+1, 0).getDate();
+  for(let d=1; d<=dim; d++){
+    const dt = new Date(year, month, d);
+    if(dt.getDay() === dow) all.push(dt);
+  }
+  return all[nth-1] || null;
+}
+
+// Busca escala do mês e, se vazia, copia do mês de referência (prev)
 async function loadEscala() {
   document.getElementById('esc-mes-lbl').textContent=`${MONTHS[curMonth]} ${curYear}`;
-
-  // Mostra loading
   ['week','sat','sun'].forEach(t=>{
-    document.getElementById('grid-'+t).innerHTML='<div style="grid-column:1/-1;padding:20px;color:var(--muted2);font-size:13px;display:flex;align-items:center;gap:8px"><span class=\'spin\'></span> Carregando...</div>';
+    document.getElementById('grid-'+t).innerHTML=
+      '<div style="grid-column:1/-1;padding:20px;color:var(--muted2);font-size:13px;display:flex;align-items:center;gap:8px"><span class="spin"></span> Carregando...</div>';
   });
 
   await fetchEscalaDoMes(curYear, curMonth);
 
-  // Se mês vazio, copia do mês anterior automaticamente
   if(Object.keys(escalaCache).length === 0) {
-    await copiarMesAnterior();
+    await copiarMesReferencia(curYear, curMonth);
   }
 
   renderGrid('week');
@@ -550,60 +563,47 @@ async function loadEscala() {
   renderGrid('sun');
 }
 
-// ── Gera "posição no mês" = Nth ocorrência daquele dia-da-semana ──────────
-function nthDow(date) {
-  // ex: 4 de maio (segunda) = 1ª segunda => {dow:1, nth:1}
-  const dow = date.getDay();
-  const nth = Math.ceil(date.getDate() / 7);
-  return {dow, nth};
-}
+// Encontra o mês mais recente com dados para usar como referência
+async function copiarMesReferencia(targetYear, targetMonth) {
+  // Tenta até 3 meses para trás
+  for(let i=1; i<=3; i++){
+    let refMonth = targetMonth - i;
+    let refYear  = targetYear;
+    if(refMonth < 0){ refMonth += 12; refYear--; }
 
-function findDateByNthDow(year, month, dow, nth) {
-  // encontra a Nth ocorrência do dia-da-semana dow no mês year/month
-  const result = [];
-  const daysInMonth = new Date(year, month+1, 0).getDate();
-  for(let d=1; d<=daysInMonth; d++){
-    const dt = new Date(year, month, d);
-    if(dt.getDay() === dow) result.push(dt);
+    const start = Timestamp.fromDate(new Date(refYear, refMonth, 1));
+    const end   = Timestamp.fromDate(new Date(refYear, refMonth+1, 0, 23,59,59));
+    const snap  = await getDocs(query(collection(db,'escala'), where('data','>=',start), where('data','<=',end)));
+    if(snap.empty) continue;
+
+    // Monta mapa: {dow}-{nth}-{horario} → campos
+    const refMap = {};
+    snap.docs.forEach(d => {
+      const dat = d.data();
+      const dt  = dat.data.toDate();
+      const {dow, nth} = nthDow(dt);
+      // chave sem underscore no horário para evitar split errado
+      const k = `${dow}|${nth}|${dat.horario}`;
+      refMap[k] = {
+        ministerioId:   dat.ministerioId  || null,
+        ministerioNome: dat.ministerioNome|| '',
+        nomeAvulso:     dat.nomeAvulso    || '',
+      };
+    });
+
+    await escreverMesACopiar(targetYear, targetMonth, refMap);
+    return; // copiou, para aqui
   }
-  return result[nth-1] || null; // nth é 1-based
 }
 
-async function copiarMesAnterior() {
-  let prevMonth = curMonth - 1;
-  let prevYear  = curYear;
-  if(prevMonth < 0){ prevMonth = 11; prevYear--; }
-
-  const start = Timestamp.fromDate(new Date(prevYear, prevMonth, 1));
-  const end   = Timestamp.fromDate(new Date(prevYear, prevMonth+1, 0, 23,59,59));
-  const snap  = await getDocs(query(collection(db,'escala'), where('data','>=',start), where('data','<=',end)));
-
-  if(snap.empty) return;
-
-  // Mapeia: "dow_nth_horario" -> dados do mês anterior
-  const prevMap = {};
-  snap.docs.forEach(d => {
-    const dat = d.data();
-    const dt  = dat.data.toDate();
-    const {dow, nth} = nthDow(dt);
-    const mapKey = `${dow}_${nth}_${dat.horario}`;
-    prevMap[mapKey] = {
-      ministerioId:   dat.ministerioId||null,
-      ministerioNome: dat.ministerioNome||'',
-      nomeAvulso:     dat.nomeAvulso||'',
-    };
-  });
-
-  if(Object.keys(prevMap).length === 0) return;
-
-  // Para cada entrada do mês anterior, encontra o dia correspondente no mês atual
+async function escreverMesACopiar(year, month, refMap) {
   const writes = [];
-  for(const [mapKey, dados] of Object.entries(prevMap)){
-    const [dowStr, nthStr, hor] = mapKey.split('_');
+  for(const [k, dados] of Object.entries(refMap)){
+    const [dowStr, nthStr, hor] = k.split('|');
     const dow = parseInt(dowStr);
     const nth = parseInt(nthStr);
-    const targetDt = findDateByNthDow(curYear, curMonth, dow, nth);
-    if(!targetDt) continue; // esse mês não tem essa semana (ex: 5ª sexta)
+    const targetDt = findDateByNthDow(year, month, dow, nth);
+    if(!targetDt) continue;
 
     const payload = {
       data:           Timestamp.fromDate(targetDt),
@@ -615,56 +615,64 @@ async function copiarMesAnterior() {
       musicosNomes:   [],
       observacoes:    ''
     };
-    writes.push(addDoc(collection(db,'escala'), payload).then(ref=>{
-      const key = makeKey(targetDt, hor);
-      escalaCache[key] = {id:ref.id, ...payload};
-    }));
+    writes.push(
+      addDoc(collection(db,'escala'), payload).then(ref => {
+        escalaCache[makeKey(targetDt, hor)] = {id: ref.id, ...payload};
+      })
+    );
   }
   await Promise.all(writes);
 }
 
-// ── Propaga alteração para meses futuros que ainda seguem o padrão ─────────
+// Propaga alteração para os próximos 6 meses
+// Se o mês futuro já tem dados → atualiza o slot equivalente
+// Se o mês futuro está vazio  → cria o slot (ele vai existir para quando o usuário navegar)
 async function propagarParaProximosMeses(changedDt, hor, fields) {
   const {dow, nth} = nthDow(changedDt);
 
-  // Verifica os próximos 3 meses
-  const promises = [];
-  for(let i=1; i<=3; i++){
-    let futMonth = curMonth + i;
-    let futYear  = curYear;
-    if(futMonth > 11){ futMonth -= 12; futYear++; }
+  for(let i=1; i<=6; i++){
+    let futMonth = changedDt.getMonth() + i;
+    let futYear  = changedDt.getFullYear();
+    while(futMonth > 11){ futMonth -= 12; futYear++; }
 
-    // Busca se esse mês já tem dados
+    const targetDt = findDateByNthDow(futYear, futMonth, dow, nth);
+    if(!targetDt) continue;
+
+    const futKey = makeKey(targetDt, hor);
+
+    // Verifica se já existe no Firestore
     const start = Timestamp.fromDate(new Date(futYear, futMonth, 1));
     const end   = Timestamp.fromDate(new Date(futYear, futMonth+1, 0, 23,59,59));
+    const snap  = await getDocs(query(
+      collection(db,'escala'),
+      where('data','>=',start),
+      where('data','<=',end)
+    ));
 
-    promises.push((async () => {
-      const snap = await getDocs(query(collection(db,'escala'), where('data','>=',start), where('data','<=',end)));
+    const existingDoc = snap.docs.find(d => {
+      const dat = d.data();
+      return makeKey(dat.data.toDate(), dat.horario) === futKey;
+    });
 
-      const targetDt = findDateByNthDow(futYear, futMonth, dow, nth);
-      if(!targetDt) return;
-
-      const futKey = makeKey(targetDt, hor);
-
-      if(snap.empty) {
-        // Mês vazio → não existe ainda, não propaga (será copiado quando o usuário navegar)
-        return;
-      }
-
-      // Mês tem dados → atualiza o slot correspondente se ele existir
-      const existingDoc = snap.docs.find(d => {
-        const dat = d.data();
-        const dt2 = dat.data.toDate();
-        return makeKey(dt2, dat.horario) === futKey;
-      });
-
-      if(existingDoc) {
-        // Só atualiza se NÃO foi editado manualmente (obs permanece intacta)
-        await updateDoc(doc(db,'escala',existingDoc.id), fields);
-      }
-    })());
+    if(existingDoc) {
+      // Atualiza (preserva obs do futuro)
+      await updateDoc(doc(db,'escala', existingDoc.id), fields);
+    } else {
+      // Cria novo slot no futuro com os novos dados
+      const existing = escalaCache[makeKey(changedDt, hor)] || {};
+      const payload = {
+        data:           Timestamp.fromDate(targetDt),
+        horario:        hor,
+        ministerioId:   fields.ministerioId   ?? existing.ministerioId   ?? null,
+        ministerioNome: fields.ministerioNome ?? existing.ministerioNome ?? '',
+        nomeAvulso:     fields.nomeAvulso     ?? existing.nomeAvulso     ?? '',
+        musicosIds:     [],
+        musicosNomes:   [],
+        observacoes:    ''
+      };
+      await addDoc(collection(db,'escala'), payload);
+    }
   }
-  await Promise.all(promises);
 }
 
 function getDaysOfType(year, month, type) {

@@ -153,6 +153,13 @@
     .slot-obs { width:100%; background:transparent; border:none; border-bottom:1px solid var(--border); padding:3px 2px; font-size:11px; font-family:var(--font); color:var(--muted); outline:none; }
     .slot-obs:focus { border-bottom-color:var(--rose); }
     .slot-obs::placeholder { color:var(--muted2); }
+    .slot-livre { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:5px 8px; font-size:12px; font-family:var(--font); color:var(--text); outline:none; margin-top:2px; }
+    .slot-livre:focus { border-color:var(--rose); box-shadow:0 0 0 2px rgba(155,35,53,.08); }
+    .slot-livre::placeholder { color:var(--muted2); font-style:italic; }
+    .slot-livre.has-val { background:rgba(90,130,60,.07); border-color:rgba(90,130,60,.3); color:#3a5c20; font-weight:500; }
+    .slot-obs-inp { width:100%; background:transparent; border:none; border-bottom:1px dashed var(--border); padding:3px 2px; font-size:11px; font-family:var(--font); color:var(--muted); outline:none; margin-top:4px; }
+    .slot-obs-inp:focus { border-bottom-color:var(--rose); }
+    .slot-obs-inp::placeholder { color:var(--muted2); }
 
     .saving-dot { display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--rose); animation:pulse 1s ease infinite; margin-left:4px; vertical-align:middle; }
     @keyframes pulse { 0%,100%{opacity:.3} 50%{opacity:1} }
@@ -525,10 +532,85 @@ window.changeMonth = async delta => {
 // ── ESCALA ─────────────────────────────────────────────────────────────────
 async function loadEscala() {
   document.getElementById('esc-mes-lbl').textContent=`${MONTHS[curMonth]} ${curYear}`;
+
+  // Mostra loading
+  ['week','sat','sun'].forEach(t=>{
+    document.getElementById('grid-'+t).innerHTML='<div style="grid-column:1/-1;padding:20px;color:var(--muted2);font-size:13px;display:flex;align-items:center;gap:8px"><span class=\'spin\'></span> Carregando...</div>';
+  });
+
   await fetchEscalaDoMes(curYear, curMonth);
+
+  // Se mês vazio, copia do mês anterior automaticamente
+  if(Object.keys(escalaCache).length === 0) {
+    await copiarMesAnterior();
+  }
+
   renderGrid('week');
   renderGrid('sat');
   renderGrid('sun');
+}
+
+async function copiarMesAnterior() {
+  let prevMonth = curMonth - 1;
+  let prevYear  = curYear;
+  if(prevMonth < 0){ prevMonth = 11; prevYear--; }
+
+  const start = Timestamp.fromDate(new Date(prevYear, prevMonth, 1));
+  const end   = Timestamp.fromDate(new Date(prevYear, prevMonth+1, 0, 23,59,59));
+  const snap  = await getDocs(query(collection(db,'escala'), where('data','>=',start), where('data','<=',end)));
+
+  if(snap.empty) return; // nada para copiar
+
+  // Para cada entrada do mês anterior, recria no mês atual no mesmo dia-da-semana + horário
+  // Mapeia: "dow_horario" -> dados
+  const prevMap = {};
+  snap.docs.forEach(d => {
+    const dat = d.data();
+    const dt  = dat.data.toDate();
+    const dow = dt.getDay(); // dia da semana
+    const mapKey = `${dow}_${dat.horario}`;
+    // Guarda só ministerioId/Nome e nomeAvulso (NÃO copia obs pois é específico do dia)
+    prevMap[mapKey] = {
+      ministerioId:   dat.ministerioId||null,
+      ministerioNome: dat.ministerioNome||'',
+      nomeAvulso:     dat.nomeAvulso||'',
+    };
+  });
+
+  if(Object.keys(prevMap).length === 0) return;
+
+  // Gera todos os dias do mês atual e cria docs apenas onde há correspondência
+  const daysInMonth = new Date(curYear, curMonth+1, 0).getDate();
+  const writes = [];
+  for(let d=1; d<=daysInMonth; d++){
+    const dt  = new Date(curYear, curMonth, d);
+    const dow = dt.getDay();
+    let hors = [];
+    if(dow >= 1 && dow <= 5) hors = HORARIOS.week;
+    else if(dow === 6)       hors = HORARIOS.sat;
+    else                     hors = HORARIOS.sun;
+
+    for(const h of hors){
+      const mapKey = `${dow}_${h}`;
+      if(prevMap[mapKey]){
+        const payload = {
+          data:           Timestamp.fromDate(dt),
+          horario:        h,
+          ministerioId:   prevMap[mapKey].ministerioId,
+          ministerioNome: prevMap[mapKey].ministerioNome,
+          nomeAvulso:     prevMap[mapKey].nomeAvulso,
+          musicosIds:     [],
+          musicosNomes:   [],
+          observacoes:    ''
+        };
+        writes.push(addDoc(collection(db,'escala'), payload).then(ref=>{
+          const key = makeKey(dt, h);
+          escalaCache[key] = {id:ref.id, ...payload};
+        }));
+      }
+    }
+  }
+  await Promise.all(writes);
 }
 
 function getDaysOfType(year, month, type) {
@@ -560,8 +642,10 @@ function renderGrid(type) {
       const key=makeKey(dt,h);
       const saved=escalaCache[key];
       const minId=saved?.ministerioId||'';
+      const livre=saved?.nomeAvulso||'';
       const obs  =saved?.observacoes||'';
       const filled=minId?'filled':'';
+      const livreClass=livre?'has-val':'';
       const minOpts=ministerios.map(m=>`<option value="${m.id}" ${m.id===minId?'selected':''}>${m.nome}</option>`).join('');
       return `<div class="slot-row">
         <div class="slot-time">${h}</div>
@@ -569,6 +653,8 @@ function renderGrid(type) {
           <option value="">— sem ministério —</option>
           ${minOpts}
         </select>
+        <input type="text" class="slot-livre ${livreClass}" placeholder="Dupla / convidado..." data-key="${key}" data-dt="${dt.toISOString()}" data-hor="${h}" value="${(livre||'').replace(/"/g,'&quot;')}" onchange="onLivreChange(this)" onblur="onLivreChange(this)"/>
+        <input type="text" class="slot-obs-inp" placeholder="Obs: padre, evento..." data-key="${key}" data-dt="${dt.toISOString()}" data-hor="${h}" value="${(obs||'').replace(/"/g,'&quot;')}" onchange="onObsChange(this)" onblur="onObsChange(this)"/>
       </div>`;
     }).join('');
 
@@ -584,41 +670,53 @@ function renderGrid(type) {
 }
 
 // ── SAVE ON CHANGE ─────────────────────────────────────────────────────────
-window.onSlotChange = async sel => {
-  const key   = sel.dataset.key;
-  const dtISO = sel.dataset.dt;
-  const hor   = sel.dataset.hor;
-  const minId = sel.value;
-  const minNome = ministerios.find(m=>m.id===minId)?.nome||'';
-  const dt    = new Date(dtISO);
-
-  // visual feedback
-  sel.classList.toggle('filled', !!minId);
-
+async function saveSlotField(key, dtISO, hor, fields) {
+  const dt       = new Date(dtISO);
   const existing = escalaCache[key];
   const payload  = {
-    data: Timestamp.fromDate(dt),
-    horario: hor,
-    ministerioId: minId||null,
-    ministerioNome: minNome,
-    musicosIds: existing?.musicosIds||[],
-    musicosNomes: existing?.musicosNomes||[],
-    observacoes: existing?.observacoes||''
+    data:           Timestamp.fromDate(dt),
+    horario:        hor,
+    ministerioId:   existing?.ministerioId   ?? null,
+    ministerioNome: existing?.ministerioNome ?? '',
+    nomeAvulso:     existing?.nomeAvulso     ?? '',
+    musicosIds:     existing?.musicosIds     ?? [],
+    musicosNomes:   existing?.musicosNomes   ?? [],
+    observacoes:    existing?.observacoes    ?? '',
+    ...fields
   };
-
   try {
     if(existing?.id) {
       await updateDoc(doc(db,'escala',existing.id), payload);
+      escalaCache[key] = {...existing, ...payload};
     } else {
-      const ref=await addDoc(collection(db,'escala'), payload);
-      escalaCache[key]={id:ref.id,...payload};
+      const ref = await addDoc(collection(db,'escala'), payload);
+      escalaCache[key] = {id:ref.id, ...payload};
     }
-    if(!existing?.id) escalaCache[key]={...escalaCache[key],...payload};
-    else escalaCache[key]={...existing,...payload};
   } catch(e){
     console.error(e);
     alert('Erro ao salvar: '+e.message);
   }
+}
+
+window.onSlotChange = async sel => {
+  const {key, dt: dtISO, hor} = sel.dataset;
+  const minId   = sel.value;
+  const minNome = ministerios.find(m=>m.id===minId)?.nome||'';
+  sel.classList.toggle('filled', !!minId);
+  await saveSlotField(key, dtISO, hor, {ministerioId: minId||null, ministerioNome: minNome});
+};
+
+window.onLivreChange = async inp => {
+  const {key, dt: dtISO, hor} = inp.dataset;
+  const val = inp.value.trim();
+  inp.classList.toggle('has-val', !!val);
+  await saveSlotField(key, dtISO, hor, {nomeAvulso: val});
+};
+
+window.onObsChange = async inp => {
+  const {key, dt: dtISO, hor} = inp.dataset;
+  const val = inp.value.trim();
+  await saveSlotField(key, dtISO, hor, {observacoes: val});
 };
 
 // ── MINISTÉRIOS ────────────────────────────────────────────────────────────

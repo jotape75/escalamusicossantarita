@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — Escala Santa Rita</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0f0e0c;
+      --bg2: #181714;
+      --bg3: #211f1b;
+      --border: #2e2b25;
+      --border2: #3d3a32;
+      --gold: #c9a84c;
+      --gold2: #e8c97a;
+      --gold-dim: rgba(201,168,76,0.12);
+      --text: #e8e4dc;
+      --text2: #9e9a90;
+      --text3: #5c5952;
+      --red: #d4564a;
+      --green: #5a9e6f;
+      --radius: 8px;
+      --sidebar: 220px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* ── LOGIN ── */
+    #login-screen {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.08) 0%, transparent 60%), var(--bg);
+    }
+    .login-card {
+      width: 360px; background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 16px; padding: 48px 40px; text-align: center;
+    }
+    .login-card .cross {
+      font-size: 28px; margin-bottom: 20px; color: var(--gold);
+      font-family: 'Crimson Pro', serif;
+    }
+    .login-card h1 { font-family: 'Crimson Pro', serif; font-size: 22px; color: var(--text); margin-bottom: 4px; }
+    .login-card p { font-size: 13px; color: var(--text2); margin-bottom: 32px; }
+    .field { margin-bottom: 14px; text-align: left; }
+    .field label { display: block; font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+    .field input {
+      width: 100%; background: var(--bg3); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 11px 14px; color: var(--text); font-size: 14px;
+      font-family: 'DM Sans', sans-serif; outline: none; transition: border-color .2s;
+    }
+    .field input:focus { border-color: var(--gold); }
+    .btn-primary {
+      width: 100%; padding: 12px; background: var(--gold); color: #0f0e0c;
+      border: none; border-radius: var(--radius); font-size: 14px; font-weight: 500;
+      font-family: 'DM Sans', sans-serif; cursor: pointer; transition: background .2s;
+      margin-top: 8px;
+    }
+    .btn-primary:hover { background: var(--gold2); }
+    .login-error { color: var(--red); font-size: 13px; margin-top: 12px; }
+
+    /* ── APP SHELL ── */
+    #app { display: none; min-height: 100vh; }
+    .sidebar {
+      position: fixed; top: 0; left: 0; width: var(--sidebar); height: 100vh;
+      background: var(--bg2); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; z-index: 100;
+    }
+    .sidebar-brand {
+      padding: 24px 20px 20px; border-bottom: 1px solid var(--border);
+    }
+    .sidebar-brand .cross { color: var(--gold); font-family: 'Crimson Pro', serif; font-size: 18px; }
+    .sidebar-brand h2 { font-family: 'Crimson Pro', serif; font-size: 15px; color: var(--text); margin-top: 2px; }
+    .sidebar-brand p { font-size: 11px; color: var(--text3); margin-top: 1px; }
+    nav { flex: 1; padding: 16px 10px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      border-radius: var(--radius); color: var(--text2); font-size: 13px;
+      cursor: pointer; transition: all .15s; margin-bottom: 2px; border: none;
+      background: none; width: 100%; text-align: left;
+    }
+    .nav-item:hover { background: var(--bg3); color: var(--text); }
+    .nav-item.active { background: var(--gold-dim); color: var(--gold); }
+    .nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
+    .sidebar-bottom { padding: 16px 10px; border-top: 1px solid var(--border); }
+    .user-info { display: flex; align-items: center; gap: 10px; padding: 8px 12px; margin-bottom: 6px; }
+    .user-avatar {
+      width: 30px; height: 30px; border-radius: 50%; background: var(--gold-dim);
+      border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center;
+      font-size: 12px; color: var(--gold);
+    }
+    .user-email { font-size: 11px; color: var(--text2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 130px; }
+    .btn-logout {
+      width: 100%; padding: 9px; background: none; border: 1px solid var(--border);
+      border-radius: var(--radius); color: var(--text2); font-size: 12px;
+      font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all .15s;
+    }
+    .btn-logout:hover { border-color: var(--red); color: var(--red); }
+
+    .main { margin-left: var(--sidebar); padding: 32px; min-height: 100vh; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .page-header { margin-bottom: 28px; display: flex; align-items: flex-start; justify-content: space-between; }
+    .page-header h1 { font-family: 'Crimson Pro', serif; font-size: 28px; color: var(--text); }
+    .page-header p { font-size: 13px; color: var(--text2); margin-top: 4px; }
+
+    /* ── CARDS / TABLE ── */
+    .card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+    }
+    .card-header {
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .card-header h3 { font-size: 14px; font-weight: 500; color: var(--text); }
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 12px 20px; font-size: 11px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; border-bottom: 1px solid var(--border); }
+    td { padding: 14px 20px; font-size: 13px; color: var(--text); border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--bg3); }
+    .badge {
+      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 500; background: var(--gold-dim); color: var(--gold);
+      border: 1px solid rgba(201,168,76,.25);
+    }
+    .empty-state {
+      text-align: center; padding: 48px 20px; color: var(--text3); font-size: 13px;
+    }
+    .empty-state .icon { font-size: 32px; margin-bottom: 12px; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px;
+      border-radius: var(--radius); font-size: 13px; font-family: 'DM Sans', sans-serif;
+      cursor: pointer; transition: all .15s; border: none; font-weight: 500;
+    }
+    .btn-gold { background: var(--gold); color: #0f0e0c; }
+    .btn-gold:hover { background: var(--gold2); }
+    .btn-ghost { background: none; border: 1px solid var(--border); color: var(--text2); }
+    .btn-ghost:hover { border-color: var(--border2); color: var(--text); }
+    .btn-danger { background: none; border: 1px solid transparent; color: var(--red); font-size: 12px; padding: 6px 10px; }
+    .btn-danger:hover { background: rgba(212,86,74,.1); }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+    /* ── MODAL ── */
+    .modal-backdrop {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6);
+      z-index: 200; align-items: center; justify-content: center;
+      backdrop-filter: blur(2px);
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: var(--bg2); border: 1px solid var(--border2);
+      border-radius: 16px; padding: 32px; width: 440px; max-width: 95vw;
+      max-height: 90vh; overflow-y: auto;
+    }
+    .modal h2 { font-family: 'Crimson Pro', serif; font-size: 22px; margin-bottom: 20px; color: var(--text); }
+    .modal .field { margin-bottom: 16px; }
+    .modal select {
+      width: 100%; background: var(--bg3); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 11px 14px; color: var(--text); font-size: 14px;
+      font-family: 'DM Sans', sans-serif; outline: none; appearance: none;
+    }
+    .modal select:focus { border-color: var(--gold); }
+    .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+    .msg { font-size: 13px; padding: 10px 14px; border-radius: var(--radius); margin-top: 12px; }
+    .msg.success { background: rgba(90,158,111,.15); color: var(--green); border: 1px solid rgba(90,158,111,.3); }
+    .msg.error { background: rgba(212,86,74,.15); color: var(--red); border: 1px solid rgba(212,86,74,.3); }
+
+    /* ── ESCALA ── */
+    .escala-controls {
+      display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 24px;
+    }
+    .escala-controls select {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 9px 14px; color: var(--text); font-size: 13px; font-family: 'DM Sans', sans-serif;
+      outline: none; min-width: 160px;
+    }
+    .escala-controls select:focus { border-color: var(--gold); }
+    .escala-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    .escala-item {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 10px;
+      padding: 16px 20px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+    }
+    .escala-item-left {}
+    .escala-item .data { font-size: 12px; color: var(--gold); font-weight: 500; margin-bottom: 4px; }
+    .escala-item .horario { font-size: 13px; color: var(--text2); margin-bottom: 6px; }
+    .escala-item .ministerio { font-size: 14px; color: var(--text); font-weight: 500; }
+    .escala-item .musicos { font-size: 12px; color: var(--text2); margin-top: 4px; }
+    .escala-item-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+    /* ── DASHBOARD ── */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 28px; }
+    .stat-card {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 12px;
+      padding: 20px; text-align: center;
+    }
+    .stat-card .num { font-family: 'Crimson Pro', serif; font-size: 36px; color: var(--gold); }
+    .stat-card .label { font-size: 12px; color: var(--text2); margin-top: 4px; }
+
+    /* Loading */
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin .6s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Semana chips */
+    .dias-semana { display: flex; flex-wrap: wrap; gap: 6px; }
+    .dia-chip {
+      padding: 5px 10px; border-radius: 20px; font-size: 11px; cursor: pointer;
+      border: 1px solid var(--border); color: var(--text2); background: none; transition: all .15s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .dia-chip.selected { background: var(--gold-dim); color: var(--gold); border-color: rgba(201,168,76,.4); }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="cross">✝</div>
+    <h1>Portal Admin</h1>
+    <p>Santuário Santa Rita de Cássia</p>
+    <div class="field">
+      <label>E-mail</label>
+      <input type="email" id="login-email" placeholder="seu@email.com"/>
+    </div>
+    <div class="field">
+      <label>Senha</label>
+      <input type="password" id="login-password" placeholder="••••••••"/>
+    </div>
+    <button class="btn-primary" onclick="doLogin()">Entrar</button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="cross">✝</div>
+      <h2>Santa Rita</h2>
+      <p>Ministérios de Música</p>
+    </div>
+    <nav>
+      <button class="nav-item active" onclick="showPage('dashboard')">
+        <span class="icon">◈</span> Dashboard
+      </button>
+      <button class="nav-item" onclick="showPage('ministerios')">
+        <span class="icon">♪</span> Ministérios
+      </button>
+      <button class="nav-item" onclick="showPage('musicos')">
+        <span class="icon">✦</span> Músicos
+      </button>
+      <button class="nav-item" onclick="showPage('escala')">
+        <span class="icon">◷</span> Escala
+      </button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="user-info">
+        <div class="user-avatar" id="user-initial">A</div>
+        <div class="user-email" id="user-email-display"></div>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">Sair</button>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div>
+          <h1>Dashboard</h1>
+          <p>Visão geral da escala</p>
+        </div>
+      </div>
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card"><div class="num" id="stat-min">—</div><div class="label">Ministérios</div></div>
+        <div class="stat-card"><div class="num" id="stat-mus">—</div><div class="label">Músicos</div></div>
+        <div class="stat-card"><div class="num" id="stat-esc">—</div><div class="label">Escalas este mês</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>Próximas escalas</h3></div>
+        <div id="proximas-list"><div class="empty-state"><div class="icon">◷</div>Carregando...</div></div>
+      </div>
+    </div>
+
+    <!-- MINISTÉRIOS -->
+    <div class="page" id="page-ministerios">
+      <div class="page-header">
+        <div>
+          <h1>Ministérios</h1>
+          <p>Gerencie os grupos de música</p>
+        </div>
+        <button class="btn btn-gold" onclick="openModal('modal-ministerio')">+ Novo ministério</button>
+      </div>
+      <div class="card">
+        <table>
+          <thead><tr><th>Nome</th><th>Responsável</th><th>Músicos</th><th></th></tr></thead>
+          <tbody id="tb-ministerios"><tr><td colspan="4"><div class="empty-state"><span class="spinner"></span></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- MÚSICOS -->
+    <div class="page" id="page-musicos">
+      <div class="page-header">
+        <div>
+          <h1>Músicos</h1>
+          <p>Membros de cada ministério</p>
+        </div>
+        <button class="btn btn-gold" onclick="openModal('modal-musico')">+ Novo músico</button>
+      </div>
+      <div class="card">
+        <table>
+          <thead><tr><th>Nome</th><th>Ministério</th><th>Contato</th><th></th></tr></thead>
+          <tbody id="tb-musicos"><tr><td colspan="4"><div class="empty-state"><span class="spinner"></span></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ESCALA -->
+    <div class="page" id="page-escala">
+      <div class="page-header">
+        <div>
+          <h1>Escala</h1>
+          <p>Quem toca quando</p>
+        </div>
+        <button class="btn btn-gold" onclick="openModal('modal-escala')">+ Nova escala</button>
+      </div>
+      <div class="escala-controls">
+        <select id="filtro-mes" onchange="loadEscala()">
+          <option value="">Todos os meses</option>
+        </select>
+        <select id="filtro-min-escala" onchange="loadEscala()">
+          <option value="">Todos ministérios</option>
+        </select>
+      </div>
+      <div class="escala-grid" id="escala-list">
+        <div class="empty-state"><span class="spinner"></span></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL: Ministério -->
+<div class="modal-backdrop" id="modal-ministerio">
+  <div class="modal">
+    <h2 id="modal-min-title">Novo Ministério</h2>
+    <input type="hidden" id="min-id"/>
+    <div class="field">
+      <label>Nome do ministério</label>
+      <input type="text" id="min-nome" placeholder="ex: Vida Nova"/>
+    </div>
+    <div class="field">
+      <label>Responsável</label>
+      <input type="text" id="min-resp" placeholder="Nome do líder"/>
+    </div>
+    <div class="field">
+      <label>Observações (opcional)</label>
+      <input type="text" id="min-obs" placeholder="Notas adicionais"/>
+    </div>
+    <div id="min-msg"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-ministerio')">Cancelar</button>
+      <button class="btn btn-gold" onclick="saveMinisterio()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Músico -->
+<div class="modal-backdrop" id="modal-musico">
+  <div class="modal">
+    <h2 id="modal-mus-title">Novo Músico</h2>
+    <input type="hidden" id="mus-id"/>
+    <div class="field">
+      <label>Nome</label>
+      <input type="text" id="mus-nome" placeholder="Nome completo"/>
+    </div>
+    <div class="field">
+      <label>Ministério</label>
+      <select id="mus-ministerio"><option value="">Selecione...</option></select>
+    </div>
+    <div class="field">
+      <label>Telefone/WhatsApp (opcional)</label>
+      <input type="text" id="mus-tel" placeholder="(19) 99999-9999"/>
+    </div>
+    <div id="mus-msg"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-musico')">Cancelar</button>
+      <button class="btn btn-gold" onclick="saveMusico()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Escala -->
+<div class="modal-backdrop" id="modal-escala">
+  <div class="modal">
+    <h2 id="modal-esc-title">Nova Escala</h2>
+    <input type="hidden" id="esc-id"/>
+    <div class="field">
+      <label>Data</label>
+      <input type="date" id="esc-data"/>
+    </div>
+    <div class="field">
+      <label>Horário da missa</label>
+      <select id="esc-horario">
+        <option>07h</option><option>07:30h</option><option>08:30h</option>
+        <option>10h</option><option>12h</option><option>14h</option>
+        <option>15h</option><option>15:30h</option><option>17h</option>
+        <option>17:30h</option><option>18:30h</option><option>19:30h</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Tipo de dia</label>
+      <select id="esc-tipo">
+        <option value="Dia de Semana">Dia de Semana</option>
+        <option value="Sábado">Sábado</option>
+        <option value="Domingo">Domingo</option>
+        <option value="Festa">Festa / Evento especial</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Ministério</label>
+      <select id="esc-ministerio" onchange="loadMusicosDoMinisterio()"><option value="">Selecione...</option></select>
+    </div>
+    <div class="field">
+      <label>Músicos escalados</label>
+      <div id="esc-musicos-lista" style="display:flex;flex-wrap:wrap;gap:6px;min-height:36px;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);"></div>
+    </div>
+    <div class="field">
+      <label>Observações</label>
+      <input type="text" id="esc-obs" placeholder="Pe. fulano, evento especial..."/>
+    </div>
+    <div id="esc-msg"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-escala')">Cancelar</button>
+      <button class="btn btn-gold" onclick="saveEscala()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- FIREBASE SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore, collection, doc, addDoc, updateDoc, deleteDoc,
+  getDocs, query, orderBy, where, Timestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCkLu7SEJ76-SrmEYBCFewG6YQCnOW1z7k",
+  authDomain: "escala-santa-rita.firebaseapp.com",
+  projectId: "escala-santa-rita",
+  storageBucket: "escala-santa-rita.firebasestorage.app",
+  messagingSenderId: "931972149605",
+  appId: "1:931972149605:web:fa716dff0bf0a8abde318c"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ── STATE ──────────────────────────────────────────
+let ministerios = [];
+let musicos = [];
+let musicosSelecionados = [];
+
+// ── AUTH ───────────────────────────────────────────
+window.doLogin = async () => {
+  const email = document.getElementById('login-email').value;
+  const pass  = document.getElementById('login-password').value;
+  const err   = document.getElementById('login-error');
+  err.textContent = '';
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch(e) {
+    err.textContent = 'E-mail ou senha incorretos.';
+  }
+};
+
+window.doLogout = () => signOut(auth);
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('user-email-display').textContent = user.email;
+    document.getElementById('user-initial').textContent = user.email[0].toUpperCase();
+    initApp();
+  } else {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+  }
+});
+
+// ── NAVIGATION ─────────────────────────────────────
+window.showPage = (name) => {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (name === 'ministerios') loadMinisterios();
+  if (name === 'musicos') loadMusicos();
+  if (name === 'escala') { loadEscala(); populateEscalaFilters(); }
+};
+
+// ── INIT ───────────────────────────────────────────
+async function initApp() {
+  await Promise.all([fetchMinisterios(), fetchMusicos()]);
+  loadDashboard();
+}
+
+async function fetchMinisterios() {
+  const snap = await getDocs(query(collection(db,'ministerios'), orderBy('nome')));
+  ministerios = snap.docs.map(d => ({id: d.id, ...d.data()}));
+}
+
+async function fetchMusicos() {
+  const snap = await getDocs(query(collection(db,'musicos'), orderBy('nome')));
+  musicos = snap.docs.map(d => ({id: d.id, ...d.data()}));
+}
+
+// ── DASHBOARD ──────────────────────────────────────
+async function loadDashboard() {
+  document.getElementById('stat-min').textContent = ministerios.length;
+  document.getElementById('stat-mus').textContent = musicos.length;
+
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), 1);
+  const end   = new Date(now.getFullYear(), now.getMonth()+1, 0);
+  const snap = await getDocs(query(
+    collection(db,'escala'),
+    where('data','>=', Timestamp.fromDate(start)),
+    where('data','<=', Timestamp.fromDate(end))
+  ));
+  document.getElementById('stat-esc').textContent = snap.docs.length;
+
+  // Próximas escalas
+  const today = Timestamp.fromDate(new Date());
+  const snap2 = await getDocs(query(
+    collection(db,'escala'),
+    where('data','>=', today),
+    orderBy('data')
+  ));
+  const items = snap2.docs.slice(0,8).map(d => d.data());
+  const container = document.getElementById('proximas-list');
+  if (!items.length) {
+    container.innerHTML = '<div class="empty-state"><div class="icon">◷</div>Nenhuma escala futura cadastrada.</div>';
+    return;
+  }
+  container.innerHTML = items.map(e => {
+    const d = e.data.toDate();
+    const dt = d.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short'});
+    return `<div style="display:flex;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid var(--border)">
+      <div style="min-width:90px;font-size:12px;color:var(--gold)">${dt}</div>
+      <div style="font-size:12px;color:var(--text2);min-width:70px">${e.horario}</div>
+      <div style="font-size:13px;color:var(--text);flex:1">${e.ministerioNome}</div>
+      <div style="font-size:12px;color:var(--text2)">${(e.musicosNomes||[]).join(', ')}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── MINISTÉRIOS ────────────────────────────────────
+window.loadMinisterios = async () => {
+  await fetchMinisterios();
+  const tb = document.getElementById('tb-ministerios');
+  if (!ministerios.length) {
+    tb.innerHTML = '<tr><td colspan="4"><div class="empty-state"><div class="icon">♪</div>Nenhum ministério cadastrado.</div></td></tr>';
+    return;
+  }
+  tb.innerHTML = ministerios.map(m => {
+    const count = musicos.filter(mu => mu.ministerioId === m.id).length;
+    return `<tr>
+      <td><strong>${m.nome}</strong></td>
+      <td>${m.responsavel||'—'}</td>
+      <td><span class="badge">${count} músico${count!==1?'s':''}</span></td>
+      <td style="text-align:right">
+        <button class="btn btn-ghost btn-sm" onclick="editMinisterio('${m.id}')">Editar</button>
+        <button class="btn btn-danger" onclick="deleteMinisterio('${m.id}')">Excluir</button>
+      </td>
+    </tr>`;
+  }).join('');
+};
+
+window.openModal = (id) => {
+  document.getElementById(id).classList.add('open');
+  if (id === 'modal-musico') populateMusicoPicker();
+  if (id === 'modal-escala') populateEscalaPickers();
+};
+window.closeModal = (id) => {
+  document.getElementById(id).classList.remove('open');
+  clearMinForm(); clearMusForm(); clearEscForm();
+};
+
+function clearMinForm() {
+  ['min-id','min-nome','min-resp','min-obs'].forEach(i => document.getElementById(i).value='');
+  document.getElementById('min-msg').innerHTML='';
+  document.getElementById('modal-min-title').textContent='Novo Ministério';
+}
+
+window.saveMinisterio = async () => {
+  const id   = document.getElementById('min-id').value;
+  const nome = document.getElementById('min-nome').value.trim();
+  const resp = document.getElementById('min-resp').value.trim();
+  const obs  = document.getElementById('min-obs').value.trim();
+  const msg  = document.getElementById('min-msg');
+  if (!nome) { showMsg(msg,'error','Informe o nome do ministério.'); return; }
+  try {
+    const data = {nome, responsavel:resp, observacoes:obs};
+    if (id) await updateDoc(doc(db,'ministerios',id), data);
+    else await addDoc(collection(db,'ministerios'), data);
+    showMsg(msg,'success','Salvo com sucesso!');
+    await fetchMinisterios();
+    await fetchMusicos();
+    loadMinisterios();
+    setTimeout(()=>closeModal('modal-ministerio'),800);
+  } catch(e) { showMsg(msg,'error','Erro ao salvar: '+e.message); }
+};
+
+window.editMinisterio = (id) => {
+  const m = ministerios.find(x=>x.id===id);
+  document.getElementById('min-id').value   = m.id;
+  document.getElementById('min-nome').value = m.nome;
+  document.getElementById('min-resp').value = m.responsavel||'';
+  document.getElementById('min-obs').value  = m.observacoes||'';
+  document.getElementById('modal-min-title').textContent = 'Editar Ministério';
+  openModal('modal-ministerio');
+};
+
+window.deleteMinisterio = async (id) => {
+  if (!confirm('Excluir este ministério?')) return;
+  await deleteDoc(doc(db,'ministerios',id));
+  await fetchMinisterios();
+  loadMinisterios();
+};
+
+// ── MÚSICOS ────────────────────────────────────────
+window.loadMusicos = async () => {
+  await fetchMusicos();
+  const tb = document.getElementById('tb-musicos');
+  if (!musicos.length) {
+    tb.innerHTML = '<tr><td colspan="4"><div class="empty-state"><div class="icon">✦</div>Nenhum músico cadastrado.</div></td></tr>';
+    return;
+  }
+  tb.innerHTML = musicos.map(m => {
+    const min = ministerios.find(x=>x.id===m.ministerioId);
+    return `<tr>
+      <td><strong>${m.nome}</strong></td>
+      <td>${min ? `<span class="badge">${min.nome}</span>` : '—'}</td>
+      <td>${m.telefone||'—'}</td>
+      <td style="text-align:right">
+        <button class="btn btn-ghost btn-sm" onclick="editMusico('${m.id}')">Editar</button>
+        <button class="btn btn-danger" onclick="deleteMusico('${m.id}')">Excluir</button>
+      </td>
+    </tr>`;
+  }).join('');
+};
+
+function clearMusForm() {
+  ['mus-id','mus-nome','mus-tel'].forEach(i => document.getElementById(i).value='');
+  document.getElementById('mus-ministerio').value='';
+  document.getElementById('mus-msg').innerHTML='';
+  document.getElementById('modal-mus-title').textContent='Novo Músico';
+}
+
+function populateMusicoPicker() {
+  const sel = document.getElementById('mus-ministerio');
+  sel.innerHTML = '<option value="">Selecione...</option>' +
+    ministerios.map(m=>`<option value="${m.id}">${m.nome}</option>`).join('');
+}
+
+window.saveMusico = async () => {
+  const id   = document.getElementById('mus-id').value;
+  const nome = document.getElementById('mus-nome').value.trim();
+  const minId= document.getElementById('mus-ministerio').value;
+  const tel  = document.getElementById('mus-tel').value.trim();
+  const msg  = document.getElementById('mus-msg');
+  if (!nome) { showMsg(msg,'error','Informe o nome.'); return; }
+  if (!minId) { showMsg(msg,'error','Selecione o ministério.'); return; }
+  const minNome = ministerios.find(x=>x.id===minId)?.nome||'';
+  try {
+    const data = {nome, ministerioId:minId, ministerioNome:minNome, telefone:tel};
+    if (id) await updateDoc(doc(db,'musicos',id), data);
+    else await addDoc(collection(db,'musicos'), data);
+    showMsg(msg,'success','Salvo!');
+    await fetchMusicos();
+    loadMusicos();
+    setTimeout(()=>closeModal('modal-musico'),800);
+  } catch(e) { showMsg(msg,'error','Erro: '+e.message); }
+};
+
+window.editMusico = (id) => {
+  const m = musicos.find(x=>x.id===id);
+  populateMusicoPicker();
+  document.getElementById('mus-id').value = m.id;
+  document.getElementById('mus-nome').value = m.nome;
+  document.getElementById('mus-ministerio').value = m.ministerioId||'';
+  document.getElementById('mus-tel').value = m.telefone||'';
+  document.getElementById('modal-mus-title').textContent = 'Editar Músico';
+  openModal('modal-musico');
+};
+
+window.deleteMusico = async (id) => {
+  if (!confirm('Excluir este músico?')) return;
+  await deleteDoc(doc(db,'musicos',id));
+  await fetchMusicos();
+  loadMusicos();
+};
+
+// ── ESCALA ─────────────────────────────────────────
+function populateEscalaPickers() {
+  const sel = document.getElementById('esc-ministerio');
+  sel.innerHTML = '<option value="">Selecione...</option>' +
+    ministerios.map(m=>`<option value="${m.id}">${m.nome}</option>`).join('');
+  musicosSelecionados = [];
+  renderMusicosChips();
+}
+
+function populateEscalaFilters() {
+  const selMin = document.getElementById('filtro-min-escala');
+  selMin.innerHTML = '<option value="">Todos ministérios</option>' +
+    ministerios.map(m=>`<option value="${m.id}">${m.nome}</option>`).join('');
+
+  const selMes = document.getElementById('filtro-mes');
+  const now = new Date();
+  selMes.innerHTML = '<option value="">Todos os meses</option>';
+  for (let i=-2; i<=4; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth()+i, 1);
+    const val = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const label = d.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+    const sel = i===0 ? ' selected' : '';
+    selMes.innerHTML += `<option value="${val}"${sel}>${label.charAt(0).toUpperCase()+label.slice(1)}</option>`;
+  }
+}
+
+window.loadMusicosDoMinisterio = () => {
+  musicosSelecionados = [];
+  renderMusicosChips();
+};
+
+function renderMusicosChips() {
+  const minId = document.getElementById('esc-ministerio').value;
+  const lista = document.getElementById('esc-musicos-lista');
+  const filtrados = musicos.filter(m => m.ministerioId === minId);
+  if (!filtrados.length) {
+    lista.innerHTML = '<span style="font-size:12px;color:var(--text3)">Selecione um ministério primeiro</span>';
+    return;
+  }
+  lista.innerHTML = filtrados.map(m => {
+    const sel = musicosSelecionados.includes(m.id);
+    return `<button class="dia-chip ${sel?'selected':''}" onclick="toggleMusico('${m.id}','${m.nome}')">${m.nome}</button>`;
+  }).join('');
+}
+
+window.toggleMusico = (id, nome) => {
+  if (musicosSelecionados.includes(id)) {
+    musicosSelecionados = musicosSelecionados.filter(x=>x!==id);
+  } else {
+    musicosSelecionados.push(id);
+  }
+  renderMusicosChips();
+};
+
+function clearEscForm() {
+  ['esc-id','esc-data','esc-obs'].forEach(i => document.getElementById(i).value='');
+  document.getElementById('esc-ministerio').value='';
+  musicosSelecionados = [];
+  document.getElementById('esc-msg').innerHTML='';
+  document.getElementById('modal-esc-title').textContent='Nova Escala';
+}
+
+window.saveEscala = async () => {
+  const id     = document.getElementById('esc-id').value;
+  const data   = document.getElementById('esc-data').value;
+  const hor    = document.getElementById('esc-horario').value;
+  const tipo   = document.getElementById('esc-tipo').value;
+  const minId  = document.getElementById('esc-ministerio').value;
+  const obs    = document.getElementById('esc-obs').value.trim();
+  const msg    = document.getElementById('esc-msg');
+
+  if (!data) { showMsg(msg,'error','Informe a data.'); return; }
+  if (!minId) { showMsg(msg,'error','Selecione o ministério.'); return; }
+
+  const minNome = ministerios.find(x=>x.id===minId)?.nome||'';
+  const musicosNomes = musicosSelecionados.map(mid => musicos.find(m=>m.id===mid)?.nome||'').filter(Boolean);
+  const [y,mo,d2] = data.split('-').map(Number);
+  const ts = Timestamp.fromDate(new Date(y,mo-1,d2));
+
+  try {
+    const payload = {
+      data: ts, horario: hor, tipo, ministerioId: minId, ministerioNome: minNome,
+      musicosIds: musicosSelecionados, musicosNomes, observacoes: obs
+    };
+    if (id) await updateDoc(doc(db,'escala',id), payload);
+    else await addDoc(collection(db,'escala'), payload);
+    showMsg(msg,'success','Escala salva!');
+    loadEscala();
+    setTimeout(()=>closeModal('modal-escala'),800);
+  } catch(e) { showMsg(msg,'error','Erro: '+e.message); }
+};
+
+window.loadEscala = async () => {
+  const mes    = document.getElementById('filtro-mes')?.value;
+  const minFil = document.getElementById('filtro-min-escala')?.value;
+  const list   = document.getElementById('escala-list');
+  list.innerHTML = '<div class="empty-state"><span class="spinner"></span></div>';
+
+  let q = query(collection(db,'escala'), orderBy('data'));
+
+  if (mes) {
+    const [y,mo] = mes.split('-').map(Number);
+    const start = Timestamp.fromDate(new Date(y,mo-1,1));
+    const end   = Timestamp.fromDate(new Date(y,mo,0,23,59,59));
+    q = query(collection(db,'escala'), where('data','>=',start), where('data','<=',end), orderBy('data'));
+  }
+
+  const snap = await getDocs(q);
+  let items = snap.docs.map(d=>({id:d.id,...d.data()}));
+  if (minFil) items = items.filter(e=>e.ministerioId===minFil);
+
+  if (!items.length) {
+    list.innerHTML = '<div class="empty-state"><div class="icon">◷</div>Nenhuma escala encontrada.</div>';
+    return;
+  }
+
+  list.innerHTML = items.map(e => {
+    const d = e.data.toDate();
+    const dt = d.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+    const nomes = (e.musicosNomes||[]).join(', ') || 'Nenhum músico';
+    return `<div class="escala-item">
+      <div class="escala-item-left">
+        <div class="data">${dt}</div>
+        <div class="horario">${e.horario} · ${e.tipo}</div>
+        <div class="ministerio">${e.ministerioNome}</div>
+        <div class="musicos">${nomes}</div>
+        ${e.observacoes ? `<div class="musicos" style="margin-top:4px;color:var(--text3)">📝 ${e.observacoes}</div>` : ''}
+      </div>
+      <div class="escala-item-actions">
+        <button class="btn btn-ghost btn-sm" onclick="editEscala('${e.id}')">Editar</button>
+        <button class="btn btn-danger" onclick="deleteEscala('${e.id}')">Excluir</button>
+      </div>
+    </div>`;
+  }).join('');
+};
+
+window.editEscala = async (id) => {
+  const snap = await getDocs(query(collection(db,'escala'), where('__name__','==',id)));
+  // Fallback: search from last loaded items
+  const allSnap = await getDocs(query(collection(db,'escala'), orderBy('data')));
+  const item = allSnap.docs.find(d=>d.id===id)?.data();
+  if (!item) return;
+
+  populateEscalaPickers();
+  document.getElementById('esc-id').value = id;
+  const d = item.data.toDate();
+  document.getElementById('esc-data').value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  document.getElementById('esc-horario').value = item.horario;
+  document.getElementById('esc-tipo').value = item.tipo;
+  document.getElementById('esc-ministerio').value = item.ministerioId||'';
+  musicosSelecionados = item.musicosIds||[];
+  document.getElementById('esc-obs').value = item.observacoes||'';
+  document.getElementById('modal-esc-title').textContent = 'Editar Escala';
+  renderMusicosChips();
+  openModal('modal-escala');
+};
+
+window.deleteEscala = async (id) => {
+  if (!confirm('Excluir esta escala?')) return;
+  await deleteDoc(doc(db,'escala',id));
+  loadEscala();
+};
+
+// ── HELPERS ────────────────────────────────────────
+function showMsg(el, type, text) {
+  el.innerHTML = `<div class="msg ${type}">${text}</div>`;
+}
+
+// Fechar modal clicando fora
+document.querySelectorAll('.modal-backdrop').forEach(b => {
+  b.addEventListener('click', e => { if (e.target===b) b.classList.remove('open'); });
+});
+
+// Enter no login
+document.getElementById('login-password').addEventListener('keydown', e => {
+  if (e.key==='Enter') doLogin();
+});
+</script>
+</body>
+</html>

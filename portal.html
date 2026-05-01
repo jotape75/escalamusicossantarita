@@ -77,8 +77,14 @@
     .sb-user { padding:12px 20px; border-bottom:1px solid rgba(255,255,255,.07); }
     .sb-user-lbl  { font-size:10px; color:rgba(255,255,255,.28); text-transform:uppercase; letter-spacing:.08em; margin-bottom:2px; }
     .sb-user-name { font-size:13px; font-weight:600; color:#fff; }
+    .sb-nav  { flex:1; overflow-y:auto; padding:8px 0; }
+    .sb-section { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.09em; color:rgba(255,255,255,.25); padding:10px 20px 4px; }
+    .sb-item { display:flex; align-items:center; gap:10px; padding:10px 20px; cursor:pointer; color:rgba(255,255,255,.48); font-size:13px; font-weight:500; border-left:3px solid transparent; transition:all .15s; }
+    .sb-item:hover { background:rgba(255,255,255,.05); color:rgba(255,255,255,.85); }
+    .sb-item.on { background:rgba(155,35,53,.18); border-left-color:#9b2335; color:#fff; }
+    .sb-item-icon { font-size:15px; width:20px; text-align:center; flex-shrink:0; }
     .sb-foot { padding:14px 20px; border-top:1px solid rgba(255,255,255,.07); margin-top:auto; }
-    .btn-sair { width:100%; padding:10px 14px; background:none; border:1px solid rgba(255,255,255,.1); border-radius:var(--r); color:rgba(255,255,255,.4); font-size:13px; font-weight:600; cursor:pointer; font-family:var(--font); text-align:left; transition:all .15s; }
+    .btn-sair { width:100%; padding:10px 14px; background:none; border:1px solid rgba(255,255,255,.1); border-radius:var(--r); color:rgba(255,255,255,.85); font-size:13px; font-weight:600; cursor:pointer; font-family:var(--font); text-align:left; transition:all .15s; }
     .btn-sair:hover { border-color:rgba(155,35,53,.5); color:rgba(255,120,120,.8); }
 
     /* ── CARDS / STATS ── */
@@ -214,6 +220,15 @@
     <div class="sb-user">
       <div class="sb-user-lbl">Usuário</div>
       <div class="sb-user-name" id="sb-user-name">—</div>
+    </div>
+    <div class="sb-nav">
+      <div class="sb-section">Geral</div>
+      <div class="sb-item on" data-page="home"><span class="sb-item-icon">▦</span> Dashboard</div>
+      <div class="sb-section">Programação</div>
+      <div class="sb-item" data-page="escala"><span class="sb-item-icon">◷</span> Escala</div>
+      <div class="sb-section">Cadastros</div>
+      <div class="sb-item" data-page="musicos"><span class="sb-item-icon">♪</span> Músicos</div>
+      <div class="sb-item" data-page="ministerios"><span class="sb-item-icon">♫</span> Ministérios</div>
     </div>
     <div class="sb-foot">
       <button class="btn-sair" id="btn-logout">⬅ Sair da conta</button>
@@ -410,14 +425,13 @@ async function loadDashboard() {
   // Escalas do mês
   const s = Timestamp.fromDate(new Date(now.getFullYear(), now.getMonth(), 1));
   const e = Timestamp.fromDate(new Date(now.getFullYear(), now.getMonth()+1, 0, 23,59,59));
-  const sm = await getDocs(query(collection(db,'escala'), where('data','>=',s), where('data','<=',e), where('ministerioId','!=',null)));
-  document.getElementById('st-esc').textContent = sm.docs.length;
+  const sm = await getDocs(query(collection(db,'escala'), where('data','>=',s), where('data','<=',e)));
+  document.getElementById('st-esc').textContent = sm.docs.filter(d => d.data().ministerioId).length;
 
   // Próximas escalas
   const today = Timestamp.fromDate(new Date());
-  const sp = await getDocs(query(collection(db,'escala'), where('data','>=',today), where('ministerioId','!=',null), orderBy('ministerioId'), orderBy('data')));
-  const items = sp.docs.slice(0,8).map(d => d.data()).filter(e => e.ministerioNome);
-  items.sort((a, b) => a.data.toDate() - b.data.toDate());
+  const sp = await getDocs(query(collection(db,'escala'), where('data','>=',today), orderBy('data')));
+  const items = sp.docs.map(d => d.data()).filter(e => e.ministerioNome).slice(0, 8);
 
   const el = document.getElementById('home-prox');
   if (!items.length) { el.innerHTML='<div class="empty-msg">Nenhuma escala futura.</div>'; return; }
@@ -449,18 +463,25 @@ function closeSb() {
 
 // ── BOTTOM NAV ────────────────────────────────────────────────────────────────
 const pageTitles = { home:'Dashboard', escala:'Escala', musicos:'Músicos', ministerios:'Ministérios' };
+
+function navigateTo(p) {
+  document.querySelectorAll('#app .page').forEach(x => x.classList.remove('on'));
+  document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('on'));
+  document.querySelectorAll('.sb-item').forEach(x => x.classList.remove('on'));
+  document.getElementById('page-' + p).classList.add('on');
+  document.querySelector(`.nav-item[data-page="${p}"]`)?.classList.add('on');
+  document.querySelector(`.sb-item[data-page="${p}"]`)?.classList.add('on');
+  document.getElementById('topbar-title').textContent = pageTitles[p] || '';
+  if (p === 'escala')       loadEscala();
+  if (p === 'musicos')      renderMusicos();
+  if (p === 'ministerios')  renderMins();
+}
+
 document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const p = btn.dataset.page;
-    document.querySelectorAll('#app .page').forEach(x => x.classList.remove('on'));
-    document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('on'));
-    document.getElementById('page-' + p).classList.add('on');
-    btn.classList.add('on');
-    document.getElementById('topbar-title').textContent = pageTitles[p] || '';
-    if (p === 'escala')       loadEscala();
-    if (p === 'musicos')      renderMusicos();
-    if (p === 'ministerios')  renderMins();
-  });
+  btn.addEventListener('click', () => navigateTo(btn.dataset.page));
+});
+document.querySelectorAll('.sb-item[data-page]').forEach(btn => {
+  btn.addEventListener('click', () => { navigateTo(btn.dataset.page); closeSb(); });
 });
 
 // ── ESCALA ────────────────────────────────────────────────────────────────────

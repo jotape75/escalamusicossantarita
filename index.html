@@ -182,7 +182,7 @@
       <span class="month-label" id="month-label">—</span>
       <button class="btn-icon" id="btn-next">›</button>
     </div>
-    <button class="btn-filter" id="btn-filter-open">⚙</button>
+    <!-- ⚙ removido: filtro fica no sidebar -->
   </div>
   <div class="day-carousel-wrap">
     <div class="day-carousel" id="day-carousel"></div>
@@ -197,7 +197,7 @@
   <div class="filter-view-head">
     <button class="btn-back" id="btn-back-filter">←</button>
     <h2 id="filter-view-title">Resultados</h2>
-    <button class="btn-filter" id="btn-filter-open2">⚙</button>
+    <!-- ⚙ removido: filtro fica no sidebar -->
   </div>
   <div class="filter-results" id="filter-results-list">
     <div class="loading-wrap"><span class="spin"></span></div>
@@ -445,25 +445,35 @@ async function renderDaySlots(day) {
     const hasAny=hasMin||hasLivre||hasObs;
 
     // Com filtro: só mostra se bate o filtro
-    if(hasFilter){
-      if(!e) continue;
-      // Filtro por ministério
-      if(minF && e.ministerioId!==minF) continue;
-      // Filtro por músico: aparece pelo ministério dele OU pelo campo dupla/convidado
-      if(musF){
-        const mus=musicos.find(m=>m.id===musF);
-        if(!mus) continue;
-        if(minF){
-          // Músico + ministério: aparece pelo ministério dele OU pela dupla
-          const inMin=mus.ministerioId&&e?.ministerioId===mus.ministerioId;
-          const inNomes=e?.musicosNomes&&e.musicosNomes.includes(mus.nome);
-          const inAvulso=e?.nomeAvulso&&e.nomeAvulso.toLowerCase().includes(mus.nome.toLowerCase());
-          if(!inMin&&!inNomes&&!inAvulso) continue;
-        } else {
-          // Só músico: APENAS pelo campo dupla/convidado
-          const inAvulso=e?.nomeAvulso&&e.nomeAvulso.toLowerCase().includes(mus.nome.toLowerCase());
-          if(!inAvulso) continue;
-        }
+    if (hasFilter) {
+      if (!e) continue;
+
+      const mus = musF ? musicos.find(m => m.id === musF) : null;
+      const musNome = mus?.nome ? mus.nome.trim().toLowerCase() : '';
+
+      // 1) Só ministério
+      if (minF && !musF) {
+        if (e.ministerioId !== minF) continue;
+      }
+
+      // 2) Só músico: APENAS pelo campo dupla/convidado, e "sozinho" = exatamente o nome
+      if (musF && !minF) {
+        if (!musNome) continue;
+        const av = (e.nomeAvulso || '').trim().toLowerCase();
+        if (av !== musNome) continue;
+      }
+
+      // 3) Ministério + músico:
+      // - mostra tudo do ministério selecionado
+      // - e também o músico sozinho em nomeAvulso (mesmo fora do ministério)
+      if (minF && musF) {
+        if (!musNome) continue;
+
+        const inSelectedMin = (e.ministerioId === minF);
+        const av = (e.nomeAvulso || '').trim().toLowerCase();
+        const isSoloInDupla = (av === musNome);
+
+        if (!inSelectedMin && !isSoloInDupla) continue;
       }
     } // sem filtro: mostra todos os horários
 
@@ -499,13 +509,8 @@ function updateMusDropdown(minId){
 }
 document.getElementById('filter-min').addEventListener('change',function(){updateMusDropdown(this.value);});
 
-document.getElementById('btn-filter-open').addEventListener('click',()=>{
-  document.getElementById('filter-min').value=activeMinFilter;
-  updateMusDropdown(activeMinFilter);
-  document.getElementById('filter-mus').value=activeMusFilter;
-  document.getElementById('drawer').classList.add('on');
-  document.getElementById('drawer-overlay').classList.add('on');
-});
+// (⚙ removido) - abertura do drawer deve ser feita pelo sidebar/☰
+
 function closeDrawer(){
   document.getElementById('drawer').classList.remove('on');
   document.getElementById('drawer-overlay').classList.remove('on');
@@ -516,7 +521,7 @@ document.getElementById('btn-filter-apply').addEventListener('click',()=>{
   activeMinFilter=document.getElementById('filter-min').value;
   activeMusFilter=document.getElementById('filter-mus').value;
   const hasFilter=!!(activeMinFilter||activeMusFilter);
-  document.getElementById('btn-filter-open').classList.toggle('active', hasFilter);
+  // (btn-filter-open removido) sem toggle de classe aqui
   closeDrawer();
   if(hasFilter) {
     showFilterResultsView();
@@ -532,19 +537,10 @@ document.getElementById('btn-filter-clear').addEventListener('click',()=>{
   document.getElementById('filter-mus').value='';
 });
 
-// Botão filtro na view de resultados
-document.getElementById('btn-filter-open2').addEventListener('click',()=>{
-  document.getElementById('filter-min').value=activeMinFilter;
-  updateMusDropdown(activeMinFilter);
-  document.getElementById('filter-mus').value=activeMusFilter;
-  document.getElementById('drawer').classList.add('on');
-  document.getElementById('drawer-overlay').classList.add('on');
-});
-
 // Botão voltar da view de resultados
 document.getElementById('btn-back-filter').addEventListener('click',()=>{
   activeMinFilter=''; activeMusFilter='';
-  document.getElementById('btn-filter-open').classList.remove('active');
+  // (btn-filter-open removido)
   navigateTo('escala');
 });
 
@@ -590,29 +586,35 @@ async function showFilterResultsView() {
     const dt=new Date(curYear,curMonth,d);
 
     // Filtra slots do dia que batem o filtro
-    const matching=daySlots.filter(e=>{
-      const mus=musF?musicos.find(m=>m.id===musF):null;
+    const matching = daySlots.filter(e => {
+      const mus = musF ? musicos.find(m => m.id === musF) : null;
+      const musNome = mus?.nome ? mus.nome.trim().toLowerCase() : '';
 
-      if(minF && musF && mus){
-        // Ministério + músico: slot tem que ter o ministério selecionado
-        // E o músico aparece nele (pelo ministério dele OU pela dupla)
-        if(e.ministerioId!==minF) return false;
-        const inMin=mus.ministerioId&&e.ministerioId===mus.ministerioId;
-        const inNomes=e.musicosNomes&&e.musicosNomes.includes(mus.nome);
-        const inAvulso=e.nomeAvulso&&e.nomeAvulso.toLowerCase().includes(mus.nome.toLowerCase());
-        return inMin||inNomes||inAvulso;
+      // 1) Só ministério
+      if (minF && !musF) {
+        return e.ministerioId === minF;
       }
-      if(minF && !musF){
-        // Só ministério
-        return e.ministerioId===minF;
+
+      // 2) Só músico: APENAS pelo campo dupla/convidado, e "sozinho" = exatamente o nome
+      if (musF && !minF) {
+        if (!musNome) return false;
+        const av = (e.nomeAvulso || '').trim().toLowerCase();
+        return av === musNome;
       }
-      if(musF && mus && !minF){
-        // Só músico: APENAS pelo campo dupla/convidado
-        const inAvulso=e.nomeAvulso&&e.nomeAvulso.toLowerCase().includes(mus.nome.toLowerCase());
-        return inAvulso;
+
+      // 3) Ministério + músico:
+      // - mostra tudo do ministério selecionado
+      // - e também o músico sozinho em nomeAvulso (mesmo fora do ministério)
+      if (minF && musF) {
+        if (!musNome) return false;
+        const inSelectedMin = (e.ministerioId === minF);
+        const av = (e.nomeAvulso || '').trim().toLowerCase();
+        const isSoloInDupla = (av === musNome);
+        return inSelectedMin || isSoloInDupla;
       }
+
       return true;
-    }).filter(e=>e.ministerioNome||e.nomeAvulso||e.observacoes);
+    }).filter(e => e.ministerioNome || e.nomeAvulso || e.observacoes);
 
     if(!matching.length) continue;
 

@@ -85,37 +85,28 @@
     .btn-filter { background:none; border:1px solid var(--border); border-radius:var(--r); width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px; color:var(--muted); transition:all .15s; }
     .btn-filter.active { border-color:var(--rose); color:var(--rose); background:rgba(155,35,53,.06); }
 
-    /* Drawer de filtros */
-    .drawer-overlay { display:none; position:fixed; inset:0; background:rgba(15,13,11,.45); z-index:300; }
-    .drawer-overlay.on { display:block; }
-    .drawer { position:fixed; top:0; right:-320px; width:300px; max-width:90vw; height:100%; background:var(--surface); z-index:301; display:flex; flex-direction:column; transition:right .28s cubic-bezier(.4,0,.2,1); box-shadow:-4px 0 24px rgba(0,0,0,.12); }
-    .drawer.on { right:0; }
-    .drawer-head { padding:18px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
-    .drawer-head h2 { font-size:15px; font-weight:700; }
-    .btn-close { background:none; border:none; font-size:22px; cursor:pointer; color:var(--muted); line-height:1; }
-    .drawer-body { flex:1; padding:16px; overflow-y:auto; display:flex; flex-direction:column; gap:14px; }
-    .filter-group label { display:block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); margin-bottom:6px; }
-    .filter-sel { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:var(--r); padding:10px 12px; font-size:13px; font-family:var(--font); color:var(--text); outline:none; appearance:none; cursor:pointer; }
-    .filter-sel:focus { border-color:var(--rose); }
-    .drawer-foot { padding:14px 16px; border-top:1px solid var(--border); display:flex; gap:8px; }
-    .btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:9px 16px; border-radius:var(--r); font-size:13px; font-family:var(--font); font-weight:600; cursor:pointer; border:none; transition:all .15s; }
-    .btn-rose { background:var(--rose); color:#fff; }
-    .btn-rose:hover { background:var(--rose2); }
-    .btn-ghost { background:none; border:1px solid var(--border); color:var(--muted); }
-    .btn-block { width:100%; }
+    /* Day carousel */
+    .day-carousel-wrap { background:var(--surface); border-bottom:1px solid var(--border); padding:10px 0; overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+    .day-carousel-wrap::-webkit-scrollbar { display:none; }
+    .day-carousel { display:flex; gap:6px; padding:0 16px; min-width:max-content; }
+    .day-pill { display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 10px; border-radius:12px; cursor:pointer; border:1.5px solid var(--border); background:var(--surface2); min-width:46px; transition:all .15s; flex-shrink:0; }
+    .day-pill.today { border-color:var(--rose); }
+    .day-pill.selected { background:var(--rose); border-color:var(--rose); }
+    .day-pill-wkd { font-size:10px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); }
+    .day-pill-num { font-size:18px; font-weight:700; color:var(--text); line-height:1; }
+    .day-pill.today .day-pill-num { color:var(--rose); }
+    .day-pill.selected .day-pill-wkd,
+    .day-pill.selected .day-pill-num { color:#fff; }
 
-    /* Escala results */
-    .escala-content { padding:12px 16px; display:flex; flex-direction:column; gap:10px; }
-    .date-group { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
-    .date-group-head { padding:10px 14px; background:var(--surface2); border-bottom:1px solid var(--border); }
-    .date-group-head h3 { font-size:13px; font-weight:700; color:var(--text); }
-    .slot-item { padding:10px 14px; border-bottom:1px solid var(--border); display:flex; flex-direction:column; gap:3px; }
-    .slot-item:last-child { border-bottom:none; }
-    .slot-hor { font-size:12px; font-weight:700; color:var(--muted); }
-    .slot-badge { display:inline-block; padding:2px 9px; border-radius:20px; font-size:11px; font-weight:600; background:rgba(155,35,53,.1); color:var(--rose); border:1px solid rgba(155,35,53,.2); margin-top:2px; }
-    .slot-livre { font-size:12px; color:var(--text); font-weight:600; margin-top:2px; }
-    .slot-obs { font-size:11px; color:var(--muted); margin-top:1px; font-style:italic; }
-    .empty-msg { text-align:center; padding:40px 20px; color:var(--muted); font-size:13px; }
+    /* Slots container */
+    .slots-container { padding:12px 16px; display:flex; flex-direction:column; gap:8px; }
+    .slot-row { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:10px 14px; }
+    .slot-row-empty { opacity:.55; }
+    .slot-hor { font-size:12px; font-weight:700; color:var(--muted); margin-bottom:4px; }
+    .slot-badge { display:inline-block; padding:2px 9px; border-radius:20px; font-size:11px; font-weight:600; background:rgba(155,35,53,.1); color:var(--rose); border:1px solid rgba(155,35,53,.2); }
+    .slot-livre { font-size:12px; color:var(--text); font-weight:600; margin-top:3px; }
+    .slot-obs { font-size:11px; color:var(--muted); margin-top:2px; font-style:italic; }
+    .slot-sem-escala { font-size:12px; color:var(--muted); }
 
     /* ── INFO PAGE ── */
     .info-header { padding:32px 20px 24px; display:flex; flex-direction:column; align-items:center; gap:12px; }
@@ -141,6 +132,26 @@
     .spin { display:inline-block; width:14px; height:14px; border:2px solid var(--border); border-top-color:var(--rose); border-radius:50%; animation:spin .6s linear infinite; vertical-align:middle; }
     @keyframes spin { to{transform:rotate(360deg)} }
     .loading-wrap { padding:30px; text-align:center; color:var(--muted); font-size:13px; display:flex; align-items:center; justify-content:center; gap:8px; }
+    .empty-msg { text-align:center; padding:40px 20px; color:var(--muted); font-size:13px; }
+
+    /* Drawer de filtros */
+    .drawer-overlay { display:none; position:fixed; inset:0; background:rgba(15,13,11,.45); z-index:300; }
+    .drawer-overlay.on { display:block; }
+    .drawer { position:fixed; top:0; left:-320px; width:300px; max-width:90vw; height:100%; background:var(--surface); z-index:301; display:flex; flex-direction:column; transition:left .28s cubic-bezier(.4,0,.2,1); box-shadow:4px 0 24px rgba(0,0,0,.12); }
+    .drawer.on { left:0; }
+    .drawer-head { padding:18px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .drawer-head h2 { font-size:15px; font-weight:700; }
+    .btn-close { background:none; border:none; font-size:22px; cursor:pointer; color:var(--muted); line-height:1; }
+    .drawer-body { flex:1; padding:16px; overflow-y:auto; display:flex; flex-direction:column; gap:14px; }
+    .filter-group label { display:block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); margin-bottom:6px; }
+    .filter-sel { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:var(--r); padding:10px 12px; font-size:13px; font-family:var(--font); color:var(--text); outline:none; appearance:none; cursor:pointer; }
+    .filter-sel:focus { border-color:var(--rose); }
+    .drawer-foot { padding:14px 16px; border-top:1px solid var(--border); display:flex; gap:8px; }
+    .btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:9px 16px; border-radius:var(--r); font-size:13px; font-family:var(--font); font-weight:600; cursor:pointer; border:none; transition:all .15s; }
+    .btn-rose { background:var(--rose); color:#fff; }
+    .btn-rose:hover { background:var(--rose2); }
+    .btn-ghost { background:none; border:1px solid var(--border); color:var(--muted); }
+    .btn-block { width:100%; }
   </style>
 </head>
 <body>
@@ -183,7 +194,10 @@
     </div>
     <button class="btn-filter" id="btn-filter-open">☰</button>
   </div>
-  <div class="escala-content" id="escala-results">
+  <div class="day-carousel-wrap">
+    <div class="day-carousel" id="day-carousel"></div>
+  </div>
+  <div class="slots-container" id="escala-results">
     <div class="loading-wrap"><span class="spin"></span> Carregando...</div>
   </div>
 </div>
@@ -201,7 +215,7 @@
         <div class="info-icon">📍</div>
         <div class="info-text">
           <div class="lbl">Endereço</div>
-          <div class="val">R. Santa Rita de Cássia — Campinas, SP</div>
+          <div class="val">Av. Maj. Alfredo Camargo Fonseca, 399 - Cidade Nova I, Indaiatuba</div>
         </div>
       </div>
       <div class="info-row">
@@ -226,7 +240,9 @@
         <div class="info-icon">👨‍💻</div>
         <div class="info-text">
           <div class="lbl">Desenvolvedor</div>
-          <div class="val">@jotape_1980</div>
+          <div class="val">
+            <a href="https://www.instagram.com/jotape_1980" target="_blank" rel="noopener">@jotape_1980</a>
+          </div>
         </div>
       </div>
       <div class="info-row">
@@ -304,9 +320,15 @@ const MONTHS  = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','
 const MONTHS_S= ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 
 let ministerios = [], musicos = [];
-let curYear, curMonth;
+let curYear, curMonth, selectedDay;
 let activeMinFilter = '', activeMusFilter = '';
 let escalaCache = {}; // key: "YYYY-MM-DD" → [{horario, ministerioId, ministerioNome, nomeAvulso, observacoes}]
+
+const HORARIOS = {
+  week: ['07h','08:30h','10h','12h','19:30h'],
+  sat:  ['07h','08:30h','10h','12h','14h','15h','15:30h','17:30h','19:30h'],
+  sun:  ['07h','08:30h','10h','12h','17h','18:30h']
+};
 
 // ── BOTTOM NAV ──────────────────────────────────────────────────────────────
 document.querySelectorAll('.nav-item').forEach(btn => {
@@ -324,6 +346,7 @@ document.querySelectorAll('.nav-item').forEach(btn => {
 const now = new Date();
 curYear = now.getFullYear();
 curMonth = now.getMonth();
+selectedDay = now.getDate();
 
 async function init() {
   const [minSnap, musSnap] = await Promise.all([
@@ -350,8 +373,6 @@ async function loadDashboard() {
   const proxSnap = await getDocs(query(
     collection(db, 'escala'),
     where('data', '>=', todayTs),
-    where('ministerioNome', '!=', ''),
-    orderBy('ministerioNome'),
     orderBy('data')
   ));
 
@@ -419,15 +440,18 @@ async function loadDashboard() {
 // ── ESCALA ───────────────────────────────────────────────────────────────────
 document.getElementById('btn-prev-month').addEventListener('click', () => {
   curMonth--; if (curMonth < 0) { curMonth = 11; curYear--; }
+  selectedDay = 1;
   loadEscala();
 });
 document.getElementById('btn-next-month').addEventListener('click', () => {
   curMonth++; if (curMonth > 11) { curMonth = 0; curYear++; }
+  selectedDay = 1;
   loadEscala();
 });
 
 async function loadEscala() {
   document.getElementById('month-label').textContent = `${MONTHS_S[curMonth]} ${curYear}`;
+  document.getElementById('escala-results').innerHTML = '<div class="loading-wrap"><span class="spin"></span> Carregando...</div>';
   const start = Timestamp.fromDate(new Date(curYear, curMonth, 1));
   const end   = Timestamp.fromDate(new Date(curYear, curMonth + 1, 0, 23, 59, 59));
   const snap  = await getDocs(query(collection(db, 'escala'), where('data', '>=', start), where('data', '<=', end)));
@@ -448,77 +472,108 @@ async function loadEscala() {
     });
   });
 
-  renderEscalaResults();
+  renderCarousel();
+  renderDaySlots(selectedDay);
 }
 
 function renderEscala() {
+  // Set selectedDay to today if we are in the current month
+  const currentDate = new Date();
+  if (curYear === currentDate.getFullYear() && curMonth === currentDate.getMonth()) {
+    selectedDay = currentDate.getDate();
+  } else {
+    selectedDay = 1;
+  }
   document.getElementById('month-label').textContent = `${MONTHS_S[curMonth]} ${curYear}`;
   if (Object.keys(escalaCache).length === 0) {
     loadEscala();
   } else {
-    renderEscalaResults();
+    renderCarousel();
+    renderDaySlots(selectedDay);
   }
 }
 
-function slotPassesFilter(slot, minF, musF) {
-  if (!minF && !musF) return !!slot.ministerioNome;
-  if (minF && !musF) return slot.ministerioId === minF && !!slot.ministerioNome;
-  if (!minF && musF) {
+function getDayType(date) {
+  const dow = date.getDay();
+  if (dow === 0) return 'sun';
+  if (dow === 6) return 'sat';
+  return 'week';
+}
+
+function renderCarousel() {
+  const daysInMonth = new Date(curYear, curMonth + 1, 0).getDate();
+  const todayDay = now.getDate(), todayMonth = now.getMonth(), todayYear = now.getFullYear();
+  const carousel = document.getElementById('day-carousel');
+
+  carousel.innerHTML = '';
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dt   = new Date(curYear, curMonth, d);
+    const pill = document.createElement('div');
+    pill.className = 'day-pill';
+    if (d === selectedDay) pill.classList.add('selected');
+    if (d === todayDay && curMonth === todayMonth && curYear === todayYear) pill.classList.add('today');
+    pill.innerHTML = `<span class="day-pill-wkd">${WKDAYS[dt.getDay()]}</span><span class="day-pill-num">${d}</span>`;
+    pill.addEventListener('click', () => {
+      selectedDay = d;
+      document.querySelectorAll('.day-pill').forEach(p => p.classList.remove('selected'));
+      pill.classList.add('selected');
+      renderDaySlots(d);
+    });
+    carousel.appendChild(pill);
+  }
+
+  // Scroll to selected day
+  setTimeout(() => {
+    const pills = carousel.querySelectorAll('.day-pill');
+    const idx   = selectedDay - 1;
+    if (pills[idx]) pills[idx].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }, 50);
+}
+
+function slotMatchesFilter(slot, minF, musF) {
+  if (!minF && !musF) return true;
+  if (minF && slot.ministerioId !== minF) return false;
+  if (musF) {
     const mus = musicos.find(m => m.id === musF);
     if (!mus) return false;
-    const inNomes = slot.musicosNomes && slot.musicosNomes.includes(mus.nome);
+    const inNomes  = slot.musicosNomes && slot.musicosNomes.includes(mus.nome);
     const inAvulso = slot.nomeAvulso && slot.nomeAvulso.toLowerCase().includes(mus.nome.toLowerCase());
     return inNomes || inAvulso;
   }
-  // both set
-  if (slot.ministerioId !== minF) return false;
-  const mus = musicos.find(m => m.id === musF);
-  if (!mus) return false;
-  const inNomes = slot.musicosNomes && slot.musicosNomes.includes(mus.nome);
-  const inAvulso = slot.nomeAvulso && slot.nomeAvulso.toLowerCase().includes(mus.nome.toLowerCase());
-  return inNomes || inAvulso;
+  return true;
 }
 
-function renderEscalaResults() {
+function renderDaySlots(day) {
   const container = document.getElementById('escala-results');
+  const dt        = new Date(curYear, curMonth, day);
+  const type      = getDayType(dt);
+  const hors      = HORARIOS[type];
+  const dateKey   = `${curYear}-${String(curMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+  const daySlots  = escalaCache[dateKey] || [];
   const minF = activeMinFilter;
   const musF = activeMusFilter;
+  const hasFilter = !!(minF || musF);
 
-  // Sort dates
-  const sortedDates = Object.keys(escalaCache).sort();
-  const groups = [];
+  const rows = hors.map(h => {
+    const slot = daySlots.find(s => s.horario === h);
+    if (hasFilter) {
+      if (!slot || !slotMatchesFilter(slot, minF, musF)) return '';
+    }
+    const isEmpty = !slot || (!slot.ministerioNome && !slot.nomeAvulso && !slot.observacoes);
+    return `<div class="slot-row${isEmpty ? ' slot-row-empty' : ''}">
+      <div class="slot-hor">${h}</div>
+      ${slot && slot.ministerioNome ? `<span class="slot-badge">${slot.ministerioNome}</span>` : ''}
+      ${slot && slot.nomeAvulso  ? `<div class="slot-livre">${slot.nomeAvulso}</div>`   : ''}
+      ${slot && slot.observacoes ? `<div class="slot-obs">${slot.observacoes}</div>`    : ''}
+      ${isEmpty ? '<span class="slot-sem-escala">Sem escala</span>' : ''}
+    </div>`;
+  }).join('');
 
-  sortedDates.forEach(dateKey => {
-    const slots = escalaCache[dateKey];
-    const filtered = slots.filter(s => slotPassesFilter(s, minF, musF));
-    if (filtered.length === 0) return;
-
-    // Sort slots by horario
-    filtered.sort((a, b) => a.horario.localeCompare(b.horario));
-
-    const dt = new Date(dateKey + 'T12:00:00');
-    const label = `${WKDAYS[dt.getDay()]} ${String(dt.getDate()).padStart(2,'0')}/${String(dt.getMonth()+1).padStart(2,'0')}`;
-    groups.push({ label, slots: filtered });
-  });
-
-  if (!groups.length) {
-    container.innerHTML = '<div class="empty-msg">Nenhuma escala encontrada para os filtros selecionados.</div>';
+  if (hasFilter && !rows.trim()) {
+    container.innerHTML = '<div class="empty-msg">Nenhuma escala encontrada para este filtro neste dia.</div>';
     return;
   }
-
-  container.innerHTML = groups.map(g => `
-    <div class="date-group">
-      <div class="date-group-head"><h3>${g.label}</h3></div>
-      ${g.slots.map(s => `
-        <div class="slot-item">
-          <div class="slot-hor">${s.horario}</div>
-          ${s.ministerioNome ? `<span class="slot-badge">${s.ministerioNome}</span>` : ''}
-          ${s.nomeAvulso ? `<div class="slot-livre">${s.nomeAvulso}</div>` : ''}
-          ${s.observacoes ? `<div class="slot-obs">${s.observacoes}</div>` : ''}
-        </div>
-      `).join('')}
-    </div>
-  `).join('');
+  container.innerHTML = rows || '<div class="empty-msg">Nenhum horário disponível para este dia.</div>';
 }
 
 // ── FILTERS ──────────────────────────────────────────────────────────────────
@@ -563,7 +618,7 @@ document.getElementById('btn-filter-apply').addEventListener('click', () => {
   const hasFilter = activeMinFilter || activeMusFilter;
   document.getElementById('btn-filter-open').classList.toggle('active', !!hasFilter);
   closeDrawer();
-  renderEscalaResults();
+  renderDaySlots(selectedDay);
 });
 
 document.getElementById('btn-filter-clear').addEventListener('click', () => {

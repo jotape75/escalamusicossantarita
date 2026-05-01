@@ -80,7 +80,7 @@
     .day-pill.selected .day-pill-wkd,
     .day-pill.selected .day-pill-num { color:#fff; }
 
-    /* Slots — só mostra preenchidos */
+    /* Slots */
     .slots-container { padding:12px 16px; display:flex; flex-direction:column; gap:8px; }
     .slot-row { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px 14px; }
     .slot-hor   { font-size:12px; font-weight:700; color:var(--muted); margin-bottom:6px; }
@@ -176,13 +176,13 @@
 <!-- ESCALA -->
 <div class="page" id="page-escala">
   <div class="escala-topbar">
+    <!-- ☰ abre o sidebar de filtros -->
     <button class="btn-sb-open" id="btn-sb-escala" aria-label="Menu">☰</button>
     <div class="month-nav">
       <button class="btn-icon" id="btn-prev">‹</button>
       <span class="month-label" id="month-label">—</span>
       <button class="btn-icon" id="btn-next">›</button>
     </div>
-    <!-- ⚙ removido: filtro fica no sidebar -->
   </div>
   <div class="day-carousel-wrap">
     <div class="day-carousel" id="day-carousel"></div>
@@ -197,7 +197,8 @@
   <div class="filter-view-head">
     <button class="btn-back" id="btn-back-filter">←</button>
     <h2 id="filter-view-title">Resultados</h2>
-    <!-- ⚙ removido: filtro fica no sidebar -->
+    <!-- ⚙ abre o sidebar para alterar o filtro sem voltar para a escala -->
+    <button class="btn-filter" id="btn-sb-filter" aria-label="Filtros">⚙</button>
   </div>
   <div class="filter-results" id="filter-results-list">
     <div class="loading-wrap"><span class="spin"></span></div>
@@ -242,7 +243,7 @@
   </div>
 </div>
 
-<!-- FILTER DRAWER -->
+<!-- FILTER DRAWER (sidebar) -->
 <div class="drawer-overlay" id="drawer-overlay"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-head">
@@ -288,37 +289,38 @@ const fb = initializeApp({
 });
 const db = getFirestore(fb);
 
-// ── HORÁRIOS FIXOS (corrigidos) ───────────────────────────────────────────────
+// ── HORÁRIOS FIXOS ────────────────────────────────────────────���───────────────
 const HORARIOS = {
   week: ['07:30h','12h','15h','17:30h','19:30h'],
   sat:  ['07h','12h','17h','19:30h'],
   sun:  ['07h','08:30h','10h','12h','17h','18:30h']
 };
 
-const WKDAYS  = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-const MONTHS  = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-const MONTHS_S= ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const WKDAYS   = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const WKDAYS_FULL = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+const MONTHS_S = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 
-let ministerios=[], musicos=[];
+let ministerios = [], musicos = [];
 let curYear, curMonth, selectedDay;
-let activeMinFilter='', activeMusFilter='';
+let activeMinFilter = '', activeMusFilter = '';
 const now = new Date();
-curYear=now.getFullYear(); curMonth=now.getMonth(); selectedDay=now.getDate();
+curYear = now.getFullYear(); curMonth = now.getMonth(); selectedDay = now.getDate();
 
 function getDayType(date) {
-  const dow=date.getDay(); return dow===0?'sun':dow===6?'sat':'week';
+  const dow = date.getDay();
+  return dow === 0 ? 'sun' : dow === 6 ? 'sat' : 'week';
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 async function init() {
   const [minSnap, musSnap] = await Promise.all([
-    getDocs(query(collection(db,'ministerios'),orderBy('nome'))),
-    getDocs(query(collection(db,'musicos'),orderBy('nome')))
+    getDocs(query(collection(db,'ministerios'), orderBy('nome'))),
+    getDocs(query(collection(db,'musicos'), orderBy('nome')))
   ]);
-  ministerios=minSnap.docs.map(d=>({id:d.id,...d.data()}));
-  musicos=musSnap.docs.map(d=>({id:d.id,...d.data()}));
-  document.getElementById('st-min').textContent=ministerios.length;
-  document.getElementById('st-mus').textContent=musicos.length;
+  ministerios = minSnap.docs.map(d => ({id:d.id, ...d.data()}));
+  musicos     = musSnap.docs.map(d => ({id:d.id, ...d.data()}));
+  document.getElementById('st-min').textContent = ministerios.length;
+  document.getElementById('st-mus').textContent = musicos.length;
   populateFilterDropdowns();
   loadDashboard();
 }
@@ -326,291 +328,301 @@ init();
 
 // ── DASHBOARD ────────────────────────────────────────────────────────────────
 async function loadDashboard() {
-  const today=new Date(); today.setHours(0,0,0,0);
-  const tomorrow=new Date(today); tomorrow.setDate(tomorrow.getDate()+1);
-  const snap=await getDocs(query(
+  const today    = new Date(); today.setHours(0,0,0,0);
+  const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate()+1);
+  const snap = await getDocs(query(
     collection(db,'escala'),
     where('data','>=',Timestamp.fromDate(today)),
-    where('data','<',Timestamp.fromDate(tomorrow))
+    where('data','<', Timestamp.fromDate(tomorrow))
   ));
-  const byH={};
-  snap.docs.forEach(d=>{byH[d.data().horario]=d.data();});
+  const byH = {};
+  snap.docs.forEach(d => { byH[d.data().horario] = d.data(); });
 
-  // Todos os horários do dia (fixos + extras)
-  const type=getDayType(today);
-  const fixed=[...HORARIOS[type]];
-  Object.keys(byH).forEach(h=>{ if(!fixed.includes(h)) fixed.push(h); });
-  fixed.sort((a,b)=>toMin(a)-toMin(b));
+  const type  = getDayType(today);
+  const fixed = [...HORARIOS[type]];
+  Object.keys(byH).forEach(h => { if(!fixed.includes(h)) fixed.push(h); });
+  fixed.sort((a,b) => toMin(a)-toMin(b));
 
-  const hojeSlots=fixed.map(h=>({h,e:byH[h]})).filter(({e})=>e&&(e.ministerioNome||e.nomeAvulso||e.observacoes));
-  const el=document.getElementById('hoje-card');
-  if(!hojeSlots.length){el.innerHTML='<div class="empty-msg">Nenhuma missa escalada para hoje.</div>';return;}
-  el.innerHTML=hojeSlots.map(({h,e})=>`
+  const hojeSlots = fixed
+    .map(h => ({h, e:byH[h]}))
+    .filter(({e}) => e && (e.ministerioNome || e.nomeAvulso || e.observacoes));
+
+  const el = document.getElementById('hoje-card');
+  if(!hojeSlots.length) {
+    el.innerHTML = '<div class="empty-msg">Nenhuma missa escalada para hoje.</div>';
+    return;
+  }
+  el.innerHTML = hojeSlots.map(({h,e}) => `
     <div class="hoje-slot">
       <div class="hoje-hor">${h}</div>
-      ${e.ministerioNome?`<span class="hoje-badge">${e.ministerioNome}</span>`:''}
-      ${e.nomeAvulso?`<div class="hoje-livre">${e.nomeAvulso}</div>`:''}
-      ${e.observacoes?`<div class="hoje-obs">${e.observacoes}</div>`:''}
+      ${e.ministerioNome ? `<span class="hoje-badge">${e.ministerioNome}</span>` : ''}
+      ${e.nomeAvulso     ? `<div class="hoje-livre">${e.nomeAvulso}</div>`       : ''}
+      ${e.observacoes    ? `<div class="hoje-obs">${e.observacoes}</div>`         : ''}
     </div>`).join('');
 }
 
 // ── NAV ───────────────────────────────────────────────────────────────────────
 function navigateTo(p) {
-  document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));
-  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.page').forEach(x => x.classList.remove('on'));
+  document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('on'));
   document.getElementById('page-'+p).classList.add('on');
   document.querySelector(`.nav-item[data-page="${p}"]`)?.classList.add('on');
-  if(p==='escala') renderEscala();
+  if(p === 'escala') renderEscala();
 }
-document.querySelectorAll('.nav-item').forEach(btn=>{
-  btn.addEventListener('click',()=>navigateTo(btn.dataset.page));
+document.querySelectorAll('.nav-item').forEach(btn => {
+  btn.addEventListener('click', () => navigateTo(btn.dataset.page));
 });
 
 // ── ESCALA ────────────────────────────────────────────────────────────────────
-document.getElementById('btn-prev').addEventListener('click',()=>{
-  curMonth--; if(curMonth<0){curMonth=11;curYear--;} selectedDay=1; loadEscala();
+document.getElementById('btn-prev').addEventListener('click', () => {
+  curMonth--; if(curMonth < 0){ curMonth = 11; curYear--; } selectedDay = 1; loadEscala();
 });
-document.getElementById('btn-next').addEventListener('click',()=>{
-  curMonth++; if(curMonth>11){curMonth=0;curYear++;} selectedDay=1; loadEscala();
+document.getElementById('btn-next').addEventListener('click', () => {
+  curMonth++; if(curMonth > 11){ curMonth = 0; curYear++; } selectedDay = 1; loadEscala();
 });
 
 function renderEscala() {
-  if(curYear===now.getFullYear()&&curMonth===now.getMonth()) selectedDay=now.getDate();
-  else selectedDay=1;
-  document.getElementById('month-label').textContent=`${MONTHS_S[curMonth]} ${curYear}`;
+  if(curYear === now.getFullYear() && curMonth === now.getMonth()) selectedDay = now.getDate();
+  else selectedDay = 1;
+  document.getElementById('month-label').textContent = `${MONTHS_S[curMonth]} ${curYear}`;
   renderCarousel();
   renderDaySlots(selectedDay);
 }
 
 async function loadEscala() {
-  document.getElementById('month-label').textContent=`${MONTHS_S[curMonth]} ${curYear}`;
+  document.getElementById('month-label').textContent = `${MONTHS_S[curMonth]} ${curYear}`;
   renderCarousel();
   renderDaySlots(selectedDay);
 }
 
 function renderCarousel() {
-  const dim=new Date(curYear,curMonth+1,0).getDate();
-  const todayD=now.getDate(),todayM=now.getMonth(),todayY=now.getFullYear();
-  const carousel=document.getElementById('day-carousel');
-  carousel.innerHTML='';
-  for(let d=1;d<=dim;d++){
-    const dt=new Date(curYear,curMonth,d);
-    const pill=document.createElement('div');
-    pill.className='day-pill';
-    if(d===selectedDay) pill.classList.add('selected');
-    if(d===todayD&&curMonth===todayM&&curYear===todayY) pill.classList.add('today');
-    pill.innerHTML=`<span class="day-pill-wkd">${WKDAYS[dt.getDay()]}</span><span class="day-pill-num">${d}</span>`;
-    pill.addEventListener('click',()=>{
-      selectedDay=d;
-      document.querySelectorAll('.day-pill').forEach(p=>p.classList.remove('selected'));
+  const dim    = new Date(curYear, curMonth+1, 0).getDate();
+  const todayD = now.getDate(), todayM = now.getMonth(), todayY = now.getFullYear();
+  const carousel = document.getElementById('day-carousel');
+  carousel.innerHTML = '';
+  for(let d = 1; d <= dim; d++){
+    const dt   = new Date(curYear, curMonth, d);
+    const pill = document.createElement('div');
+    pill.className = 'day-pill';
+    if(d === selectedDay) pill.classList.add('selected');
+    if(d === todayD && curMonth === todayM && curYear === todayY) pill.classList.add('today');
+    pill.innerHTML = `<span class="day-pill-wkd">${WKDAYS[dt.getDay()]}</span><span class="day-pill-num">${d}</span>`;
+    pill.addEventListener('click', () => {
+      selectedDay = d;
+      document.querySelectorAll('.day-pill').forEach(p => p.classList.remove('selected'));
       pill.classList.add('selected');
       renderDaySlots(d);
     });
     carousel.appendChild(pill);
   }
-  setTimeout(()=>{
-    const pills=carousel.querySelectorAll('.day-pill');
-    if(pills[selectedDay-1]) pills[selectedDay-1].scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
-  },50);
+  setTimeout(() => {
+    const pills = carousel.querySelectorAll('.day-pill');
+    if(pills[selectedDay-1]) pills[selectedDay-1].scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+  }, 50);
 }
 
 async function renderDaySlots(day) {
-  const container=document.getElementById('escala-results');
-  container.innerHTML='<div class="loading-wrap"><span class="spin"></span></div>';
+  const container = document.getElementById('escala-results');
+  container.innerHTML = '<div class="loading-wrap"><span class="spin"></span></div>';
 
-  const dt=new Date(curYear,curMonth,day);
-  const start=Timestamp.fromDate(new Date(curYear,curMonth,day,0,0,0));
-  const end=Timestamp.fromDate(new Date(curYear,curMonth,day,23,59,59));
-  const snap=await getDocs(query(collection(db,'escala'),where('data','>=',start),where('data','<=',end)));
+  const dt    = new Date(curYear, curMonth, day);
+  const start = Timestamp.fromDate(new Date(curYear, curMonth, day, 0, 0, 0));
+  const end   = Timestamp.fromDate(new Date(curYear, curMonth, day, 23, 59, 59));
+  const snap  = await getDocs(query(collection(db,'escala'), where('data','>=',start), where('data','<=',end)));
 
-  const byH={};
-  snap.docs.forEach(d=>{byH[d.data().horario]=d.data();});
+  const byH = {};
+  snap.docs.forEach(d => { byH[d.data().horario] = d.data(); });
 
-  // Todos os horários: fixos + extras do dia
-  const type=getDayType(dt);
-  const allHors=[...HORARIOS[type]];
-  Object.keys(byH).forEach(h=>{ if(!allHors.includes(h)) allHors.push(h); });
-  allHors.sort((a,b)=>toMin(a)-toMin(b));
+  const type    = getDayType(dt);
+  const allHors = [...HORARIOS[type]];
+  Object.keys(byH).forEach(h => { if(!allHors.includes(h)) allHors.push(h); });
+  allHors.sort((a,b) => toMin(a)-toMin(b));
 
-  const minF=activeMinFilter, musF=activeMusFilter;
-  const hasFilter=!!(minF||musF);
+  const minF      = activeMinFilter;
+  const musF      = activeMusFilter;
+  const hasFilter = !!(minF || musF);
 
-  // Filtra slots com alguma informação preenchida
-  const rows=[];
+  const rows = [];
   for(const h of allHors){
-    const e=byH[h];
-    const hasMin=e?.ministerioNome;
-    const hasLivre=e?.nomeAvulso;
-    const hasObs=e?.observacoes;
-    const hasAny=hasMin||hasLivre||hasObs;
+    const e       = byH[h];
+    const hasMin  = e?.ministerioNome;
+    const hasLivre= e?.nomeAvulso;
+    const hasObs  = e?.observacoes;
 
-    // Com filtro: só mostra se bate o filtro
-    if (hasFilter) {
-      if (!e) continue;
+    if(hasFilter){
+      if(!e) continue;
 
       const mus = musF ? musicos.find(m => m.id === musF) : null;
-      const musNome = mus?.nome ? mus.nome.trim().toLowerCase() : '';
 
       // 1) Só ministério
-      if (minF && !musF) {
-        if (e.ministerioId !== minF) continue;
+      if(minF && !musF){
+        if(e.ministerioId !== minF) continue;
       }
 
-      // 2) Só músico: APENAS pelo campo dupla/convidado, e "sozinho" = exatamente o nome
-      if (musF && !minF) {
-        if (!musNome) continue;
-        const av = (e.nomeAvulso || '').trim().toLowerCase();
-        if (av !== musNome) continue;
+      // 2) Só músico — pelo campo nomeAvulso (sozinho ou em dupla)
+      if(musF && !minF){
+        if(!mus) continue;
+        if(!musicianInNomeAvulso(e.nomeAvulso, mus.nome)) continue;
       }
 
-      // 3) Ministério + músico:
-      // - mostra tudo do ministério selecionado
-      // - e também o músico sozinho em nomeAvulso (mesmo fora do ministério)
-      if (minF && musF) {
-        if (!musNome) continue;
-
+      // 3) Ministério + músico — tudo do ministério OU músico em nomeAvulso
+      if(minF && musF){
+        if(!mus) continue;
         const inSelectedMin = (e.ministerioId === minF);
-        const av = (e.nomeAvulso || '').trim().toLowerCase();
-        const isSoloInDupla = (av === musNome);
-
-        if (!inSelectedMin && !isSoloInDupla) continue;
+        const inDupla       = musicianInNomeAvulso(e.nomeAvulso, mus.nome);
+        if(!inSelectedMin && !inDupla) continue;
       }
-    } // sem filtro: mostra todos os horários
+    }
 
-    const isEmpty=!hasMin&&!hasLivre&&!hasObs;
-    rows.push(`<div class="slot-row${isEmpty?' slot-empty':''}">
+    const isEmpty = !hasMin && !hasLivre && !hasObs;
+    rows.push(`<div class="slot-row${isEmpty ? ' slot-empty' : ''}">
       <div class="slot-hor">${h}</div>
-      ${hasMin?`<span class="slot-badge">${e?.ministerioNome}</span>`:''}
-      ${hasLivre?`<div class="slot-livre">${e?.nomeAvulso}</div>`:''}
-      ${hasObs?`<div class="slot-obs">${e?.observacoes}</div>`:''}
-      ${isEmpty?`<div style="font-size:12px;color:var(--muted);font-style:italic">Sem escala</div>`:''}
+      ${hasMin   ? `<span class="slot-badge">${e.ministerioNome}</span>`                               : ''}
+      ${hasLivre ? `<div class="slot-livre">${e.nomeAvulso}</div>`                                     : ''}
+      ${hasObs   ? `<div class="slot-obs">${e.observacoes}</div>`                                      : ''}
+      ${isEmpty  ? `<div style="font-size:12px;color:var(--muted);font-style:italic">Sem escala</div>` : ''}
     </div>`);
   }
 
   if(!rows.length){
-    container.innerHTML='<div class="empty-msg">Nenhuma missa escalada para este dia.</div>';
+    container.innerHTML = '<div class="empty-msg">Nenhuma missa escalada para este dia.</div>';
     return;
   }
-  container.innerHTML=rows.join('');
+  container.innerHTML = rows.join('');
 }
 
 // ── FILTROS ───────────────────────────────────────────────────────────────────
 function populateFilterDropdowns(){
-  const minSel=document.getElementById('filter-min');
-  minSel.innerHTML='<option value="">Todos</option>'+
-    ministerios.map(m=>`<option value="${m.id}">${m.nome}</option>`).join('');
+  const minSel = document.getElementById('filter-min');
+  minSel.innerHTML = '<option value="">Todos</option>' +
+    ministerios.map(m => `<option value="${m.id}">${m.nome}</option>`).join('');
   updateMusDropdown('');
 }
-function updateMusDropdown(minId){
-  const musSel=document.getElementById('filter-mus');
-  const list=minId?musicos.filter(m=>m.ministerioId===minId):musicos;
-  musSel.innerHTML='<option value="">Todos</option>'+
-    list.map(m=>`<option value="${m.id}">${m.nome}</option>`).join('');
-}
-document.getElementById('filter-min').addEventListener('change',function(){updateMusDropdown(this.value);});
 
-// (⚙ removido) - abertura do drawer deve ser feita pelo sidebar/☰
+function updateMusDropdown(minId){
+  const musSel = document.getElementById('filter-mus');
+  const list   = minId ? musicos.filter(m => m.ministerioId === minId) : musicos;
+  musSel.innerHTML = '<option value="">Todos</option>' +
+    list.map(m => `<option value="${m.id}">${m.nome}</option>`).join('');
+}
+
+document.getElementById('filter-min').addEventListener('change', function(){ updateMusDropdown(this.value); });
+
+// ── DRAWER ────────────────────────────────────────────────────────────────────
+function openDrawer(){
+  // sincroniza selects com filtro ativo antes de abrir
+  document.getElementById('filter-min').value = activeMinFilter;
+  updateMusDropdown(activeMinFilter);
+  document.getElementById('filter-mus').value = activeMusFilter;
+  document.getElementById('drawer').classList.add('on');
+  document.getElementById('drawer-overlay').classList.add('on');
+}
 
 function closeDrawer(){
   document.getElementById('drawer').classList.remove('on');
   document.getElementById('drawer-overlay').classList.remove('on');
 }
-document.getElementById('btn-drawer-close').addEventListener('click',closeDrawer);
-document.getElementById('drawer-overlay').addEventListener('click',closeDrawer);
-document.getElementById('btn-filter-apply').addEventListener('click',()=>{
-  activeMinFilter=document.getElementById('filter-min').value;
-  activeMusFilter=document.getElementById('filter-mus').value;
-  const hasFilter=!!(activeMinFilter||activeMusFilter);
-  // (btn-filter-open removido) sem toggle de classe aqui
+
+// ☰ na página Escala abre o drawer
+document.getElementById('btn-sb-escala').addEventListener('click', openDrawer);
+
+// ⚙ na página de Resultados também abre o drawer
+document.getElementById('btn-sb-filter').addEventListener('click', openDrawer);
+
+document.getElementById('btn-drawer-close').addEventListener('click', closeDrawer);
+document.getElementById('drawer-overlay').addEventListener('click', closeDrawer);
+
+// Aplicar filtro
+document.getElementById('btn-filter-apply').addEventListener('click', () => {
+  activeMinFilter = document.getElementById('filter-min').value;
+  activeMusFilter = document.getElementById('filter-mus').value;
+  const hasFilter = !!(activeMinFilter || activeMusFilter);
   closeDrawer();
-  if(hasFilter) {
+  if(hasFilter){
     showFilterResultsView();
   } else {
-    // sem filtro: volta para escala normal
     navigateTo('escala');
   }
 });
-document.getElementById('btn-filter-clear').addEventListener('click',()=>{
-  activeMinFilter=''; activeMusFilter='';
-  document.getElementById('filter-min').value='';
-  updateMusDropdown('');
-  document.getElementById('filter-mus').value='';
-});
 
-// Botão voltar da view de resultados
-document.getElementById('btn-back-filter').addEventListener('click',()=>{
-  activeMinFilter=''; activeMusFilter='';
-  // (btn-filter-open removido)
+// Limpar filtro — fecha o drawer e volta para a escala
+document.getElementById('btn-filter-clear').addEventListener('click', () => {
+  activeMinFilter = '';
+  activeMusFilter = '';
+  document.getElementById('filter-min').value = '';
+  updateMusDropdown('');
+  document.getElementById('filter-mus').value = '';
+  closeDrawer();
   navigateTo('escala');
 });
 
+// Botão voltar — limpa filtros e volta para a escala
+document.getElementById('btn-back-filter').addEventListener('click', () => {
+  activeMinFilter = '';
+  activeMusFilter = '';
+  navigateTo('escala');
+});
+
+// ── RESULTADOS DO FILTRO ──────────────────────────────────────────────────────
 async function showFilterResultsView() {
-  // Título
-  const minNome = activeMinFilter ? ministerios.find(m=>m.id===activeMinFilter)?.nome : null;
-  const musNome = activeMusFilter ? musicos.find(m=>m.id===activeMusFilter)?.nome : null;
+  const minNome = activeMinFilter ? ministerios.find(m => m.id === activeMinFilter)?.nome : null;
+  const musNome = activeMusFilter ? musicos.find(m => m.id === activeMusFilter)?.nome     : null;
   let title = 'Resultados';
   if(minNome && musNome) title = `${musNome} · ${minNome}`;
-  else if(minNome) title = minNome;
-  else if(musNome) title = musNome;
+  else if(minNome)       title = minNome;
+  else if(musNome)       title = musNome;
   document.getElementById('filter-view-title').textContent = title;
 
-  // Navega para a view
-  document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));
-  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('on'));
+  // navega para a página de resultados
+  document.querySelectorAll('.page').forEach(x => x.classList.remove('on'));
+  document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('on'));
   document.getElementById('page-filter-results').classList.add('on');
 
   const list = document.getElementById('filter-results-list');
-  list.innerHTML='<div class="loading-wrap"><span class="spin"></span> Carregando...</div>';
+  list.innerHTML = '<div class="loading-wrap"><span class="spin"></span> Carregando...</div>';
 
-  // Busca o mês inteiro
-  const start = Timestamp.fromDate(new Date(curYear,curMonth,1));
-  const end   = Timestamp.fromDate(new Date(curYear,curMonth+1,0,23,59,59));
-  const snap  = await getDocs(query(collection(db,'escala'),where('data','>=',start),where('data','<=',end)));
+  // busca o mês inteiro
+  const start = Timestamp.fromDate(new Date(curYear, curMonth, 1));
+  const end   = Timestamp.fromDate(new Date(curYear, curMonth+1, 0, 23, 59, 59));
+  const snap  = await getDocs(query(collection(db,'escala'), where('data','>=',start), where('data','<=',end)));
 
-  // Agrupa por dia
+  // agrupa por dia
   const byDay = {};
-  snap.docs.forEach(d=>{
-    const dat=d.data(), dt=dat.data.toDate();
-    const dayKey=dt.getDate();
-    if(!byDay[dayKey]) byDay[dayKey]=[];
+  snap.docs.forEach(d => {
+    const dat    = d.data();
+    const dt     = dat.data.toDate();
+    const dayKey = dt.getDate();
+    if(!byDay[dayKey]) byDay[dayKey] = [];
     byDay[dayKey].push({...dat, _date:dt});
   });
 
-  const WKDAYS_FULL=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
-  const minF=activeMinFilter, musF=activeMusFilter;
-  const groups=[];
+  const minF        = activeMinFilter;
+  const musF        = activeMusFilter;
+  const groups      = [];
+  const daysInMonth = new Date(curYear, curMonth+1, 0).getDate();
 
-  const daysInMonth=new Date(curYear,curMonth+1,0).getDate();
-  for(let d=1;d<=daysInMonth;d++){
-    const daySlots=(byDay[d]||[]);
-    const dt=new Date(curYear,curMonth,d);
+  for(let d = 1; d <= daysInMonth; d++){
+    const daySlots = byDay[d] || [];
+    const dt       = new Date(curYear, curMonth, d);
 
-    // Filtra slots do dia que batem o filtro
     const matching = daySlots.filter(e => {
       const mus = musF ? musicos.find(m => m.id === musF) : null;
-      const musNome = mus?.nome ? mus.nome.trim().toLowerCase() : '';
 
       // 1) Só ministério
-      if (minF && !musF) {
+      if(minF && !musF){
         return e.ministerioId === minF;
       }
 
-      // 2) Só músico: APENAS pelo campo dupla/convidado, e "sozinho" = exatamente o nome
-      if (musF && !minF) {
-        if (!musNome) return false;
-        const av = (e.nomeAvulso || '').trim().toLowerCase();
-        return av === musNome;
+      // 2) Só músico — pelo campo nomeAvulso (sozinho ou em dupla)
+      if(musF && !minF){
+        if(!mus) return false;
+        return musicianInNomeAvulso(e.nomeAvulso, mus.nome);
       }
 
-      // 3) Ministério + músico:
-      // - mostra tudo do ministério selecionado
-      // - e também o músico sozinho em nomeAvulso (mesmo fora do ministério)
-      if (minF && musF) {
-        if (!musNome) return false;
-        const inSelectedMin = (e.ministerioId === minF);
-        const av = (e.nomeAvulso || '').trim().toLowerCase();
-        const isSoloInDupla = (av === musNome);
-        return inSelectedMin || isSoloInDupla;
+      // 3) Ministério + músico — tudo do ministério OU músico em nomeAvulso
+      if(minF && musF){
+        if(!mus) return false;
+        return (e.ministerioId === minF) || musicianInNomeAvulso(e.nomeAvulso, mus.nome);
       }
 
       return true;
@@ -618,15 +630,14 @@ async function showFilterResultsView() {
 
     if(!matching.length) continue;
 
-    // Ordena por horário
-    matching.sort((a,b)=>toMin(a.horario)-toMin(b.horario));
+    matching.sort((a,b) => toMin(a.horario)-toMin(b.horario));
 
-    const slotsHtml=matching.map(e=>`
+    const slotsHtml = matching.map(e => `
       <div class="filter-slot">
         <div class="filter-slot-hor">${e.horario}</div>
-        ${e.ministerioNome?`<span class="filter-slot-badge">${e.ministerioNome}</span>`:''}
-        ${e.nomeAvulso?`<div class="filter-slot-livre">${e.nomeAvulso}</div>`:''}
-        ${e.observacoes?`<div class="filter-slot-obs">${e.observacoes}</div>`:''}
+        ${e.ministerioNome ? `<span class="filter-slot-badge">${e.ministerioNome}</span>` : ''}
+        ${e.nomeAvulso     ? `<div class="filter-slot-livre">${e.nomeAvulso}</div>`       : ''}
+        ${e.observacoes    ? `<div class="filter-slot-obs">${e.observacoes}</div>`         : ''}
       </div>`).join('');
 
     groups.push(`<div class="filter-day-group">
@@ -642,17 +653,47 @@ async function showFilterResultsView() {
   }
 
   if(!groups.length){
-    list.innerHTML='<div class="filter-empty">Nenhuma escala encontrada para este filtro.</div>';
+    list.innerHTML = '<div class="filter-empty">Nenhuma escala encontrada para este filtro.</div>';
     return;
   }
-  list.innerHTML=groups.join('');
+  list.innerHTML = groups.join('');
 }
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
+
+// Remove acentos e normaliza para comparação
+function normalizeName(s){
+  return (s || '')
+    .toString()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLowerCase();
+}
+
+// Divide o campo nomeAvulso em tokens pelo separadores mais comuns
+function splitDuplaNames(nomeAvulso){
+  return (nomeAvulso || '')
+    .toString()
+    .replace(/\s+(e|com)\s+/gi, ',')   // "João e Maria" / "João com Maria"
+    .replace(/[\/+&;-]/g, ',')         // / + & ; -
+    .split(',')
+    .map(s => normalizeName(s))
+    .filter(Boolean);
+}
+
+// Verifica se o músico está em nomeAvulso (sozinho ou em dupla)
+function musicianInNomeAvulso(nomeAvulso, musicianName){
+  const target = normalizeName(musicianName);
+  if(!target) return false;
+  return splitDuplaNames(nomeAvulso).includes(target);
+}
+
+// Converte horário "07:30h" ou "12h" em minutos para ordenação
 function toMin(hor){
-  const clean=hor.replace('h','').replace(':','.');
-  const parts=clean.split('.');
-  return parseInt(parts[0])*60+(parts[1]?parseInt(parts[1]):0);
+  const clean = hor.replace('h','').replace(':','.');
+  const parts = clean.split('.');
+  return parseInt(parts[0]) * 60 + (parts[1] ? parseInt(parts[1]) : 0);
 }
 
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(console.error);

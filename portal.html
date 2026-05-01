@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <title>Portal Gestor — Escala Santa Rita</title>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#9b2335"/>
+  <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/jotape75/escalamusicossantarita/main/logo_santarita.jpg"/>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --rose:    #9b2335;
+      --rose2:   #b8304a;
+      --bg:      #faf8f5;
+      --surface: #ffffff;
+      --surface2:#f3f0eb;
+      --border:  #e8e2da;
+      --text:    #0f0d0b;
+      --muted:   #6b6057;
+      --font:    'Geist', sans-serif;
+      --r:       10px;
+      --nav-h:   62px;
+    }
+    body { background:var(--bg); color:var(--text); font-family:var(--font); min-height:100vh; font-size:16px; -webkit-font-smoothing:antialiased; }
+
+    /* ── LOGIN ── */
+    #loginScreen { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; background:radial-gradient(ellipse 70% 50% at 50% 0%, rgba(155,35,53,.06), transparent 65%), var(--bg); }
+    .login-box { width:100%; max-width:380px; background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:40px 32px; box-shadow:0 8px 40px rgba(155,35,53,.08); animation:fadeUp .3s ease; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:none} }
+    .login-brand { display:flex; align-items:center; gap:12px; margin-bottom:26px; }
+    .login-brand img { width:80px; height:80px; border-radius:50%; object-fit:cover; border:2px solid var(--border); }
+    .login-brand b  { display:block; font-size:15px; font-weight:700; }
+    .login-brand span { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; }
+    .login-title { font-size:22px; font-weight:700; letter-spacing:-.4px; margin-bottom:4px; }
+    .login-sub   { font-size:13px; color:var(--muted); margin-bottom:24px; }
+    .f { margin-bottom:13px; }
+    .f label { display:block; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); margin-bottom:5px; }
+    .f input, .f select { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:var(--r); padding:11px 13px; font-size:14px; font-family:var(--font); color:var(--text); outline:none; }
+    .f input:focus, .f select:focus { border-color:var(--rose); box-shadow:0 0 0 3px rgba(155,35,53,.1); }
+    .f input::placeholder { color:var(--muted); }
+    .btn-login { width:100%; margin-top:6px; padding:13px; background:var(--rose); color:#fff; border:none; border-radius:var(--r); font-family:var(--font); font-size:15px; font-weight:600; cursor:pointer; }
+    .btn-login:hover { background:var(--rose2); }
+    .login-err { margin-top:10px; font-size:13px; color:var(--rose); text-align:center; }
+
+    /* ── APP ── */
+    #app { display:none; }
+    #app.on { display:flex; flex-direction:column; min-height:100vh; padding-bottom:var(--nav-h); }
+
+    /* ── TOPBAR ── */
+    .topbar { height:54px; background:var(--surface); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 16px; gap:12px; position:sticky; top:0; z-index:100; }
+    .topbar-title { font-size:15px; font-weight:600; flex:1; }
+    .btn-topbar { background:none; border:none; font-size:22px; cursor:pointer; color:var(--muted); padding:4px; line-height:1; }
+
+    /* ── PAGES ── */
+    .page { display:none; flex:1; }
+    .page.on { display:block; animation:fadeUp .2s ease; }
+    .content { padding:16px; }
+
+    /* ── BOTTOM NAV ── */
+    .bottom-nav { position:fixed; bottom:0; left:0; right:0; height:var(--nav-h); background:var(--surface); border-top:1px solid var(--border); display:flex; z-index:200; padding-bottom:env(safe-area-inset-bottom); }
+    .nav-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; cursor:pointer; color:var(--muted); transition:color .15s; border:none; background:none; font-family:var(--font); }
+    .nav-item.on { color:var(--rose); }
+    .nav-icon  { font-size:20px; line-height:1; }
+    .nav-label { font-size:10px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; }
+
+    /* ── SIDEBAR (drawer) ── */
+    .sb-overlay { display:none; position:fixed; inset:0; background:rgba(15,13,11,.45); z-index:300; }
+    .sb-overlay.on { display:block; }
+    .sb { position:fixed; top:0; left:-280px; width:260px; height:100%; background:#0f0d0b; z-index:301; display:flex; flex-direction:column; transition:left .28s cubic-bezier(.4,0,.2,1); box-shadow:4px 0 24px rgba(0,0,0,.2); }
+    .sb.on { left:0; }
+    .sb-brand { display:flex; align-items:center; gap:11px; padding:20px; border-bottom:1px solid rgba(255,255,255,.07); }
+    .sb-brand img { width:48px; height:48px; border-radius:50%; object-fit:cover; border:1.5px solid rgba(155,35,53,.5); flex-shrink:0; }
+    .sb-brand-name { font-size:13px; font-weight:700; color:#fff; line-height:1.3; }
+    .sb-brand-sub  { font-size:10px; color:rgba(255,255,255,.3); text-transform:uppercase; letter-spacing:.08em; }
+    .sb-user { padding:12px 20px; border-bottom:1px solid rgba(255,255,255,.07); }
+    .sb-user-lbl  { font-size:10px; color:rgba(255,255,255,.28); text-transform:uppercase; letter-spacing:.08em; margin-bottom:2px; }
+    .sb-user-name { font-size:13px; font-weight:600; color:#fff; }
+    .sb-foot { padding:14px 20px; border-top:1px solid rgba(255,255,255,.07); margin-top:auto; }
+    .btn-sair { width:100%; padding:10px 14px; background:none; border:1px solid rgba(255,255,255,.1); border-radius:var(--r); color:rgba(255,255,255,.4); font-size:13px; font-weight:600; cursor:pointer; font-family:var(--font); text-align:left; transition:all .15s; }
+    .btn-sair:hover { border-color:rgba(155,35,53,.5); color:rgba(255,120,120,.8); }
+
+    /* ── CARDS / STATS ── */
+    .stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
+    .stat-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px 16px; }
+    .stat-n { font-size:26px; font-weight:700; color:var(--rose); letter-spacing:-1px; line-height:1; }
+    .stat-l { font-size:11px; color:var(--muted); margin-top:3px; font-weight:500; }
+    .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+    .card-head { padding:12px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .card-head h3 { font-size:13px; font-weight:600; }
+    .section-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:10px; }
+
+    /* ── PRÓXIMAS ── */
+    .prox-item { padding:12px 16px; border-bottom:1px solid var(--border); display:flex; gap:12px; align-items:center; }
+    .prox-item:last-child { border-bottom:none; }
+    .prox-date-box { text-align:center; min-width:36px; }
+    .prox-date-box .d { font-size:18px; font-weight:700; color:var(--rose); line-height:1; }
+    .prox-date-box .m { font-size:10px; color:var(--muted); text-transform:uppercase; }
+    .prox-info { flex:1; }
+    .prox-hor  { font-size:11px; color:var(--muted); }
+    .prox-min  { font-size:13px; font-weight:600; }
+
+    /* ── ESCALA ── */
+    .escala-topbar { background:var(--surface); border-bottom:1px solid var(--border); padding:10px 16px; display:flex; align-items:center; gap:10px; }
+    .month-nav { display:flex; align-items:center; gap:8px; flex:1; }
+    .month-label { font-size:15px; font-weight:700; letter-spacing:-.3px; }
+    .btn-icon { background:none; border:1px solid var(--border); border-radius:var(--r); width:32px; height:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; color:var(--muted); transition:all .15s; flex-shrink:0; }
+    .btn-icon:hover { border-color:var(--rose); color:var(--rose); }
+
+    /* Day carousel */
+    .day-carousel-wrap { background:var(--surface); border-bottom:1px solid var(--border); padding:10px 0; overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+    .day-carousel-wrap::-webkit-scrollbar { display:none; }
+    .day-carousel { display:flex; gap:6px; padding:0 16px; min-width:max-content; }
+    .day-pill { display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 10px; border-radius:12px; cursor:pointer; border:1.5px solid var(--border); background:var(--surface2); min-width:46px; transition:all .15s; flex-shrink:0; }
+    .day-pill.today { border-color:var(--rose); }
+    .day-pill.selected { background:var(--rose); border-color:var(--rose); }
+    .day-pill-wkd { font-size:10px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); }
+    .day-pill-num { font-size:18px; font-weight:700; color:var(--text); line-height:1; }
+    .day-pill.today .day-pill-num { color:var(--rose); }
+    .day-pill.selected .day-pill-wkd,
+    .day-pill.selected .day-pill-num { color:#fff; }
+
+    /* Slot cards */
+    .slots-container { padding:12px 16px; display:flex; flex-direction:column; gap:10px; }
+    .slot-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+    .slot-card-head { padding:10px 14px; background:var(--surface2); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .slot-card-time { font-size:15px; font-weight:700; color:var(--text); }
+    .saving-dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--rose); animation:pulse 1s ease infinite; }
+    @keyframes pulse { 0%,100%{opacity:.3} 50%{opacity:1} }
+    .slot-card-body { padding:12px 14px; display:flex; flex-direction:column; gap:8px; }
+    .slot-field { }
+    .slot-field label { display:block; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); margin-bottom:4px; }
+    .slot-sel {
+      width:100%; background:var(--surface2); border:1px solid var(--border);
+      border-radius:8px; padding:8px 10px; font-size:13px; font-family:var(--font);
+      color:var(--muted); outline:none; cursor:pointer; appearance:none;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23a89d94'/%3E%3C/svg%3E");
+      background-repeat:no-repeat; background-position:right 10px center; padding-right:28px;
+    }
+    .slot-sel:focus { border-color:var(--rose); box-shadow:0 0 0 2px rgba(155,35,53,.1); }
+    .slot-sel.filled { background-color:rgba(155,35,53,.07); border-color:rgba(155,35,53,.25); color:var(--rose); font-weight:600; }
+    .slot-inp { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:8px 10px; font-size:13px; font-family:var(--font); color:var(--text); outline:none; }
+    .slot-inp:focus { border-color:var(--rose); box-shadow:0 0 0 2px rgba(155,35,53,.1); }
+    .slot-inp::placeholder { color:var(--muted); font-style:italic; }
+    .slot-inp.has-val { background:rgba(90,130,60,.07); border-color:rgba(90,130,60,.3); color:#3a5c20; font-weight:600; }
+
+    /* ── MÚSICOS / MINISTÉRIOS ── */
+    .list-item { background:var(--surface); border:1px solid var(--border); border-radius:12px; margin-bottom:8px; overflow:hidden; }
+    .list-item-body { padding:12px 14px; display:flex; align-items:center; gap:10px; }
+    .list-item-info { flex:1; }
+    .list-item-name { font-size:14px; font-weight:600; }
+    .list-item-sub  { font-size:12px; color:var(--muted); margin-top:2px; }
+    .list-item-actions { display:flex; gap:6px; }
+
+    .btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:8px 14px; border-radius:var(--r); font-size:12px; font-family:var(--font); font-weight:600; cursor:pointer; border:none; transition:all .15s; }
+    .btn-rose { background:var(--rose); color:#fff; }
+    .btn-rose:hover { background:var(--rose2); }
+    .btn-ghost { background:none; border:1px solid var(--border); color:var(--muted); }
+    .btn-ghost:hover { color:var(--text); }
+    .btn-danger { background:none; border:1px solid transparent; color:var(--rose); font-family:var(--font); font-size:12px; font-weight:600; cursor:pointer; border-radius:var(--r); padding:8px 10px; transition:all .15s; }
+    .btn-danger:hover { background:rgba(155,35,53,.07); border-color:rgba(155,35,53,.2); }
+    .fab { position:fixed; bottom:calc(var(--nav-h) + 16px); right:16px; width:52px; height:52px; border-radius:50%; background:var(--rose); color:#fff; border:none; font-size:24px; cursor:pointer; box-shadow:0 4px 16px rgba(155,35,53,.4); display:flex; align-items:center; justify-content:center; z-index:190; transition:background .15s; }
+    .fab:hover { background:var(--rose2); }
+    .badge { display:inline-block; padding:2px 9px; border-radius:20px; font-size:11px; font-weight:600; background:rgba(155,35,53,.1); color:var(--rose); border:1px solid rgba(155,35,53,.2); }
+
+    /* ── BOTTOM SHEET MODAL ── */
+    .backdrop { display:none; position:fixed; inset:0; background:rgba(15,13,11,.45); z-index:400; }
+    .backdrop.on { display:flex; align-items:flex-end; }
+    .sheet { background:var(--surface); border-radius:18px 18px 0 0; padding:24px 20px 32px; width:100%; max-height:90vh; overflow-y:auto; animation:slideUp .2s ease; }
+    @keyframes slideUp { from{transform:translateY(100%)} to{transform:none} }
+    .sheet-head { display:flex; align-items:center; gap:10px; margin-bottom:20px; }
+    .sheet-head h2 { font-size:18px; font-weight:700; letter-spacing:-.3px; }
+    .sheet-foot { display:flex; gap:8px; justify-content:flex-end; margin-top:20px; padding-top:16px; border-top:1px solid var(--border); }
+    .msg { font-size:13px; padding:9px 12px; border-radius:var(--r); margin-top:10px; }
+    .msg.ok  { background:rgba(50,120,70,.1); color:#2d7a45; border:1px solid rgba(50,120,70,.25); }
+    .msg.err { background:rgba(155,35,53,.08); color:var(--rose); border:1px solid rgba(155,35,53,.2); }
+
+    .empty-msg { text-align:center; padding:30px 20px; color:var(--muted); font-size:13px; }
+    .spin { display:inline-block; width:14px; height:14px; border:2px solid var(--border); border-top-color:var(--rose); border-radius:50%; animation:spin .6s linear infinite; vertical-align:middle; }
+    @keyframes spin { to{transform:rotate(360deg)} }
+    .loading-wrap { padding:30px; text-align:center; color:var(--muted); font-size:13px; display:flex; align-items:center; justify-content:center; gap:8px; }
+
+    @media (max-width:400px) { .stats-grid { grid-template-columns:1fr 1fr; } }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-brand">
+      <img src="https://raw.githubusercontent.com/jotape75/escalamusicossantarita/main/logo_santarita.jpg" alt="Santa Rita"/>
+      <div><b>Santa Rita de Cássia</b><span>Portal do Gestor</span></div>
+    </div>
+    <div class="login-title">Bem-vindo</div>
+    <div class="login-sub">Faça login para gerenciar a escala</div>
+    <div class="f"><label>E-mail</label><input type="email" id="l-em" placeholder="seu@email.com" autocomplete="email"/></div>
+    <div class="f"><label>Senha</label><input type="password" id="l-pw" placeholder="••••••••" autocomplete="current-password"/></div>
+    <button class="btn-login" id="btn-login">Entrar</button>
+    <p class="login-err" id="l-err"></p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <!-- SIDEBAR OVERLAY -->
+  <div class="sb-overlay" id="sb-overlay"></div>
+  <nav class="sb" id="sb">
+    <div class="sb-brand">
+      <img src="https://raw.githubusercontent.com/jotape75/escalamusicossantarita/main/logo_santarita.jpg" alt="Santa Rita"/>
+      <div><div class="sb-brand-name">Santa Rita<br>de Cássia</div><div class="sb-brand-sub">Portal Gestor</div></div>
+    </div>
+    <div class="sb-user">
+      <div class="sb-user-lbl">Usuário</div>
+      <div class="sb-user-name" id="sb-user-name">—</div>
+    </div>
+    <div class="sb-foot">
+      <button class="btn-sair" id="btn-logout">⬅ Sair da conta</button>
+    </div>
+  </nav>
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <button class="btn-topbar" id="btn-menu">☰</button>
+    <div class="topbar-title" id="topbar-title">Dashboard</div>
+  </div>
+
+  <!-- PAGES -->
+
+  <!-- HOME -->
+  <div class="page on" id="page-home">
+    <div class="content">
+      <div style="margin-bottom:16px">
+        <div style="font-size:22px;font-weight:700;letter-spacing:-.4px">Olá! 👋</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:2px" id="home-user">—</div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-n" id="st-min">—</div><div class="stat-l">Ministérios</div></div>
+        <div class="stat-card"><div class="stat-n" id="st-mus">—</div><div class="stat-l">Músicos</div></div>
+        <div class="stat-card"><div class="stat-n" id="st-esc">—</div><div class="stat-l">Escalas</div></div>
+      </div>
+      <div class="section-title">Próximas escalas</div>
+      <div class="card" id="home-prox">
+        <div class="loading-wrap"><span class="spin"></span> Carregando...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ESCALA -->
+  <div class="page" id="page-escala">
+    <div class="escala-topbar">
+      <div class="month-nav">
+        <button class="btn-icon" id="btn-prev-month">‹</button>
+        <span class="month-label" id="month-label">—</span>
+        <button class="btn-icon" id="btn-next-month">›</button>
+      </div>
+    </div>
+    <div class="day-carousel-wrap">
+      <div class="day-carousel" id="day-carousel"></div>
+    </div>
+    <div class="slots-container" id="slots-container">
+      <div class="loading-wrap"><span class="spin"></span></div>
+    </div>
+  </div>
+
+  <!-- MÚSICOS -->
+  <div class="page" id="page-musicos">
+    <div class="content">
+      <div class="section-title" style="margin-bottom:16px">Músicos</div>
+      <div id="list-musicos"><div class="loading-wrap"><span class="spin"></span></div></div>
+    </div>
+    <button class="fab" id="fab-mus">+</button>
+  </div>
+
+  <!-- MINISTÉRIOS -->
+  <div class="page" id="page-ministerios">
+    <div class="content">
+      <div class="section-title" style="margin-bottom:16px">Ministérios</div>
+      <div id="list-ministerios"><div class="loading-wrap"><span class="spin"></span></div></div>
+    </div>
+    <button class="fab" id="fab-min">+</button>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-item on" data-page="home"><span class="nav-icon">🏠</span><span class="nav-label">Início</span></button>
+    <button class="nav-item" data-page="escala"><span class="nav-icon">📅</span><span class="nav-label">Escala</span></button>
+    <button class="nav-item" data-page="musicos"><span class="nav-icon">👥</span><span class="nav-label">Músicos</span></button>
+    <button class="nav-item" data-page="ministerios"><span class="nav-icon">♫</span><span class="nav-label">Ministérios</span></button>
+  </nav>
+</div>
+
+<!-- MODAL: Músico -->
+<div class="backdrop" id="m-mus">
+  <div class="sheet">
+    <div class="sheet-head"><span>♪</span><h2 id="t-mus">Novo Músico</h2></div>
+    <input type="hidden" id="mus-id"/>
+    <div class="f"><label>Nome *</label><input type="text" id="mus-nome" placeholder="Nome completo"/></div>
+    <div class="f"><label>Ministério *</label>
+      <select id="mus-min" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:11px 13px;font-size:14px;font-family:var(--font);color:var(--text);outline:none;appearance:none;"></select>
+    </div>
+    <div class="f"><label>Telefone</label><input type="text" id="mus-tel" placeholder="(19) 99999-9999"/></div>
+    <div id="mus-msg"></div>
+    <div class="sheet-foot">
+      <button class="btn btn-ghost" id="btn-mus-cancel">Cancelar</button>
+      <button class="btn btn-rose" id="btn-mus-save">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Ministério -->
+<div class="backdrop" id="m-min">
+  <div class="sheet">
+    <div class="sheet-head"><span>♫</span><h2 id="t-min">Novo Ministério</h2></div>
+    <input type="hidden" id="min-id"/>
+    <div class="f"><label>Nome *</label><input type="text" id="min-nome" placeholder="ex: Vida Nova"/></div>
+    <div class="f"><label>Responsável</label><input type="text" id="min-resp" placeholder="Nome do líder"/></div>
+    <div id="min-msg"></div>
+    <div class="sheet-foot">
+      <button class="btn btn-ghost" id="btn-min-cancel">Cancelar</button>
+      <button class="btn btn-rose" id="btn-min-save">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore, collection, doc, addDoc, updateDoc, deleteDoc,
+  getDocs, query, orderBy, where, Timestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const fb = initializeApp({
+  apiKey:"AIzaSyCkLu7SEJ76-SrmEYBCFewG6YQCnOW1z7k",
+  authDomain:"escala-santa-rita.firebaseapp.com",
+  projectId:"escala-santa-rita",
+  storageBucket:"escala-santa-rita.firebasestorage.app",
+  messagingSenderId:"931972149605",
+  appId:"1:931972149605:web:fa716dff0bf0a8abde318c"
+});
+const auth = getAuth(fb);
+const db   = getFirestore(fb);
+
+const HORARIOS = {
+  week: ['07:30h','12h','15h','17:30h','19:30h'],
+  sat:  ['07h','08:30h','10h','12h','14h','15h','15:30h','17:30h','19:30h'],
+  sun:  ['07h','08:30h','10h','12h','17h','18:30h']
+};
+const WKDAYS   = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const MONTHS   = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const MONTHS_S = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+let ministerios = [], musicos = [];
+let escalaCache = {}; // key: "YYYY-MM-DD_HH" → doc
+let curYear, curMonth, selectedDay;
+const now = new Date();
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+document.getElementById('btn-login').addEventListener('click', doLogin);
+document.getElementById('l-pw').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('btn-logout').addEventListener('click', () => signOut(auth));
+
+async function doLogin() {
+  const em = document.getElementById('l-em').value.trim();
+  const pw = document.getElementById('l-pw').value;
+  const er = document.getElementById('l-err');
+  er.textContent = '';
+  try { await signInWithEmailAndPassword(auth, em, pw); }
+  catch { er.textContent = 'E-mail ou senha incorretos.'; }
+}
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').classList.add('on');
+    document.getElementById('sb-user-name').textContent = user.email;
+    document.getElementById('home-user').textContent = user.email;
+    curYear  = now.getFullYear();
+    curMonth = now.getMonth();
+    selectedDay = now.getDate();
+    initApp();
+  } else {
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('app').classList.remove('on');
+  }
+});
+
+async function initApp() {
+  await Promise.all([fetchMin(), fetchMus()]);
+  loadDashboard();
+}
+
+async function fetchMin() {
+  const s = await getDocs(query(collection(db, 'ministerios'), orderBy('nome')));
+  ministerios = s.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+async function fetchMus() {
+  const s = await getDocs(query(collection(db, 'musicos'), orderBy('nome')));
+  musicos = s.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+async function loadDashboard() {
+  document.getElementById('st-min').textContent = ministerios.length;
+  document.getElementById('st-mus').textContent = musicos.length;
+
+  // Escalas do mês
+  const s = Timestamp.fromDate(new Date(now.getFullYear(), now.getMonth(), 1));
+  const e = Timestamp.fromDate(new Date(now.getFullYear(), now.getMonth()+1, 0, 23,59,59));
+  const sm = await getDocs(query(collection(db,'escala'), where('data','>=',s), where('data','<=',e), where('ministerioId','!=',null)));
+  document.getElementById('st-esc').textContent = sm.docs.length;
+
+  // Próximas escalas
+  const today = Timestamp.fromDate(new Date());
+  const sp = await getDocs(query(collection(db,'escala'), where('data','>=',today), where('ministerioId','!=',null), orderBy('ministerioId'), orderBy('data')));
+  const items = sp.docs.slice(0,8).map(d => d.data()).filter(e => e.ministerioNome);
+  items.sort((a, b) => a.data.toDate() - b.data.toDate());
+
+  const el = document.getElementById('home-prox');
+  if (!items.length) { el.innerHTML='<div class="empty-msg">Nenhuma escala futura.</div>'; return; }
+  el.innerHTML = items.map(e => {
+    const d = e.data.toDate();
+    return `<div class="prox-item">
+      <div class="prox-date-box">
+        <div class="d">${String(d.getDate()).padStart(2,'0')}</div>
+        <div class="m">${MONTHS_S[d.getMonth()]}</div>
+      </div>
+      <div class="prox-info">
+        <div class="prox-hor">${WKDAYS[d.getDay()]} · ${e.horario}</div>
+        <div class="prox-min">${e.ministerioNome}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── SIDEBAR ───────────────────────────────────────────────────────────────────
+document.getElementById('btn-menu').addEventListener('click', () => {
+  document.getElementById('sb').classList.toggle('on');
+  document.getElementById('sb-overlay').classList.toggle('on');
+});
+document.getElementById('sb-overlay').addEventListener('click', closeSb);
+function closeSb() {
+  document.getElementById('sb').classList.remove('on');
+  document.getElementById('sb-overlay').classList.remove('on');
+}
+
+// ── BOTTOM NAV ────────────────────────────────────────────────────────────────
+const pageTitles = { home:'Dashboard', escala:'Escala', musicos:'Músicos', ministerios:'Ministérios' };
+document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const p = btn.dataset.page;
+    document.querySelectorAll('#app .page').forEach(x => x.classList.remove('on'));
+    document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('on'));
+    document.getElementById('page-' + p).classList.add('on');
+    btn.classList.add('on');
+    document.getElementById('topbar-title').textContent = pageTitles[p] || '';
+    if (p === 'escala')       loadEscala();
+    if (p === 'musicos')      renderMusicos();
+    if (p === 'ministerios')  renderMins();
+  });
+});
+
+// ── ESCALA ────────────────────────────────────────────────────────────────────
+function makeKey(date, horario) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth()+1).padStart(2,'0');
+  const d = String(date.getDate()).padStart(2,'0');
+  return `${y}-${m}-${d}_${horario}`;
+}
+
+document.getElementById('btn-prev-month').addEventListener('click', () => {
+  curMonth--; if(curMonth<0){curMonth=11;curYear--;}
+  selectedDay = 1;
+  loadEscala();
+});
+document.getElementById('btn-next-month').addEventListener('click', () => {
+  curMonth++; if(curMonth>11){curMonth=0;curYear++;}
+  selectedDay = 1;
+  loadEscala();
+});
+
+async function loadEscala() {
+  document.getElementById('month-label').textContent = `${MONTHS_S[curMonth]} ${curYear}`;
+  document.getElementById('slots-container').innerHTML = '<div class="loading-wrap"><span class="spin"></span></div>';
+
+  const start = Timestamp.fromDate(new Date(curYear, curMonth, 1));
+  const end   = Timestamp.fromDate(new Date(curYear, curMonth+1, 0, 23, 59, 59));
+  const snap  = await getDocs(query(collection(db,'escala'), where('data','>=',start), where('data','<=',end)));
+
+  escalaCache = {};
+  snap.docs.forEach(d => {
+    const dat = d.data();
+    const dt  = dat.data.toDate();
+    const key = makeKey(dt, dat.horario);
+    escalaCache[key] = { id: d.id, ...dat };
+  });
+
+  renderCarousel();
+  renderDaySlots(selectedDay);
+}
+
+function getDayType(date) {
+  const dow = date.getDay();
+  if (dow === 0) return 'sun';
+  if (dow === 6) return 'sat';
+  return 'week';
+}
+
+function renderCarousel() {
+  const daysInMonth = new Date(curYear, curMonth+1, 0).getDate();
+  const todayD = now.getDate(), todayM = now.getMonth(), todayY = now.getFullYear();
+  const carousel = document.getElementById('day-carousel');
+
+  carousel.innerHTML = '';
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dt  = new Date(curYear, curMonth, d);
+    const pill = document.createElement('div');
+    pill.className = 'day-pill';
+    if (d === selectedDay) pill.classList.add('selected');
+    if (d === todayD && curMonth === todayM && curYear === todayY) pill.classList.add('today');
+    pill.innerHTML = `<span class="day-pill-wkd">${WKDAYS[dt.getDay()]}</span><span class="day-pill-num">${d}</span>`;
+    pill.addEventListener('click', () => {
+      selectedDay = d;
+      document.querySelectorAll('.day-pill').forEach(p => p.classList.remove('selected'));
+      pill.classList.add('selected');
+      renderDaySlots(d);
+    });
+    carousel.appendChild(pill);
+  }
+
+  // Scroll to selected day
+  setTimeout(() => {
+    const pills = carousel.querySelectorAll('.day-pill');
+    const idx   = selectedDay - 1;
+    if (pills[idx]) pills[idx].scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
+  }, 50);
+}
+
+let debounceTimers = {};
+
+function renderDaySlots(day) {
+  const dt   = new Date(curYear, curMonth, day);
+  const type = getDayType(dt);
+  const hors = HORARIOS[type];
+  const container = document.getElementById('slots-container');
+
+  container.innerHTML = hors.map(h => {
+    const key     = makeKey(dt, h);
+    const saved   = escalaCache[key];
+    const minId   = saved?.ministerioId || '';
+    const livre   = saved?.nomeAvulso || '';
+    const obs     = saved?.observacoes || '';
+    const filled  = minId ? 'filled' : '';
+    const livreClass = livre ? 'has-val' : '';
+    const minOpts = ministerios.map(m =>
+      `<option value="${m.id}" ${m.id===minId?'selected':''}>${m.nome}</option>`
+    ).join('');
+
+    return `<div class="slot-card">
+      <div class="slot-card-head">
+        <span class="slot-card-time">${h}</span>
+        <span class="saving-dot" id="dot-${key}" style="display:none"></span>
+      </div>
+      <div class="slot-card-body">
+        <div class="slot-field">
+          <label>Ministério</label>
+          <select class="slot-sel ${filled}" data-key="${key}" data-dt="${dt.toISOString()}" data-hor="${h}" onchange="onSlotChange(this)">
+            <option value="">— sem ministério —</option>
+            ${minOpts}
+          </select>
+        </div>
+        <div class="slot-field">
+          <label>Dupla / Convidado</label>
+          <input type="text" class="slot-inp ${livreClass}" placeholder="Dupla / convidado..."
+            data-key="${key}" data-dt="${dt.toISOString()}" data-hor="${h}"
+            value="${(livre||'').replace(/"/g,'&quot;')}"
+            oninput="debounceLivre(this)" onblur="onLivreChange(this)"/>
+        </div>
+        <div class="slot-field">
+          <label>Observações</label>
+          <input type="text" class="slot-inp" placeholder="Obs: padre, evento..."
+            data-key="${key}" data-dt="${dt.toISOString()}" data-hor="${h}"
+            value="${(obs||'').replace(/"/g,'&quot;')}"
+            oninput="debounceObs(this)" onblur="onObsChange(this)"/>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── SAVE LOGIC ────────────────────────────────────────────────────────────────
+async function saveSlotField(key, dtISO, hor, fields) {
+  const dt       = new Date(dtISO);
+  const existing = escalaCache[key];
+  const payload  = {
+    data:           Timestamp.fromDate(dt),
+    horario:        hor,
+    ministerioId:   existing?.ministerioId   ?? null,
+    ministerioNome: existing?.ministerioNome ?? '',
+    nomeAvulso:     existing?.nomeAvulso     ?? '',
+    musicosIds:     existing?.musicosIds     ?? [],
+    musicosNomes:   existing?.musicosNomes   ?? [],
+    observacoes:    existing?.observacoes    ?? '',
+    ...fields
+  };
+  try {
+    if (existing?.id) {
+      await updateDoc(doc(db,'escala',existing.id), payload);
+      escalaCache[key] = { ...existing, ...payload };
+    } else {
+      const ref = await addDoc(collection(db,'escala'), payload);
+      escalaCache[key] = { id: ref.id, ...payload };
+    }
+    // Propagate to next 6 months
+    const propagFields = {};
+    if ('ministerioId'   in fields) propagFields.ministerioId   = fields.ministerioId;
+    if ('ministerioNome' in fields) propagFields.ministerioNome = fields.ministerioNome;
+    if ('nomeAvulso'     in fields) propagFields.nomeAvulso     = fields.nomeAvulso;
+    if (Object.keys(propagFields).length > 0) {
+      propagarParaProximosMeses(dt, hor, propagFields).catch(console.error);
+    }
+  } catch(e) {
+    console.error(e);
+    alert('Erro ao salvar: ' + e.message);
+  }
+}
+
+function showDot(key) {
+  const dot = document.getElementById('dot-' + key);
+  if (dot) { dot.style.display = 'inline-block'; setTimeout(() => { dot.style.display = 'none'; }, 1200); }
+}
+
+window.onSlotChange = async sel => {
+  const { key, dt: dtISO, hor } = sel.dataset;
+  const minId   = sel.value;
+  const minNome = ministerios.find(m => m.id === minId)?.nome || '';
+  sel.classList.toggle('filled', !!minId);
+  showDot(key);
+  await saveSlotField(key, dtISO, hor, { ministerioId: minId||null, ministerioNome: minNome });
+};
+
+window.debounceLivre = inp => {
+  const key = inp.dataset.key;
+  clearTimeout(debounceTimers['l_' + key]);
+  debounceTimers['l_' + key] = setTimeout(() => onLivreChange(inp), 800);
+};
+window.onLivreChange = async inp => {
+  const { key, dt: dtISO, hor } = inp.dataset;
+  const val = inp.value.trim();
+  inp.classList.toggle('has-val', !!val);
+  showDot(key);
+  await saveSlotField(key, dtISO, hor, { nomeAvulso: val });
+};
+
+window.debounceObs = inp => {
+  const key = inp.dataset.key;
+  clearTimeout(debounceTimers['o_' + key]);
+  debounceTimers['o_' + key] = setTimeout(() => onObsChange(inp), 800);
+};
+window.onObsChange = async inp => {
+  const { key, dt: dtISO, hor } = inp.dataset;
+  const val = inp.value.trim();
+  showDot(key);
+  await saveSlotField(key, dtISO, hor, { observacoes: val });
+};
+
+// ── PROPAGATION HELPERS ───────────────────────────────────────────────────────
+function nthDow(date) {
+  return { dow: date.getDay(), nth: Math.ceil(date.getDate() / 7) };
+}
+function findDateByNthDow(year, month, dow, nth) {
+  const all = [];
+  const dim = new Date(year, month+1, 0).getDate();
+  for (let d = 1; d <= dim; d++) {
+    const dt = new Date(year, month, d);
+    if (dt.getDay() === dow) all.push(dt);
+  }
+  return all[nth-1] || null;
+}
+async function propagarParaProximosMeses(changedDt, hor, fields) {
+  const { dow, nth } = nthDow(changedDt);
+  for (let i = 1; i <= 6; i++) {
+    let futMonth = changedDt.getMonth() + i;
+    let futYear  = changedDt.getFullYear();
+    while (futMonth > 11) { futMonth -= 12; futYear++; }
+    const targetDt = findDateByNthDow(futYear, futMonth, dow, nth);
+    if (!targetDt) continue;
+    const futKey = makeKey(targetDt, hor);
+    const start  = Timestamp.fromDate(new Date(futYear, futMonth, 1));
+    const end    = Timestamp.fromDate(new Date(futYear, futMonth+1, 0, 23,59,59));
+    const snap   = await getDocs(query(collection(db,'escala'), where('data','>=',start), where('data','<=',end)));
+    const existingDoc = snap.docs.find(d => {
+      const dat = d.data();
+      return makeKey(dat.data.toDate(), dat.horario) === futKey;
+    });
+    if (existingDoc) {
+      await updateDoc(doc(db,'escala', existingDoc.id), fields);
+    } else {
+      const existing = escalaCache[makeKey(changedDt, hor)] || {};
+      await addDoc(collection(db,'escala'), {
+        data:           Timestamp.fromDate(targetDt),
+        horario:        hor,
+        ministerioId:   fields.ministerioId   ?? existing.ministerioId   ?? null,
+        ministerioNome: fields.ministerioNome ?? existing.ministerioNome ?? '',
+        nomeAvulso:     fields.nomeAvulso     ?? existing.nomeAvulso     ?? '',
+        musicosIds:     [],
+        musicosNomes:   [],
+        observacoes:    ''
+      });
+    }
+  }
+}
+
+// ── MÚSICOS ───────────────────────────────────────────────────────────────────
+async function renderMusicos() {
+  await fetchMus();
+  const el = document.getElementById('list-musicos');
+  if (!musicos.length) { el.innerHTML = '<div class="empty-msg">Nenhum músico cadastrado.</div>'; return; }
+  el.innerHTML = musicos.map(m => {
+    const min = ministerios.find(x => x.id === m.ministerioId);
+    return `<div class="list-item">
+      <div class="list-item-body">
+        <div class="list-item-info">
+          <div class="list-item-name">${m.nome}</div>
+          <div class="list-item-sub">${min ? `<span class="badge">${min.nome}</span>` : '—'} ${m.telefone ? '· '+m.telefone : ''}</div>
+        </div>
+        <div class="list-item-actions">
+          <button class="btn btn-ghost" onclick="editMus('${m.id}')">Editar</button>
+          <button class="btn-danger" onclick="delMus('${m.id}')">Excluir</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('fab-mus').addEventListener('click', openMus);
+document.getElementById('btn-mus-cancel').addEventListener('click', () => closeSheet('m-mus'));
+document.getElementById('btn-mus-save').addEventListener('click', saveMus);
+
+function openMus() {
+  clearMusF();
+  fillMinSel('mus-min');
+  document.getElementById('m-mus').classList.add('on');
+}
+window.editMus = id => {
+  const m = musicos.find(x => x.id === id); clearMusF(); fillMinSel('mus-min');
+  document.getElementById('mus-id').value = m.id;
+  document.getElementById('mus-nome').value = m.nome;
+  document.getElementById('mus-min').value = m.ministerioId || '';
+  document.getElementById('mus-tel').value = m.telefone || '';
+  document.getElementById('t-mus').textContent = 'Editar Músico';
+  document.getElementById('m-mus').classList.add('on');
+};
+window.delMus = async id => {
+  if (!confirm('Excluir este músico?')) return;
+  await deleteDoc(doc(db,'musicos',id));
+  await fetchMus(); renderMusicos();
+};
+async function saveMus() {
+  const id    = document.getElementById('mus-id').value;
+  const nome  = document.getElementById('mus-nome').value.trim();
+  const minId = document.getElementById('mus-min').value;
+  const tel   = document.getElementById('mus-tel').value.trim();
+  const msg   = document.getElementById('mus-msg');
+  if (!nome)  { showMsg(msg,'err','Informe o nome.'); return; }
+  if (!minId) { showMsg(msg,'err','Selecione o ministério.'); return; }
+  const minNome = ministerios.find(x => x.id === minId)?.nome || '';
+  try {
+    const d = { nome, ministerioId:minId, ministerioNome:minNome, telefone:tel };
+    if (id) await updateDoc(doc(db,'musicos',id), d);
+    else    await addDoc(collection(db,'musicos'), d);
+    showMsg(msg,'ok','Salvo!');
+    await fetchMus(); renderMusicos();
+    setTimeout(() => closeSheet('m-mus'), 700);
+  } catch(e) { showMsg(msg,'err','Erro: '+e.message); }
+}
+function clearMusF() {
+  ['mus-id','mus-nome','mus-tel'].forEach(i => document.getElementById(i).value='');
+  document.getElementById('mus-min').value = '';
+  document.getElementById('mus-msg').innerHTML = '';
+  document.getElementById('t-mus').textContent = 'Novo Músico';
+}
+
+// ── MINISTÉRIOS ───────────────────────────────────────────────────────────────
+async function renderMins() {
+  await fetchMin(); await fetchMus();
+  const el = document.getElementById('list-ministerios');
+  if (!ministerios.length) { el.innerHTML = '<div class="empty-msg">Nenhum ministério cadastrado.</div>'; return; }
+  el.innerHTML = ministerios.map(m => {
+    const n = musicos.filter(mu => mu.ministerioId === m.id).length;
+    return `<div class="list-item">
+      <div class="list-item-body">
+        <div class="list-item-info">
+          <div class="list-item-name">${m.nome}</div>
+          <div class="list-item-sub">${m.responsavel||'—'} · <span class="badge">${n} músico${n!==1?'s':''}</span></div>
+        </div>
+        <div class="list-item-actions">
+          <button class="btn btn-ghost" onclick="editMin('${m.id}')">Editar</button>
+          <button class="btn-danger" onclick="delMin('${m.id}')">Excluir</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('fab-min').addEventListener('click', openMin);
+document.getElementById('btn-min-cancel').addEventListener('click', () => closeSheet('m-min'));
+document.getElementById('btn-min-save').addEventListener('click', saveMin);
+
+function openMin() {
+  clearMinF();
+  document.getElementById('m-min').classList.add('on');
+}
+window.editMin = id => {
+  const m = ministerios.find(x => x.id === id); clearMinF();
+  document.getElementById('min-id').value = m.id;
+  document.getElementById('min-nome').value = m.nome;
+  document.getElementById('min-resp').value = m.responsavel || '';
+  document.getElementById('t-min').textContent = 'Editar Ministério';
+  document.getElementById('m-min').classList.add('on');
+};
+window.delMin = async id => {
+  if (!confirm('Excluir este ministério?')) return;
+  await deleteDoc(doc(db,'ministerios',id));
+  await fetchMin(); renderMins();
+};
+async function saveMin() {
+  const id   = document.getElementById('min-id').value;
+  const nome = document.getElementById('min-nome').value.trim();
+  const resp = document.getElementById('min-resp').value.trim();
+  const msg  = document.getElementById('min-msg');
+  if (!nome) { showMsg(msg,'err','Informe o nome.'); return; }
+  try {
+    const d = { nome, responsavel:resp };
+    if (id) await updateDoc(doc(db,'ministerios',id), d);
+    else    await addDoc(collection(db,'ministerios'), d);
+    showMsg(msg,'ok','Salvo!');
+    await fetchMin(); await fetchMus(); renderMins();
+    setTimeout(() => closeSheet('m-min'), 700);
+  } catch(e) { showMsg(msg,'err','Erro: '+e.message); }
+}
+function clearMinF() {
+  ['min-id','min-nome','min-resp'].forEach(i => document.getElementById(i).value='');
+  document.getElementById('min-msg').innerHTML = '';
+  document.getElementById('t-min').textContent = 'Novo Ministério';
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function fillMinSel(id) {
+  const sel = document.getElementById(id);
+  sel.innerHTML = '<option value="">Selecione...</option>' +
+    ministerios.map(m => `<option value="${m.id}">${m.nome}</option>`).join('');
+}
+function closeSheet(id) {
+  document.getElementById(id).classList.remove('on');
+}
+function escapeHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function showMsg(el, type, txt) {
+  el.innerHTML = `<div class="msg ${type}">${escapeHtml(txt)}</div>`;
+}
+document.querySelectorAll('.backdrop').forEach(b => {
+  b.addEventListener('click', e => { if(e.target===b) b.classList.remove('on'); });
+});
+
+// ── SERVICE WORKER ────────────────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(console.error);
+}
+</script>
+</body>
+</html>

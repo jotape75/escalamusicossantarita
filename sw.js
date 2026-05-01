@@ -31,9 +31,10 @@ self.addEventListener('fetch', event => {
 
   // Network-first for Firestore / Firebase API calls
   if (
-    url.hostname.includes('firestore.googleapis.com') ||
-    url.hostname.includes('firebase') ||
-    url.hostname.includes('googleapis.com')
+    url.hostname === 'firestore.googleapis.com' ||
+    url.hostname.endsWith('.firebaseio.com') ||
+    url.hostname.endsWith('.googleapis.com') ||
+    url.hostname.endsWith('.firebaseapp.com')
   ) {
     event.respondWith(
       fetch(event.request).catch(() => caches.match(event.request))

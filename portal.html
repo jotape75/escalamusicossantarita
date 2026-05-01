@@ -31,9 +31,9 @@
     @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:none} }
     .login-brand { display:flex; align-items:center; gap:12px; margin-bottom:26px; }
     .login-brand img { width:80px; height:80px; border-radius:50%; object-fit:cover; border:2px solid var(--border); }
-    .login-brand b  { display:block; font-size:15px; font-weight:700; }
+    .login-brand b  { display:block; font-size:15px; font-weight:700; color:var(--text); }
     .login-brand span { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; }
-    .login-title { font-size:22px; font-weight:700; letter-spacing:-.4px; margin-bottom:4px; }
+    .login-title { font-size:22px; font-weight:700; letter-spacing:-.4px; margin-bottom:4px; color:var(--text); }
     .login-sub   { font-size:13px; color:var(--muted); margin-bottom:24px; }
     .f { margin-bottom:13px; }
     .f label { display:block; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); margin-bottom:5px; }
@@ -50,7 +50,7 @@
 
     /* ── TOPBAR ── */
     .topbar { height:54px; background:var(--surface); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 16px; gap:12px; position:sticky; top:0; z-index:100; }
-    .topbar-title { font-size:15px; font-weight:600; flex:1; }
+    .topbar-title { font-size:15px; font-weight:600; flex:1; color:var(--text); }
     .btn-topbar { background:none; border:none; font-size:22px; cursor:pointer; color:var(--muted); padding:4px; line-height:1; }
 
     /* ── PAGES ── */
@@ -65,7 +65,7 @@
     .nav-icon  { font-size:20px; line-height:1; }
     .nav-label { font-size:10px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; }
 
-    /* ── SIDEBAR (drawer) ── */
+    /* ── SIDEBAR ── */
     .sb-overlay { display:none; position:fixed; inset:0; background:rgba(15,13,11,.45); z-index:300; }
     .sb-overlay.on { display:block; }
     .sb { position:fixed; top:0; left:-280px; width:260px; height:100%; background:#0f0d0b; z-index:301; display:flex; flex-direction:column; transition:left .28s cubic-bezier(.4,0,.2,1); box-shadow:4px 0 24px rgba(0,0,0,.2); }
@@ -80,37 +80,37 @@
     .sb-nav  { flex:1; overflow-y:auto; padding:8px 0; }
     .sb-section { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.09em; color:rgba(255,255,255,.55); padding:10px 20px 4px; }
     .sb-item { display:flex; align-items:center; gap:10px; padding:10px 20px; cursor:pointer; color:rgba(255,255,255,.85); font-size:13px; font-weight:500; border-left:3px solid transparent; transition:all .15s; }
-    .sb-item:hover { background:rgba(255,255,255,.05); color:rgba(255,255,255,.95); }
-    .sb-item.on { background:rgba(155,35,53,.25); border-left-color:#9b2335; color:#ffffff; }
+    .sb-item:hover { background:rgba(255,255,255,.05); }
+    .sb-item.on { background:rgba(155,35,53,.25); border-left-color:#9b2335; color:#fff; }
     .sb-item-icon { font-size:15px; width:20px; text-align:center; flex-shrink:0; }
-    .sb-foot { padding:14px 20px; border-top:1px solid rgba(255,255,255,.07); margin-top:auto; }
-    .btn-sair { width:100%; padding:10px 14px; background:none; border:1px solid rgba(255,255,255,0.3); border-radius:var(--r); color:#ffffff; font-size:13px; font-weight:600; cursor:pointer; font-family:var(--font); text-align:left; transition:all .15s; }
+    .sb-foot { padding:14px 20px; border-top:1px solid rgba(255,255,255,.07); }
+    .btn-sair { width:100%; padding:10px 14px; background:none; border:1px solid rgba(255,255,255,0.3); border-radius:var(--r); color:#fff; font-size:13px; font-weight:600; cursor:pointer; font-family:var(--font); text-align:left; transition:all .15s; }
     .btn-sair:hover { border-color:rgba(155,35,53,.5); color:rgba(255,120,120,.8); }
 
-    /* ── CARDS / STATS ── */
+    /* ── STATS ── */
     .stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
     .stat-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px 16px; }
     .stat-n { font-size:26px; font-weight:700; color:var(--rose); letter-spacing:-1px; line-height:1; }
     .stat-l { font-size:11px; color:var(--muted); margin-top:3px; font-weight:500; }
+
+    /* ── CARDS ── */
     .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
     .card-head { padding:12px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
-    .card-head h3 { font-size:13px; font-weight:600; }
+    .card-head h3 { font-size:13px; font-weight:600; color:var(--text); }
     .section-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:10px; }
 
-    /* ── PRÓXIMAS ── */
-    .prox-item { padding:12px 16px; border-bottom:1px solid var(--border); display:flex; gap:12px; align-items:center; }
-    .prox-item:last-child { border-bottom:none; }
-    .prox-date-box { text-align:center; min-width:36px; }
-    .prox-date-box .d { font-size:18px; font-weight:700; color:var(--rose); line-height:1; }
-    .prox-date-box .m { font-size:10px; color:var(--muted); text-transform:uppercase; }
-    .prox-info { flex:1; }
-    .prox-hor  { font-size:11px; color:var(--muted); }
-    .prox-min  { font-size:13px; font-weight:600; }
+    /* ── HOJE ── */
+    .hoje-slot { padding:12px 16px; border-bottom:1px solid var(--border); }
+    .hoje-slot:last-child { border-bottom:none; }
+    .hoje-hor  { font-size:12px; font-weight:700; color:var(--muted); margin-bottom:4px; }
+    .hoje-badge { display:inline-block; padding:2px 9px; border-radius:20px; font-size:11px; font-weight:700; background:rgba(155,35,53,.1); color:var(--rose); border:1px solid rgba(155,35,53,.2); }
+    .hoje-livre { font-size:13px; color:var(--text); font-weight:700; margin-top:3px; }
+    .hoje-obs   { font-size:12px; color:var(--text); font-weight:700; margin-top:2px; font-style:italic; }
 
     /* ── ESCALA ── */
     .escala-topbar { background:var(--surface); border-bottom:1px solid var(--border); padding:10px 16px; display:flex; align-items:center; gap:10px; }
     .month-nav { display:flex; align-items:center; gap:8px; flex:1; }
-    .month-label { font-size:15px; font-weight:700; letter-spacing:-.3px; }
+    .month-label { font-size:15px; font-weight:700; letter-spacing:-.3px; color:var(--text); }
     .btn-icon { background:none; border:1px solid var(--border); border-radius:var(--r); width:32px; height:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; color:var(--muted); transition:all .15s; flex-shrink:0; }
     .btn-icon:hover { border-color:var(--rose); color:var(--rose); }
 
@@ -132,30 +132,35 @@
     .slot-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
     .slot-card-head { padding:10px 14px; background:var(--surface2); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
     .slot-card-time { font-size:15px; font-weight:700; color:var(--text); }
+    .slot-card-del { background:none; border:none; color:var(--muted); font-size:18px; cursor:pointer; padding:0 4px; line-height:1; transition:color .15s; }
+    .slot-card-del:hover { color:var(--rose); }
     .saving-dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--rose); animation:pulse 1s ease infinite; }
     @keyframes pulse { 0%,100%{opacity:.3} 50%{opacity:1} }
     .slot-card-body { padding:12px 14px; display:flex; flex-direction:column; gap:8px; }
-    .slot-field { }
     .slot-field label { display:block; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); margin-bottom:4px; }
     .slot-sel {
       width:100%; background:var(--surface2); border:1px solid var(--border);
-      border-radius:8px; padding:8px 10px; font-size:13px; font-family:var(--font);
+      border-radius:8px; padding:8px 10px; font-size:14px; font-family:var(--font);
       color:var(--muted); outline:none; cursor:pointer; appearance:none;
       background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23a89d94'/%3E%3C/svg%3E");
       background-repeat:no-repeat; background-position:right 10px center; padding-right:28px;
     }
     .slot-sel:focus { border-color:var(--rose); box-shadow:0 0 0 2px rgba(155,35,53,.1); }
-    .slot-sel.filled { background-color:rgba(155,35,53,.07); border-color:rgba(155,35,53,.25); color:var(--rose); font-weight:600; }
-    .slot-inp { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:8px 10px; font-size:13px; font-family:var(--font); color:var(--text); outline:none; }
+    .slot-sel.filled { background-color:rgba(155,35,53,.07); border-color:rgba(155,35,53,.25); color:var(--rose); font-weight:700; }
+    .slot-inp { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:8px 10px; font-size:14px; font-family:var(--font); color:var(--text); outline:none; font-weight:700; }
     .slot-inp:focus { border-color:var(--rose); box-shadow:0 0 0 2px rgba(155,35,53,.1); }
-    .slot-inp::placeholder { color:var(--muted); font-style:italic; }
-    .slot-inp.has-val { background:rgba(90,130,60,.07); border-color:rgba(90,130,60,.3); color:#3a5c20; font-weight:600; }
+    .slot-inp::placeholder { color:var(--muted); font-weight:400; font-style:italic; }
+    .slot-inp.has-val { background:rgba(90,130,60,.07); border-color:rgba(90,130,60,.3); color:#0f0d0b; font-weight:700; }
 
-    /* ── MÚSICOS / MINISTÉRIOS ── */
+    /* Add extra hour button */
+    .btn-add-hor { width:100%; padding:10px; background:none; border:1.5px dashed var(--border); border-radius:12px; color:var(--muted); font-size:13px; font-family:var(--font); font-weight:600; cursor:pointer; transition:all .15s; display:flex; align-items:center; justify-content:center; gap:6px; }
+    .btn-add-hor:hover { border-color:var(--rose); color:var(--rose); }
+
+    /* ── LIST ITEMS ── */
     .list-item { background:var(--surface); border:1px solid var(--border); border-radius:12px; margin-bottom:8px; overflow:hidden; }
     .list-item-body { padding:12px 14px; display:flex; align-items:center; gap:10px; }
     .list-item-info { flex:1; }
-    .list-item-name { font-size:14px; font-weight:600; }
+    .list-item-name { font-size:14px; font-weight:600; color:var(--text); }
     .list-item-sub  { font-size:12px; color:var(--muted); margin-top:2px; }
     .list-item-actions { display:flex; gap:6px; }
 
@@ -164,19 +169,20 @@
     .btn-rose:hover { background:var(--rose2); }
     .btn-ghost { background:none; border:1px solid var(--border); color:var(--muted); }
     .btn-ghost:hover { color:var(--text); }
+    .btn-block { width:100%; }
     .btn-danger { background:none; border:1px solid transparent; color:var(--rose); font-family:var(--font); font-size:12px; font-weight:600; cursor:pointer; border-radius:var(--r); padding:8px 10px; transition:all .15s; }
     .btn-danger:hover { background:rgba(155,35,53,.07); border-color:rgba(155,35,53,.2); }
     .fab { position:fixed; bottom:calc(var(--nav-h) + 16px); right:16px; width:52px; height:52px; border-radius:50%; background:var(--rose); color:#fff; border:none; font-size:24px; cursor:pointer; box-shadow:0 4px 16px rgba(155,35,53,.4); display:flex; align-items:center; justify-content:center; z-index:190; transition:background .15s; }
     .fab:hover { background:var(--rose2); }
     .badge { display:inline-block; padding:2px 9px; border-radius:20px; font-size:11px; font-weight:600; background:rgba(155,35,53,.1); color:var(--rose); border:1px solid rgba(155,35,53,.2); }
 
-    /* ── BOTTOM SHEET MODAL ── */
+    /* ── BOTTOM SHEET ── */
     .backdrop { display:none; position:fixed; inset:0; background:rgba(15,13,11,.45); z-index:400; }
     .backdrop.on { display:flex; align-items:flex-end; }
     .sheet { background:var(--surface); border-radius:18px 18px 0 0; padding:24px 20px 32px; width:100%; max-height:90vh; overflow-y:auto; animation:slideUp .2s ease; }
     @keyframes slideUp { from{transform:translateY(100%)} to{transform:none} }
     .sheet-head { display:flex; align-items:center; gap:10px; margin-bottom:20px; }
-    .sheet-head h2 { font-size:18px; font-weight:700; letter-spacing:-.3px; }
+    .sheet-head h2 { font-size:18px; font-weight:700; letter-spacing:-.3px; color:var(--text); }
     .sheet-foot { display:flex; gap:8px; justify-content:flex-end; margin-top:20px; padding-top:16px; border-top:1px solid var(--border); }
     .msg { font-size:13px; padding:9px 12px; border-radius:var(--r); margin-top:10px; }
     .msg.ok  { background:rgba(50,120,70,.1); color:#2d7a45; border:1px solid rgba(50,120,70,.25); }
@@ -186,14 +192,6 @@
     .spin { display:inline-block; width:14px; height:14px; border:2px solid var(--border); border-top-color:var(--rose); border-radius:50%; animation:spin .6s linear infinite; vertical-align:middle; }
     @keyframes spin { to{transform:rotate(360deg)} }
     .loading-wrap { padding:30px; text-align:center; color:var(--muted); font-size:13px; display:flex; align-items:center; justify-content:center; gap:8px; }
-
-    /* ── HOJE NA ESCALA ── */
-    .hoje-slot { padding:12px 16px; border-bottom:1px solid var(--border); }
-    .hoje-slot:last-child { border-bottom:none; }
-    .hoje-hor  { font-size:12px; font-weight:700; color:var(--muted); margin-bottom:4px; }
-    .hoje-badge { display:inline-block; padding:2px 9px; border-radius:20px; font-size:11px; font-weight:600; background:rgba(155,35,53,.1); color:var(--rose); border:1px solid rgba(155,35,53,.2); }
-    .hoje-livre { font-size:12px; color:var(--text); font-weight:600; margin-top:3px; }
-    .hoje-obs   { font-size:11px; color:var(--muted); margin-top:2px; font-style:italic; }
 
     @media (max-width:400px) { .stats-grid { grid-template-columns:1fr 1fr; } }
   </style>
@@ -218,7 +216,6 @@
 
 <!-- APP -->
 <div id="app">
-  <!-- SIDEBAR OVERLAY -->
   <div class="sb-overlay" id="sb-overlay"></div>
   <nav class="sb" id="sb">
     <div class="sb-brand">
@@ -243,19 +240,16 @@
     </div>
   </nav>
 
-  <!-- TOPBAR -->
   <div class="topbar">
     <button class="btn-topbar" id="btn-menu">☰</button>
     <div class="topbar-title" id="topbar-title">Dashboard</div>
   </div>
 
-  <!-- PAGES -->
-
   <!-- HOME -->
   <div class="page on" id="page-home">
     <div class="content">
       <div style="margin-bottom:16px">
-        <div style="font-size:22px;font-weight:700;letter-spacing:-.4px">Olá! 👋</div>
+        <div style="font-size:22px;font-weight:700;letter-spacing:-.4px;color:var(--text)">Olá! 👋</div>
         <div style="font-size:13px;color:var(--muted);margin-top:2px" id="home-user">—</div>
       </div>
       <div class="stats-grid">
@@ -305,7 +299,6 @@
     <button class="fab" id="fab-min">+</button>
   </div>
 
-  <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
     <button class="nav-item on" data-page="home"><span class="nav-icon">🏠</span><span class="nav-label">Início</span></button>
     <button class="nav-item" data-page="escala"><span class="nav-icon">📅</span><span class="nav-label">Escala</span></button>
@@ -347,6 +340,41 @@
   </div>
 </div>
 
+<!-- MODAL: Novo horário extra -->
+<div class="backdrop" id="m-hor">
+  <div class="sheet">
+    <div class="sheet-head"><span>⊕</span><h2 id="t-hor">Adicionar Horário</h2></div>
+    <input type="hidden" id="hor-dt"/>
+    <div class="f">
+      <label>Horário *</label>
+      <select id="hor-sel" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:11px 13px;font-size:14px;font-family:var(--font);color:var(--text);outline:none;appearance:none;" onchange="toggleHorCustom()">
+        <option value="07h">07h</option>
+        <option value="07:30h">07:30h</option>
+        <option value="08:30h">08:30h</option>
+        <option value="10h">10h</option>
+        <option value="12h">12h</option>
+        <option value="14h">14h</option>
+        <option value="15h">15h</option>
+        <option value="15:30h">15:30h</option>
+        <option value="17h">17h</option>
+        <option value="17:30h">17:30h</option>
+        <option value="18:30h">18:30h</option>
+        <option value="19:30h">19:30h</option>
+        <option value="outro">⊕ Outro horário...</option>
+      </select>
+    </div>
+    <div class="f" id="hor-custom-wrap" style="display:none">
+      <label>Horário personalizado</label>
+      <input type="text" id="hor-custom" placeholder="ex: 20h, 09:15h"/>
+    </div>
+    <div id="hor-msg"></div>
+    <div class="sheet-foot">
+      <button class="btn btn-ghost" id="btn-hor-cancel">Cancelar</button>
+      <button class="btn btn-rose" id="btn-hor-save">Adicionar</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
@@ -367,18 +395,21 @@ const fb = initializeApp({
 const auth = getAuth(fb);
 const db   = getFirestore(fb);
 
+// ── HORÁRIOS FIXOS (corrigidos) ───────────────────────────────────────────────
 const HORARIOS = {
   week: ['07:30h','12h','15h','17:30h','19:30h'],
-  sat:  ['07h','08:30h','10h','12h','14h','15h','15:30h','17:30h','19:30h'],
+  sat:  ['07h','12h','17h','19:30h'],
   sun:  ['07h','08:30h','10h','12h','17h','18:30h']
 };
+
 const WKDAYS   = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const MONTHS   = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 const MONTHS_S = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 
 let ministerios = [], musicos = [];
-let escalaCache = {}; // key: "YYYY-MM-DD_HH" → doc
+let escalaCache = {};
 let curYear, curMonth, selectedDay;
+let debounceTimers = {};
 const now = new Date();
 
 // ── AUTH ──────────────────────────────────────────────────────────────────────
@@ -401,7 +432,7 @@ onAuthStateChanged(auth, user => {
     document.getElementById('app').classList.add('on');
     document.getElementById('sb-user-name').textContent = user.email;
     document.getElementById('home-user').textContent = user.email;
-    curYear  = now.getFullYear();
+    curYear = now.getFullYear();
     curMonth = now.getMonth();
     selectedDay = now.getDate();
     initApp();
@@ -415,28 +446,24 @@ async function initApp() {
   await Promise.all([fetchMin(), fetchMus()]);
   loadDashboard();
 }
-
 async function fetchMin() {
-  const s = await getDocs(query(collection(db, 'ministerios'), orderBy('nome')));
-  ministerios = s.docs.map(d => ({ id: d.id, ...d.data() }));
+  const s = await getDocs(query(collection(db,'ministerios'), orderBy('nome')));
+  ministerios = s.docs.map(d => ({id:d.id,...d.data()}));
 }
 async function fetchMus() {
-  const s = await getDocs(query(collection(db, 'musicos'), orderBy('nome')));
-  musicos = s.docs.map(d => ({ id: d.id, ...d.data() }));
+  const s = await getDocs(query(collection(db,'musicos'), orderBy('nome')));
+  musicos = s.docs.map(d => ({id:d.id,...d.data()}));
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────────────────────
 async function loadDashboard() {
   document.getElementById('st-min').textContent = ministerios.length;
   document.getElementById('st-mus').textContent = musicos.length;
+  const s = Timestamp.fromDate(new Date(now.getFullYear(),now.getMonth(),1));
+  const e = Timestamp.fromDate(new Date(now.getFullYear(),now.getMonth()+1,0,23,59,59));
+  const sm = await getDocs(query(collection(db,'escala'),where('data','>=',s),where('data','<=',e)));
+  document.getElementById('st-esc').textContent = sm.docs.filter(d=>d.data().ministerioId).length;
 
-  // Escalas do mês
-  const s = Timestamp.fromDate(new Date(now.getFullYear(), now.getMonth(), 1));
-  const e = Timestamp.fromDate(new Date(now.getFullYear(), now.getMonth()+1, 0, 23,59,59));
-  const sm = await getDocs(query(collection(db,'escala'), where('data','>=',s), where('data','<=',e)));
-  document.getElementById('st-esc').textContent = sm.docs.filter(d => d.data().ministerioId).length;
-
-  // Hoje na Escala
   const today = new Date(); today.setHours(0,0,0,0);
   const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate()+1);
   const snap = await getDocs(query(
@@ -444,32 +471,46 @@ async function loadDashboard() {
     where('data','>=',Timestamp.fromDate(today)),
     where('data','<',Timestamp.fromDate(tomorrow))
   ));
-
-  const byHorario = {};
-  snap.docs.forEach(d => { byHorario[d.data().horario] = d.data(); });
+  const byH = {};
+  snap.docs.forEach(d => { byH[d.data().horario] = d.data(); });
 
   const dow  = today.getDay();
-  const type = dow === 0 ? 'sun' : dow === 6 ? 'sat' : 'week';
-  const hors = HORARIOS[type];
+  const type = dow===0?'sun':dow===6?'sat':'week';
+  const hors = getAllHorariosForDay(today, byH);
 
-  const hojeSlots = hors
-    .map(h => ({ h, e: byHorario[h] }))
-    .filter(({ e }) => e && (e.ministerioNome || e.nomeAvulso || e.observacoes));
-
+  const hojeSlots = hors.map(h=>({h,e:byH[h]})).filter(({e})=>e&&(e.ministerioNome||e.nomeAvulso||e.observacoes));
   const el = document.getElementById('home-hoje');
   if (!hojeSlots.length) { el.innerHTML='<div class="empty-msg">Nenhuma missa escalada para hoje.</div>'; return; }
-  el.innerHTML = hojeSlots.map(({ h, e }) => `
+  el.innerHTML = hojeSlots.map(({h,e})=>`
     <div class="hoje-slot">
       <div class="hoje-hor">${h}</div>
-      ${e.ministerioNome ? `<span class="hoje-badge">${e.ministerioNome}</span>` : ''}
-      ${e.nomeAvulso  ? `<div class="hoje-livre">${e.nomeAvulso}</div>`  : ''}
-      ${e.observacoes ? `<div class="hoje-obs">${e.observacoes}</div>`   : ''}
-    </div>
-  `).join('');
+      ${e.ministerioNome?`<span class="hoje-badge">${e.ministerioNome}</span>`:''}
+      ${e.nomeAvulso?`<div class="hoje-livre">${e.nomeAvulso}</div>`:''}
+      ${e.observacoes?`<div class="hoje-obs">${e.observacoes}</div>`:''}
+    </div>`).join('');
 }
 
-// ── SIDEBAR ───────────────────────────────────────────────────────────────────
-document.getElementById('btn-menu').addEventListener('click', () => {
+// ── NAV ───────────────────────────────────────────────────────────────────────
+const pageTitles = {home:'Dashboard',escala:'Escala',musicos:'Músicos',ministerios:'Ministérios'};
+function navigateTo(p) {
+  document.querySelectorAll('#app .page').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.sb-item').forEach(x=>x.classList.remove('on'));
+  document.getElementById('page-'+p).classList.add('on');
+  document.querySelector(`.nav-item[data-page="${p}"]`)?.classList.add('on');
+  document.querySelector(`.sb-item[data-page="${p}"]`)?.classList.add('on');
+  document.getElementById('topbar-title').textContent = pageTitles[p]||'';
+  if(p==='escala')      loadEscala();
+  if(p==='musicos')     renderMusicos();
+  if(p==='ministerios') renderMins();
+}
+document.querySelectorAll('.nav-item[data-page]').forEach(btn=>{
+  btn.addEventListener('click', ()=>navigateTo(btn.dataset.page));
+});
+document.querySelectorAll('.sb-item[data-page]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{ navigateTo(btn.dataset.page); closeSb(); });
+});
+document.getElementById('btn-menu').addEventListener('click', ()=>{
   document.getElementById('sb').classList.toggle('on');
   document.getElementById('sb-overlay').classList.toggle('on');
 });
@@ -479,129 +520,187 @@ function closeSb() {
   document.getElementById('sb-overlay').classList.remove('on');
 }
 
-// ── BOTTOM NAV ────────────────────────────────────────────────────────────────
-const pageTitles = { home:'Dashboard', escala:'Escala', musicos:'Músicos', ministerios:'Ministérios' };
-
-function navigateTo(p) {
-  document.querySelectorAll('#app .page').forEach(x => x.classList.remove('on'));
-  document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('on'));
-  document.querySelectorAll('.sb-item').forEach(x => x.classList.remove('on'));
-  document.getElementById('page-' + p).classList.add('on');
-  document.querySelector(`.nav-item[data-page="${p}"]`)?.classList.add('on');
-  document.querySelector(`.sb-item[data-page="${p}"]`)?.classList.add('on');
-  document.getElementById('topbar-title').textContent = pageTitles[p] || '';
-  if (p === 'escala')       loadEscala();
-  if (p === 'musicos')      renderMusicos();
-  if (p === 'ministerios')  renderMins();
-}
-
-document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
-  btn.addEventListener('click', () => navigateTo(btn.dataset.page));
-});
-document.querySelectorAll('.sb-item[data-page]').forEach(btn => {
-  btn.addEventListener('click', () => { navigateTo(btn.dataset.page); closeSb(); });
-});
-
 // ── ESCALA ────────────────────────────────────────────────────────────────────
 function makeKey(date, horario) {
-  const y = date.getFullYear();
-  const m = String(date.getMonth()+1).padStart(2,'0');
-  const d = String(date.getDate()).padStart(2,'0');
+  const y=date.getFullYear(), m=String(date.getMonth()+1).padStart(2,'0'), d=String(date.getDate()).padStart(2,'0');
   return `${y}-${m}-${d}_${horario}`;
 }
+function getDayType(date) {
+  const dow=date.getDay();
+  return dow===0?'sun':dow===6?'sat':'week';
+}
 
-document.getElementById('btn-prev-month').addEventListener('click', () => {
-  curMonth--; if(curMonth<0){curMonth=11;curYear--;}
-  selectedDay = 1;
-  loadEscala();
+// Retorna horários fixos do dia + extras salvos no cache
+function getAllHorariosForDay(date, cache) {
+  const type = getDayType(date);
+  const fixed = [...HORARIOS[type]];
+  // Adiciona horários extras que existam no cache mas não sejam fixos
+  Object.keys(cache||escalaCache).forEach(key => {
+    const [datePart, hor] = key.split('_');
+    const [y,m,d] = datePart.split('-').map(Number);
+    if(y===date.getFullYear() && m-1===date.getMonth() && d===date.getDate()) {
+      if(!fixed.includes(hor)) fixed.push(hor);
+    }
+  });
+  // Ordena por horário
+  return fixed.sort((a,b) => toMinutes(a) - toMinutes(b));
+}
+
+function toMinutes(hor) {
+  const clean = hor.replace('h','').replace(':','.');
+  const parts = clean.split('.');
+  return parseInt(parts[0])*60 + (parts[1] ? parseInt(parts[1]) : 0);
+}
+
+document.getElementById('btn-prev-month').addEventListener('click', ()=>{
+  curMonth--; if(curMonth<0){curMonth=11;curYear--;} selectedDay=1; loadEscala();
 });
-document.getElementById('btn-next-month').addEventListener('click', () => {
-  curMonth++; if(curMonth>11){curMonth=0;curYear++;}
-  selectedDay = 1;
-  loadEscala();
+document.getElementById('btn-next-month').addEventListener('click', ()=>{
+  curMonth++; if(curMonth>11){curMonth=0;curYear++;} selectedDay=1; loadEscala();
 });
 
 async function loadEscala() {
   document.getElementById('month-label').textContent = `${MONTHS_S[curMonth]} ${curYear}`;
   document.getElementById('slots-container').innerHTML = '<div class="loading-wrap"><span class="spin"></span></div>';
 
-  const start = Timestamp.fromDate(new Date(curYear, curMonth, 1));
-  const end   = Timestamp.fromDate(new Date(curYear, curMonth+1, 0, 23, 59, 59));
-  const snap  = await getDocs(query(collection(db,'escala'), where('data','>=',start), where('data','<=',end)));
+  const start = Timestamp.fromDate(new Date(curYear,curMonth,1));
+  const end   = Timestamp.fromDate(new Date(curYear,curMonth+1,0,23,59,59));
+  const snap  = await getDocs(query(collection(db,'escala'),where('data','>=',start),where('data','<=',end)));
 
   escalaCache = {};
-  snap.docs.forEach(d => {
-    const dat = d.data();
-    const dt  = dat.data.toDate();
-    const key = makeKey(dt, dat.horario);
-    escalaCache[key] = { id: d.id, ...dat };
+  snap.docs.forEach(d=>{
+    const dat=d.data(), dt=dat.data.toDate();
+    escalaCache[makeKey(dt,dat.horario)] = {id:d.id,...dat};
   });
+
+  // Se mês vazio, copia do mês de referência
+  if(Object.keys(escalaCache).length === 0) {
+    await copiarMesReferencia(curYear, curMonth);
+  }
 
   renderCarousel();
   renderDaySlots(selectedDay);
 }
 
-function getDayType(date) {
-  const dow = date.getDay();
-  if (dow === 0) return 'sun';
-  if (dow === 6) return 'sat';
-  return 'week';
+// ── CÓPIA DO MÊS ANTERIOR ─────────────────────────────────────────────────────
+function nthDow(date) { return {dow:date.getDay(), nth:Math.ceil(date.getDate()/7)}; }
+function findDateByNthDow(year, month, dow, nth) {
+  const all=[];
+  const dim=new Date(year,month+1,0).getDate();
+  for(let d=1;d<=dim;d++){
+    const dt=new Date(year,month,d);
+    if(dt.getDay()===dow) all.push(dt);
+  }
+  return all[nth-1]||null;
 }
 
-function renderCarousel() {
-  const daysInMonth = new Date(curYear, curMonth+1, 0).getDate();
-  const todayD = now.getDate(), todayM = now.getMonth(), todayY = now.getFullYear();
-  const carousel = document.getElementById('day-carousel');
+async function copiarMesReferencia(targetYear, targetMonth) {
+  for(let i=1;i<=3;i++){
+    let refMonth=targetMonth-i, refYear=targetYear;
+    if(refMonth<0){refMonth+=12;refYear--;}
+    const start=Timestamp.fromDate(new Date(refYear,refMonth,1));
+    const end=Timestamp.fromDate(new Date(refYear,refMonth+1,0,23,59,59));
+    const snap=await getDocs(query(collection(db,'escala'),where('data','>=',start),where('data','<=',end)));
+    if(snap.empty) continue;
 
-  carousel.innerHTML = '';
-  for (let d = 1; d <= daysInMonth; d++) {
-    const dt  = new Date(curYear, curMonth, d);
-    const pill = document.createElement('div');
-    pill.className = 'day-pill';
-    if (d === selectedDay) pill.classList.add('selected');
-    if (d === todayD && curMonth === todayM && curYear === todayY) pill.classList.add('today');
-    pill.innerHTML = `<span class="day-pill-wkd">${WKDAYS[dt.getDay()]}</span><span class="day-pill-num">${d}</span>`;
-    pill.addEventListener('click', () => {
-      selectedDay = d;
-      document.querySelectorAll('.day-pill').forEach(p => p.classList.remove('selected'));
+    const refMap={};
+    snap.docs.forEach(d=>{
+      const dat=d.data(), dt=dat.data.toDate();
+      const {dow,nth}=nthDow(dt);
+      const k=`${dow}|${nth}|${dat.horario}`;
+      refMap[k]={ministerioId:dat.ministerioId||null,ministerioNome:dat.ministerioNome||'',nomeAvulso:dat.nomeAvulso||''};
+    });
+
+    const writes=[];
+    for(const [k,dados] of Object.entries(refMap)){
+      const [dowS,nthS,hor]=k.split('|');
+      const targetDt=findDateByNthDow(targetYear,targetMonth,parseInt(dowS),parseInt(nthS));
+      if(!targetDt) continue;
+      const payload={data:Timestamp.fromDate(targetDt),horario:hor,ministerioId:dados.ministerioId,ministerioNome:dados.ministerioNome,nomeAvulso:dados.nomeAvulso,musicosIds:[],musicosNomes:[],observacoes:''};
+      writes.push(addDoc(collection(db,'escala'),payload).then(ref=>{
+        escalaCache[makeKey(targetDt,hor)]={id:ref.id,...payload};
+      }));
+    }
+    await Promise.all(writes);
+    return;
+  }
+}
+
+async function propagarParaProximosMeses(changedDt, hor, fields) {
+  const {dow,nth}=nthDow(changedDt);
+  for(let i=1;i<=6;i++){
+    let futMonth=changedDt.getMonth()+i, futYear=changedDt.getFullYear();
+    while(futMonth>11){futMonth-=12;futYear++;}
+    const targetDt=findDateByNthDow(futYear,futMonth,dow,nth);
+    if(!targetDt) continue;
+    const futKey=makeKey(targetDt,hor);
+    const start=Timestamp.fromDate(new Date(futYear,futMonth,1));
+    const end=Timestamp.fromDate(new Date(futYear,futMonth+1,0,23,59,59));
+    const snap=await getDocs(query(collection(db,'escala'),where('data','>=',start),where('data','<=',end)));
+    const existingDoc=snap.docs.find(d=>makeKey(d.data().data.toDate(),d.data().horario)===futKey);
+    if(existingDoc){
+      await updateDoc(doc(db,'escala',existingDoc.id),fields);
+    } else {
+      const ex=escalaCache[makeKey(changedDt,hor)]||{};
+      await addDoc(collection(db,'escala'),{
+        data:Timestamp.fromDate(targetDt),horario:hor,
+        ministerioId:fields.ministerioId??ex.ministerioId??null,
+        ministerioNome:fields.ministerioNome??ex.ministerioNome??'',
+        nomeAvulso:fields.nomeAvulso??ex.nomeAvulso??'',
+        musicosIds:[],musicosNomes:[],observacoes:''
+      });
+    }
+  }
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function renderCarousel() {
+  const dim=new Date(curYear,curMonth+1,0).getDate();
+  const todayD=now.getDate(),todayM=now.getMonth(),todayY=now.getFullYear();
+  const carousel=document.getElementById('day-carousel');
+  carousel.innerHTML='';
+  for(let d=1;d<=dim;d++){
+    const dt=new Date(curYear,curMonth,d);
+    const pill=document.createElement('div');
+    pill.className='day-pill';
+    if(d===selectedDay) pill.classList.add('selected');
+    if(d===todayD&&curMonth===todayM&&curYear===todayY) pill.classList.add('today');
+    pill.innerHTML=`<span class="day-pill-wkd">${WKDAYS[dt.getDay()]}</span><span class="day-pill-num">${d}</span>`;
+    pill.addEventListener('click',()=>{
+      selectedDay=d;
+      document.querySelectorAll('.day-pill').forEach(p=>p.classList.remove('selected'));
       pill.classList.add('selected');
       renderDaySlots(d);
     });
     carousel.appendChild(pill);
   }
-
-  // Scroll to selected day
-  setTimeout(() => {
-    const pills = carousel.querySelectorAll('.day-pill');
-    const idx   = selectedDay - 1;
-    if (pills[idx]) pills[idx].scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
-  }, 50);
+  setTimeout(()=>{
+    const pills=carousel.querySelectorAll('.day-pill');
+    if(pills[selectedDay-1]) pills[selectedDay-1].scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  },50);
 }
 
-let debounceTimers = {};
-
 function renderDaySlots(day) {
-  const dt   = new Date(curYear, curMonth, day);
-  const type = getDayType(dt);
-  const hors = HORARIOS[type];
-  const container = document.getElementById('slots-container');
+  const dt=new Date(curYear,curMonth,day);
+  const hors=getAllHorariosForDay(dt, escalaCache);
+  const container=document.getElementById('slots-container');
 
-  container.innerHTML = hors.map(h => {
-    const key     = makeKey(dt, h);
-    const saved   = escalaCache[key];
-    const minId   = saved?.ministerioId || '';
-    const livre   = saved?.nomeAvulso || '';
-    const obs     = saved?.observacoes || '';
-    const filled  = minId ? 'filled' : '';
-    const livreClass = livre ? 'has-val' : '';
-    const minOpts = ministerios.map(m =>
-      `<option value="${m.id}" ${m.id===minId?'selected':''}>${m.nome}</option>`
-    ).join('');
-
+  const cards = hors.map(h=>{
+    const key=makeKey(dt,h);
+    const saved=escalaCache[key];
+    const minId=saved?.ministerioId||'';
+    const livre=saved?.nomeAvulso||'';
+    const obs=saved?.observacoes||'';
+    const filled=minId?'filled':'';
+    const livreClass=livre?'has-val':'';
+    const minOpts=ministerios.map(m=>`<option value="${m.id}" ${m.id===minId?'selected':''}>${m.nome}</option>`).join('');
     return `<div class="slot-card">
       <div class="slot-card-head">
         <span class="slot-card-time">${h}</span>
-        <span class="saving-dot" id="dot-${key}" style="display:none"></span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="saving-dot" id="dot-${key}" style="display:none"></span>
+          <button class="slot-card-del" title="Remover horário" onclick="deleteSlot('${key}','${h}')">×</button>
+        </div>
       </div>
       <div class="slot-card-body">
         <div class="slot-field">
@@ -628,288 +727,258 @@ function renderDaySlots(day) {
       </div>
     </div>`;
   }).join('');
+
+  container.innerHTML = cards +
+    `<button class="btn-add-hor" onclick="openAddHor()">⊕ Adicionar horário neste dia</button>`;
 }
 
-// ── SAVE LOGIC ────────────────────────────────────────────────────────────────
+// ── SALVAR ────────────────────────────────────────────────────────────────────
 async function saveSlotField(key, dtISO, hor, fields) {
-  const dt       = new Date(dtISO);
-  const existing = escalaCache[key];
-  const payload  = {
-    data:           Timestamp.fromDate(dt),
-    horario:        hor,
-    ministerioId:   existing?.ministerioId   ?? null,
-    ministerioNome: existing?.ministerioNome ?? '',
-    nomeAvulso:     existing?.nomeAvulso     ?? '',
-    musicosIds:     existing?.musicosIds     ?? [],
-    musicosNomes:   existing?.musicosNomes   ?? [],
-    observacoes:    existing?.observacoes    ?? '',
+  const dt=new Date(dtISO), existing=escalaCache[key];
+  const payload={
+    data:Timestamp.fromDate(dt), horario:hor,
+    ministerioId:existing?.ministerioId??null,
+    ministerioNome:existing?.ministerioNome??'',
+    nomeAvulso:existing?.nomeAvulso??'',
+    musicosIds:existing?.musicosIds??[],
+    musicosNomes:existing?.musicosNomes??[],
+    observacoes:existing?.observacoes??'',
     ...fields
   };
   try {
-    if (existing?.id) {
-      await updateDoc(doc(db,'escala',existing.id), payload);
-      escalaCache[key] = { ...existing, ...payload };
-    } else {
-      const ref = await addDoc(collection(db,'escala'), payload);
-      escalaCache[key] = { id: ref.id, ...payload };
-    }
-    // Propagate to next 6 months
-    const propagFields = {};
-    if ('ministerioId'   in fields) propagFields.ministerioId   = fields.ministerioId;
-    if ('ministerioNome' in fields) propagFields.ministerioNome = fields.ministerioNome;
-    if ('nomeAvulso'     in fields) propagFields.nomeAvulso     = fields.nomeAvulso;
-    if (Object.keys(propagFields).length > 0) {
-      propagarParaProximosMeses(dt, hor, propagFields).catch(console.error);
-    }
-  } catch(e) {
-    console.error(e);
-    alert('Erro ao salvar: ' + e.message);
-  }
+    if(existing?.id){ await updateDoc(doc(db,'escala',existing.id),payload); escalaCache[key]={...existing,...payload}; }
+    else { const ref=await addDoc(collection(db,'escala'),payload); escalaCache[key]={id:ref.id,...payload}; }
+    const pf={};
+    if('ministerioId' in fields) pf.ministerioId=fields.ministerioId;
+    if('ministerioNome' in fields) pf.ministerioNome=fields.ministerioNome;
+    if('nomeAvulso' in fields) pf.nomeAvulso=fields.nomeAvulso;
+    if(Object.keys(pf).length>0) propagarParaProximosMeses(dt,hor,pf).catch(console.error);
+  } catch(e){ console.error(e); alert('Erro ao salvar: '+e.message); }
 }
 
 function showDot(key) {
-  const dot = document.getElementById('dot-' + key);
-  if (dot) { dot.style.display = 'inline-block'; setTimeout(() => { dot.style.display = 'none'; }, 1200); }
+  const dot=document.getElementById('dot-'+key);
+  if(dot){dot.style.display='inline-block';setTimeout(()=>{dot.style.display='none';},1200);}
 }
 
 window.onSlotChange = async sel => {
-  const { key, dt: dtISO, hor } = sel.dataset;
-  const minId   = sel.value;
-  const minNome = ministerios.find(m => m.id === minId)?.nome || '';
-  sel.classList.toggle('filled', !!minId);
+  const {key,dt:dtISO,hor}=sel.dataset;
+  const minId=sel.value, minNome=ministerios.find(m=>m.id===minId)?.nome||'';
+  sel.classList.toggle('filled',!!minId);
   showDot(key);
-  await saveSlotField(key, dtISO, hor, { ministerioId: minId||null, ministerioNome: minNome });
+  await saveSlotField(key,dtISO,hor,{ministerioId:minId||null,ministerioNome:minNome});
 };
-
 window.debounceLivre = inp => {
-  const key = inp.dataset.key;
-  clearTimeout(debounceTimers['l_' + key]);
-  debounceTimers['l_' + key] = setTimeout(() => onLivreChange(inp), 800);
+  const key=inp.dataset.key;
+  clearTimeout(debounceTimers['l_'+key]);
+  debounceTimers['l_'+key]=setTimeout(()=>onLivreChange(inp),800);
 };
 window.onLivreChange = async inp => {
-  const { key, dt: dtISO, hor } = inp.dataset;
-  const val = inp.value.trim();
-  inp.classList.toggle('has-val', !!val);
+  const {key,dt:dtISO,hor}=inp.dataset;
+  const val=inp.value.trim();
+  inp.classList.toggle('has-val',!!val);
   showDot(key);
-  await saveSlotField(key, dtISO, hor, { nomeAvulso: val });
+  await saveSlotField(key,dtISO,hor,{nomeAvulso:val});
 };
-
 window.debounceObs = inp => {
-  const key = inp.dataset.key;
-  clearTimeout(debounceTimers['o_' + key]);
-  debounceTimers['o_' + key] = setTimeout(() => onObsChange(inp), 800);
+  const key=inp.dataset.key;
+  clearTimeout(debounceTimers['o_'+key]);
+  debounceTimers['o_'+key]=setTimeout(()=>onObsChange(inp),800);
 };
 window.onObsChange = async inp => {
-  const { key, dt: dtISO, hor } = inp.dataset;
-  const val = inp.value.trim();
+  const {key,dt:dtISO,hor}=inp.dataset;
   showDot(key);
-  await saveSlotField(key, dtISO, hor, { observacoes: val });
+  await saveSlotField(key,dtISO,hor,{observacoes:inp.value.trim()});
 };
 
-// ── PROPAGATION HELPERS ───────────────────────────────────────────────────────
-function nthDow(date) {
-  return { dow: date.getDay(), nth: Math.ceil(date.getDate() / 7) };
-}
-function findDateByNthDow(year, month, dow, nth) {
-  const all = [];
-  const dim = new Date(year, month+1, 0).getDate();
-  for (let d = 1; d <= dim; d++) {
-    const dt = new Date(year, month, d);
-    if (dt.getDay() === dow) all.push(dt);
+// ── ADICIONAR HORÁRIO EXTRA ───────────────────────────────────────────────────
+window.openAddHor = () => {
+  document.getElementById('hor-dt').value = new Date(curYear,curMonth,selectedDay).toISOString();
+  document.getElementById('hor-sel').value = '07h';
+  document.getElementById('hor-custom').value = '';
+  document.getElementById('hor-custom-wrap').style.display = 'none';
+  document.getElementById('hor-msg').innerHTML = '';
+  const dt = new Date(curYear,curMonth,selectedDay);
+  document.getElementById('t-hor').textContent = `Adicionar Horário — ${String(selectedDay).padStart(2,'0')}/${String(curMonth+1).padStart(2,'0')}`;
+  document.getElementById('m-hor').classList.add('on');
+};
+window.toggleHorCustom = () => {
+  document.getElementById('hor-custom-wrap').style.display =
+    document.getElementById('hor-sel').value==='outro' ? 'block' : 'none';
+};
+document.getElementById('btn-hor-cancel').addEventListener('click', ()=>closeSheet('m-hor'));
+document.getElementById('btn-hor-save').addEventListener('click', async ()=>{
+  let hor = document.getElementById('hor-sel').value;
+  const msg = document.getElementById('hor-msg');
+  if(hor==='outro'){
+    hor=document.getElementById('hor-custom').value.trim();
+    if(!hor){showMsg(msg,'err','Informe o horário.');return;}
   }
-  return all[nth-1] || null;
-}
-async function propagarParaProximosMeses(changedDt, hor, fields) {
-  const { dow, nth } = nthDow(changedDt);
-  for (let i = 1; i <= 6; i++) {
-    let futMonth = changedDt.getMonth() + i;
-    let futYear  = changedDt.getFullYear();
-    while (futMonth > 11) { futMonth -= 12; futYear++; }
-    const targetDt = findDateByNthDow(futYear, futMonth, dow, nth);
-    if (!targetDt) continue;
-    const futKey = makeKey(targetDt, hor);
-    const start  = Timestamp.fromDate(new Date(futYear, futMonth, 1));
-    const end    = Timestamp.fromDate(new Date(futYear, futMonth+1, 0, 23,59,59));
-    const snap   = await getDocs(query(collection(db,'escala'), where('data','>=',start), where('data','<=',end)));
-    const existingDoc = snap.docs.find(d => {
-      const dat = d.data();
-      return makeKey(dat.data.toDate(), dat.horario) === futKey;
-    });
-    if (existingDoc) {
-      await updateDoc(doc(db,'escala', existingDoc.id), fields);
+  const dtISO = document.getElementById('hor-dt').value;
+  const dt = new Date(dtISO);
+  const key = makeKey(dt,hor);
+  if(escalaCache[key]){showMsg(msg,'err','Este horário já existe neste dia.');return;}
+  // Cria slot vazio
+  const payload={data:Timestamp.fromDate(dt),horario:hor,ministerioId:null,ministerioNome:'',nomeAvulso:'',musicosIds:[],musicosNomes:[],observacoes:''};
+  try{
+    const ref=await addDoc(collection(db,'escala'),payload);
+    escalaCache[key]={id:ref.id,...payload};
+    showMsg(msg,'ok','Horário adicionado!');
+    setTimeout(()=>{closeSheet('m-hor');renderDaySlots(selectedDay);},600);
+  }catch(e){showMsg(msg,'err','Erro: '+e.message);}
+});
+
+window.deleteSlot = async (key, hor) => {
+  const type = getDayType(new Date(curYear,curMonth,selectedDay));
+  const isFixed = HORARIOS[type].includes(hor);
+  const label = isFixed ? 'Limpar este horário?' : 'Excluir este horário extra?';
+  if(!confirm(label)) return;
+  const existing = escalaCache[key];
+  if(existing?.id){
+    if(isFixed){
+      // Horário fixo: apenas limpa os dados
+      await updateDoc(doc(db,'escala',existing.id),{ministerioId:null,ministerioNome:'',nomeAvulso:'',observacoes:''});
+      escalaCache[key]={...existing,ministerioId:null,ministerioNome:'',nomeAvulso:'',observacoes:''};
     } else {
-      const existing = escalaCache[makeKey(changedDt, hor)] || {};
-      await addDoc(collection(db,'escala'), {
-        data:           Timestamp.fromDate(targetDt),
-        horario:        hor,
-        ministerioId:   fields.ministerioId   ?? existing.ministerioId   ?? null,
-        ministerioNome: fields.ministerioNome ?? existing.ministerioNome ?? '',
-        nomeAvulso:     fields.nomeAvulso     ?? existing.nomeAvulso     ?? '',
-        musicosIds:     [],
-        musicosNomes:   [],
-        observacoes:    ''
-      });
+      // Horário extra: exclui completamente
+      await deleteDoc(doc(db,'escala',existing.id));
+      delete escalaCache[key];
     }
   }
-}
+  renderDaySlots(selectedDay);
+};
 
 // ── MÚSICOS ───────────────────────────────────────────────────────────────────
 async function renderMusicos() {
   await fetchMus();
-  const el = document.getElementById('list-musicos');
-  if (!musicos.length) { el.innerHTML = '<div class="empty-msg">Nenhum músico cadastrado.</div>'; return; }
-  el.innerHTML = musicos.map(m => {
-    const min = ministerios.find(x => x.id === m.ministerioId);
-    return `<div class="list-item">
-      <div class="list-item-body">
-        <div class="list-item-info">
-          <div class="list-item-name">${m.nome}</div>
-          <div class="list-item-sub">${min ? `<span class="badge">${min.nome}</span>` : '—'} ${m.telefone ? '· '+m.telefone : ''}</div>
-        </div>
-        <div class="list-item-actions">
-          <button class="btn btn-ghost" onclick="editMus('${m.id}')">Editar</button>
-          <button class="btn-danger" onclick="delMus('${m.id}')">Excluir</button>
-        </div>
+  const el=document.getElementById('list-musicos');
+  if(!musicos.length){el.innerHTML='<div class="empty-msg">Nenhum músico cadastrado.</div>';return;}
+  el.innerHTML=musicos.map(m=>{
+    const min=ministerios.find(x=>x.id===m.ministerioId);
+    return `<div class="list-item"><div class="list-item-body">
+      <div class="list-item-info">
+        <div class="list-item-name">${m.nome}</div>
+        <div class="list-item-sub">${min?`<span class="badge">${min.nome}</span>`:'—'} ${m.telefone?'· '+m.telefone:''}</div>
       </div>
-    </div>`;
+      <div class="list-item-actions">
+        <button class="btn btn-ghost" onclick="editMus('${m.id}')">Editar</button>
+        <button class="btn-danger" onclick="delMus('${m.id}')">Excluir</button>
+      </div>
+    </div></div>`;
   }).join('');
 }
-
 document.getElementById('fab-mus').addEventListener('click', openMus);
-document.getElementById('btn-mus-cancel').addEventListener('click', () => closeSheet('m-mus'));
+document.getElementById('btn-mus-cancel').addEventListener('click', ()=>closeSheet('m-mus'));
 document.getElementById('btn-mus-save').addEventListener('click', saveMus);
-
-function openMus() {
-  clearMusF();
-  fillMinSel('mus-min');
-  document.getElementById('m-mus').classList.add('on');
-}
-window.editMus = id => {
-  const m = musicos.find(x => x.id === id); clearMusF(); fillMinSel('mus-min');
-  document.getElementById('mus-id').value = m.id;
-  document.getElementById('mus-nome').value = m.nome;
-  document.getElementById('mus-min').value = m.ministerioId || '';
-  document.getElementById('mus-tel').value = m.telefone || '';
-  document.getElementById('t-mus').textContent = 'Editar Músico';
+function openMus(){clearMusF();fillMinSel('mus-min');document.getElementById('m-mus').classList.add('on');}
+window.editMus = id=>{
+  const m=musicos.find(x=>x.id===id);clearMusF();fillMinSel('mus-min');
+  document.getElementById('mus-id').value=m.id;
+  document.getElementById('mus-nome').value=m.nome;
+  document.getElementById('mus-min').value=m.ministerioId||'';
+  document.getElementById('mus-tel').value=m.telefone||'';
+  document.getElementById('t-mus').textContent='Editar Músico';
   document.getElementById('m-mus').classList.add('on');
 };
-window.delMus = async id => {
-  if (!confirm('Excluir este músico?')) return;
+window.delMus = async id=>{
+  if(!confirm('Excluir este músico?')) return;
   await deleteDoc(doc(db,'musicos',id));
   await fetchMus(); renderMusicos();
 };
-async function saveMus() {
-  const id    = document.getElementById('mus-id').value;
-  const nome  = document.getElementById('mus-nome').value.trim();
-  const minId = document.getElementById('mus-min').value;
-  const tel   = document.getElementById('mus-tel').value.trim();
-  const msg   = document.getElementById('mus-msg');
-  if (!nome)  { showMsg(msg,'err','Informe o nome.'); return; }
-  if (!minId) { showMsg(msg,'err','Selecione o ministério.'); return; }
-  const minNome = ministerios.find(x => x.id === minId)?.nome || '';
-  try {
-    const d = { nome, ministerioId:minId, ministerioNome:minNome, telefone:tel };
-    if (id) await updateDoc(doc(db,'musicos',id), d);
-    else    await addDoc(collection(db,'musicos'), d);
+async function saveMus(){
+  const id=document.getElementById('mus-id').value;
+  const nome=document.getElementById('mus-nome').value.trim();
+  const minId=document.getElementById('mus-min').value;
+  const tel=document.getElementById('mus-tel').value.trim();
+  const msg=document.getElementById('mus-msg');
+  if(!nome){showMsg(msg,'err','Informe o nome.');return;}
+  if(!minId){showMsg(msg,'err','Selecione o ministério.');return;}
+  const minNome=ministerios.find(x=>x.id===minId)?.nome||'';
+  try{
+    const d={nome,ministerioId:minId,ministerioNome:minNome,telefone:tel};
+    if(id) await updateDoc(doc(db,'musicos',id),d);
+    else   await addDoc(collection(db,'musicos'),d);
     showMsg(msg,'ok','Salvo!');
-    await fetchMus(); renderMusicos();
-    setTimeout(() => closeSheet('m-mus'), 700);
-  } catch(e) { showMsg(msg,'err','Erro: '+e.message); }
+    await fetchMus();renderMusicos();
+    setTimeout(()=>closeSheet('m-mus'),700);
+  }catch(e){showMsg(msg,'err','Erro: '+e.message);}
 }
-function clearMusF() {
-  ['mus-id','mus-nome','mus-tel'].forEach(i => document.getElementById(i).value='');
-  document.getElementById('mus-min').value = '';
-  document.getElementById('mus-msg').innerHTML = '';
-  document.getElementById('t-mus').textContent = 'Novo Músico';
+function clearMusF(){
+  ['mus-id','mus-nome','mus-tel'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('mus-min').value='';
+  document.getElementById('mus-msg').innerHTML='';
+  document.getElementById('t-mus').textContent='Novo Músico';
 }
 
 // ── MINISTÉRIOS ───────────────────────────────────────────────────────────────
-async function renderMins() {
-  await fetchMin(); await fetchMus();
-  const el = document.getElementById('list-ministerios');
-  if (!ministerios.length) { el.innerHTML = '<div class="empty-msg">Nenhum ministério cadastrado.</div>'; return; }
-  el.innerHTML = ministerios.map(m => {
-    const n = musicos.filter(mu => mu.ministerioId === m.id).length;
-    return `<div class="list-item">
-      <div class="list-item-body">
-        <div class="list-item-info">
-          <div class="list-item-name">${m.nome}</div>
-          <div class="list-item-sub">${m.responsavel||'—'} · <span class="badge">${n} músico${n!==1?'s':''}</span></div>
-        </div>
-        <div class="list-item-actions">
-          <button class="btn btn-ghost" onclick="editMin('${m.id}')">Editar</button>
-          <button class="btn-danger" onclick="delMin('${m.id}')">Excluir</button>
-        </div>
+async function renderMins(){
+  await fetchMin();await fetchMus();
+  const el=document.getElementById('list-ministerios');
+  if(!ministerios.length){el.innerHTML='<div class="empty-msg">Nenhum ministério.</div>';return;}
+  el.innerHTML=ministerios.map(m=>{
+    const n=musicos.filter(mu=>mu.ministerioId===m.id).length;
+    return `<div class="list-item"><div class="list-item-body">
+      <div class="list-item-info">
+        <div class="list-item-name">${m.nome}</div>
+        <div class="list-item-sub">${m.responsavel||'—'} · <span class="badge">${n} músico${n!==1?'s':''}</span></div>
       </div>
-    </div>`;
+      <div class="list-item-actions">
+        <button class="btn btn-ghost" onclick="editMin('${m.id}')">Editar</button>
+        <button class="btn-danger" onclick="delMin('${m.id}')">Excluir</button>
+      </div>
+    </div></div>`;
   }).join('');
 }
-
 document.getElementById('fab-min').addEventListener('click', openMin);
-document.getElementById('btn-min-cancel').addEventListener('click', () => closeSheet('m-min'));
+document.getElementById('btn-min-cancel').addEventListener('click', ()=>closeSheet('m-min'));
 document.getElementById('btn-min-save').addEventListener('click', saveMin);
-
-function openMin() {
-  clearMinF();
-  document.getElementById('m-min').classList.add('on');
-}
-window.editMin = id => {
-  const m = ministerios.find(x => x.id === id); clearMinF();
-  document.getElementById('min-id').value = m.id;
-  document.getElementById('min-nome').value = m.nome;
-  document.getElementById('min-resp').value = m.responsavel || '';
-  document.getElementById('t-min').textContent = 'Editar Ministério';
+function openMin(){clearMinF();document.getElementById('m-min').classList.add('on');}
+window.editMin = id=>{
+  const m=ministerios.find(x=>x.id===id);clearMinF();
+  document.getElementById('min-id').value=m.id;
+  document.getElementById('min-nome').value=m.nome;
+  document.getElementById('min-resp').value=m.responsavel||'';
+  document.getElementById('t-min').textContent='Editar Ministério';
   document.getElementById('m-min').classList.add('on');
 };
-window.delMin = async id => {
-  if (!confirm('Excluir este ministério?')) return;
+window.delMin = async id=>{
+  if(!confirm('Excluir este ministério?')) return;
   await deleteDoc(doc(db,'ministerios',id));
-  await fetchMin(); renderMins();
+  await fetchMin();renderMins();
 };
-async function saveMin() {
-  const id   = document.getElementById('min-id').value;
-  const nome = document.getElementById('min-nome').value.trim();
-  const resp = document.getElementById('min-resp').value.trim();
-  const msg  = document.getElementById('min-msg');
-  if (!nome) { showMsg(msg,'err','Informe o nome.'); return; }
-  try {
-    const d = { nome, responsavel:resp };
-    if (id) await updateDoc(doc(db,'ministerios',id), d);
-    else    await addDoc(collection(db,'ministerios'), d);
+async function saveMin(){
+  const id=document.getElementById('min-id').value;
+  const nome=document.getElementById('min-nome').value.trim();
+  const resp=document.getElementById('min-resp').value.trim();
+  const msg=document.getElementById('min-msg');
+  if(!nome){showMsg(msg,'err','Informe o nome.');return;}
+  try{
+    const d={nome,responsavel:resp};
+    if(id) await updateDoc(doc(db,'ministerios',id),d);
+    else   await addDoc(collection(db,'ministerios'),d);
     showMsg(msg,'ok','Salvo!');
-    await fetchMin(); await fetchMus(); renderMins();
-    setTimeout(() => closeSheet('m-min'), 700);
-  } catch(e) { showMsg(msg,'err','Erro: '+e.message); }
+    await fetchMin();await fetchMus();renderMins();
+    setTimeout(()=>closeSheet('m-min'),700);
+  }catch(e){showMsg(msg,'err','Erro: '+e.message);}
 }
-function clearMinF() {
-  ['min-id','min-nome','min-resp'].forEach(i => document.getElementById(i).value='');
-  document.getElementById('min-msg').innerHTML = '';
-  document.getElementById('t-min').textContent = 'Novo Ministério';
+function clearMinF(){
+  ['min-id','min-nome','min-resp'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('min-msg').innerHTML='';
+  document.getElementById('t-min').textContent='Novo Ministério';
 }
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
-function fillMinSel(id) {
-  const sel = document.getElementById(id);
-  sel.innerHTML = '<option value="">Selecione...</option>' +
-    ministerios.map(m => `<option value="${m.id}">${m.nome}</option>`).join('');
+function fillMinSel(id){
+  const sel=document.getElementById(id);
+  sel.innerHTML='<option value="">Selecione...</option>'+
+    ministerios.map(m=>`<option value="${m.id}">${m.nome}</option>`).join('');
 }
-function closeSheet(id) {
-  document.getElementById(id).classList.remove('on');
-}
-function escapeHtml(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function showMsg(el, type, txt) {
-  el.innerHTML = `<div class="msg ${type}">${escapeHtml(txt)}</div>`;
-}
-document.querySelectorAll('.backdrop').forEach(b => {
-  b.addEventListener('click', e => { if(e.target===b) b.classList.remove('on'); });
+function closeSheet(id){document.getElementById(id).classList.remove('on');}
+function showMsg(el,type,txt){el.innerHTML=`<div class="msg ${type}">${txt}</div>`;}
+document.querySelectorAll('.backdrop').forEach(b=>{
+  b.addEventListener('click',e=>{if(e.target===b)b.classList.remove('on');});
 });
-
-// ── SERVICE WORKER ────────────────────────────────────────────────────────────
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(console.error);
-}
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(console.error);
 </script>
 </body>
 </html>

@@ -176,6 +176,7 @@
 <!-- ESCALA -->
 <div class="page" id="page-escala">
   <div class="escala-topbar">
+    <button class="btn-sb-open" id="btn-sb-escala" aria-label="Menu">☰</button>
     <div class="month-nav">
       <button class="btn-icon" id="btn-prev">‹</button>
       <span class="month-label" id="month-label">—</span>
@@ -196,7 +197,7 @@
   <div class="filter-view-head">
     <button class="btn-back" id="btn-back-filter">←</button>
     <h2 id="filter-view-title">Resultados</h2>
-    <button class="btn-filter active" id="btn-filter-open2">⚙</button>
+    <button class="btn-filter" id="btn-filter-open2">⚙</button>
   </div>
   <div class="filter-results" id="filter-results-list">
     <div class="loading-wrap"><span class="spin"></span></div>
@@ -452,10 +453,17 @@ async function renderDaySlots(day) {
       if(musF){
         const mus=musicos.find(m=>m.id===musF);
         if(!mus) continue;
-        const inMinisterio = e.ministerioId && e.ministerioId===mus.ministerioId;
-        const inNomes      = e.musicosNomes&&e.musicosNomes.includes(mus.nome);
-        const inAvulso     = e.nomeAvulso&&e.nomeAvulso.toLowerCase().includes(mus.nome.toLowerCase());
-        if(!inMinisterio&&!inNomes&&!inAvulso) continue;
+        if(minF){
+          // Músico + ministério: aparece pelo ministério dele OU pela dupla
+          const inMin=mus.ministerioId&&e?.ministerioId===mus.ministerioId;
+          const inNomes=e?.musicosNomes&&e.musicosNomes.includes(mus.nome);
+          const inAvulso=e?.nomeAvulso&&e.nomeAvulso.toLowerCase().includes(mus.nome.toLowerCase());
+          if(!inMin&&!inNomes&&!inAvulso) continue;
+        } else {
+          // Só músico: APENAS pelo campo dupla/convidado
+          const inAvulso=e?.nomeAvulso&&e.nomeAvulso.toLowerCase().includes(mus.nome.toLowerCase());
+          if(!inAvulso) continue;
+        }
       }
     } // sem filtro: mostra todos os horários
 
@@ -583,14 +591,25 @@ async function showFilterResultsView() {
 
     // Filtra slots do dia que batem o filtro
     const matching=daySlots.filter(e=>{
-      if(minF && e.ministerioId!==minF) return false;
-      if(musF){
-        const mus=musicos.find(m=>m.id===musF);
-        if(!mus) return false;
-        const inMin=e.ministerioId&&e.ministerioId===mus.ministerioId;
+      const mus=musF?musicos.find(m=>m.id===musF):null;
+
+      if(minF && musF && mus){
+        // Ministério + músico: slot tem que ter o ministério selecionado
+        // E o músico aparece nele (pelo ministério dele OU pela dupla)
+        if(e.ministerioId!==minF) return false;
+        const inMin=mus.ministerioId&&e.ministerioId===mus.ministerioId;
         const inNomes=e.musicosNomes&&e.musicosNomes.includes(mus.nome);
         const inAvulso=e.nomeAvulso&&e.nomeAvulso.toLowerCase().includes(mus.nome.toLowerCase());
         return inMin||inNomes||inAvulso;
+      }
+      if(minF && !musF){
+        // Só ministério
+        return e.ministerioId===minF;
+      }
+      if(musF && mus && !minF){
+        // Só músico: APENAS pelo campo dupla/convidado
+        const inAvulso=e.nomeAvulso&&e.nomeAvulso.toLowerCase().includes(mus.nome.toLowerCase());
+        return inAvulso;
       }
       return true;
     }).filter(e=>e.ministerioNome||e.nomeAvulso||e.observacoes);

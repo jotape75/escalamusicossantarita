@@ -6,7 +6,7 @@
   <title>Escala Musical — Santa Rita de Cássia</title>
   <link rel="manifest" href="manifest.json"/>
   <meta name="theme-color" content="#9b2335"/>
-  <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/jotape75/escalamusicossantarita/main/logo_santarita_.jpg"/>
+  <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/jotape75/escalamusicossantarita/main/logo_santarita.png"/>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
@@ -95,14 +95,14 @@
     .filter-day-head { padding:10px 14px; background:var(--surface2); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; }
     .filter-day-head .fday-num { font-size:22px; font-weight:700; color:var(--rose); line-height:1; min-width:32px; }
     .filter-day-head .fday-info { flex:1; }
-    .filter-day-head .fday-wkd { font-size:12px; font-weight:700; color:var(--muted); text-transform:uppercase; }
-    .filter-day-head .fday-full { font-size:11px; color:var(--muted); }
+    .filter-day-head .fday-wkd { font-size:13px; font-weight:700; color:var(--muted); text-transform:uppercase; }
+    .filter-day-head .fday-full { font-size:12px; color:var(--muted); }
     .filter-slot { padding:10px 14px; border-bottom:1px solid var(--border); }
     .filter-slot:last-child { border-bottom:none; }
-    .filter-slot-hor   { font-size:11px; font-weight:700; color:var(--muted); margin-bottom:4px; text-transform:uppercase; }
-    .filter-slot-badge { display:inline-block; padding:2px 9px; border-radius:20px; font-size:12px; font-weight:700; background:rgba(155,35,53,.1); color:var(--rose); border:1px solid rgba(155,35,53,.2); }
-    .filter-slot-livre { font-size:13px; color:var(--text); font-weight:700; margin-top:3px; }
-    .filter-slot-obs   { font-size:12px; color:var(--text); font-weight:700; margin-top:2px; font-style:italic; }
+    .filter-slot-hor   { font-size:13px; font-weight:700; color:var(--muted); margin-bottom:4px; text-transform:uppercase; }
+    .filter-slot-badge { display:inline-block; padding:2px 9px; border-radius:20px; font-size:13px; font-weight:700; background:rgba(155,35,53,.1); color:var(--rose); border:1px solid rgba(155,35,53,.2); }
+    .filter-slot-livre { font-size:15px; color:var(--text); font-weight:700; margin-top:3px; }
+    .filter-slot-obs   { font-size:13px; color:var(--text); font-weight:700; margin-top:2px; font-style:italic; }
     .filter-empty { text-align:center; padding:40px 20px; color:var(--muted); font-size:13px; }
     .filter-view-head { background:var(--surface); border-bottom:1px solid var(--border); padding:12px 16px; display:flex; align-items:center; gap:10px; position:sticky; top:0; z-index:100; }
     .filter-view-head h2 { font-size:15px; font-weight:700; flex:1; color:var(--text); }
@@ -155,7 +155,7 @@
 <!-- HOME -->
 <div class="page on" id="page-home">
   <div class="home-header">
-    <img src="https://raw.githubusercontent.com/jotape75/escalamusicossantarita/main/logo_santarita_.jpg" alt="Santa Rita"/>
+    <img src="https://raw.githubusercontent.com/jotape75/escalamusicossantarita/main/logo_santarita.png" alt="Santa Rita"/>
     <div class="home-title">
       <h1>Santa Rita de Cássia</h1>
       <p>Ministério Musical</p>
@@ -176,7 +176,6 @@
 <!-- ESCALA -->
 <div class="page" id="page-escala">
   <div class="escala-topbar">
-    <!-- ☰ abre o sidebar de filtros -->
     <button class="btn-sb-open" id="btn-sb-escala" aria-label="Menu">☰</button>
     <div class="month-nav">
       <button class="btn-icon" id="btn-prev">‹</button>
@@ -197,7 +196,6 @@
   <div class="filter-view-head">
     <button class="btn-back" id="btn-back-filter">←</button>
     <h2 id="filter-view-title">Resultados</h2>
-    <!-- ⚙ abre o sidebar para alterar o filtro sem voltar para a escala -->
     <button class="btn-filter" id="btn-sb-filter" aria-label="Filtros">⚙</button>
   </div>
   <div class="filter-results" id="filter-results-list">
@@ -208,7 +206,7 @@
 <!-- INFO -->
 <div class="page" id="page-info">
   <div class="info-header">
-    <img src="https://raw.githubusercontent.com/jotape75/escalamusicossantarita/main/logo_santarita_.jpg" alt="Santa Rita"/>
+    <img src="https://raw.githubusercontent.com/jotape75/escalamusicossantarita/main/logo_santarita.png" alt="Santa Rita"/>
     <h1>Paróquia Santa Rita de Cássia</h1>
     <p>Indaiatuba — SP</p>
   </div>
@@ -289,16 +287,16 @@ const fb = initializeApp({
 });
 const db = getFirestore(fb);
 
-// ── HORÁRIOS FIXOS ────────────────────────────────────────────���───────────────
+// ── HORÁRIOS FIXOS ────────────────────────────────────────────────────────────
 const HORARIOS = {
   week: ['07:30h','12h','15h','17:30h','19:30h'],
   sat:  ['07h','12h','17h','19:30h'],
   sun:  ['07h','08:30h','10h','12h','17h','18:30h']
 };
 
-const WKDAYS   = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const WKDAYS      = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const WKDAYS_FULL = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
-const MONTHS_S = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const MONTHS_S    = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 
 let ministerios = [], musicos = [];
 let curYear, curMonth, selectedDay;
@@ -361,7 +359,7 @@ async function loadDashboard() {
     </div>`).join('');
 }
 
-// ── NAV ───────────────────────────────────────────────────────────────────────
+// ── NAV ────��──────────────────────────────────────────────────────────────────
 function navigateTo(p) {
   document.querySelectorAll('.page').forEach(x => x.classList.remove('on'));
   document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('on'));
@@ -444,28 +442,22 @@ async function renderDaySlots(day) {
 
   const rows = [];
   for(const h of allHors){
-    const e       = byH[h];
-    const hasMin  = e?.ministerioNome;
-    const hasLivre= e?.nomeAvulso;
-    const hasObs  = e?.observacoes;
+    const e        = byH[h];
+    const hasMin   = e?.ministerioNome;
+    const hasLivre = e?.nomeAvulso;
+    const hasObs   = e?.observacoes;
 
     if(hasFilter){
       if(!e) continue;
-
       const mus = musF ? musicos.find(m => m.id === musF) : null;
 
-      // 1) Só ministério
       if(minF && !musF){
         if(e.ministerioId !== minF) continue;
       }
-
-      // 2) Só músico — pelo campo nomeAvulso (sozinho ou em dupla)
       if(musF && !minF){
         if(!mus) continue;
         if(!musicianInNomeAvulso(e.nomeAvulso, mus.nome)) continue;
       }
-
-      // 3) Ministério + músico — tudo do ministério OU músico em nomeAvulso
       if(minF && musF){
         if(!mus) continue;
         const inSelectedMin = (e.ministerioId === minF);
@@ -510,7 +502,6 @@ document.getElementById('filter-min').addEventListener('change', function(){ upd
 
 // ── DRAWER ────────────────────────────────────────────────────────────────────
 function openDrawer(){
-  // sincroniza selects com filtro ativo antes de abrir
   document.getElementById('filter-min').value = activeMinFilter;
   updateMusDropdown(activeMinFilter);
   document.getElementById('filter-mus').value = activeMusFilter;
@@ -523,16 +514,11 @@ function closeDrawer(){
   document.getElementById('drawer-overlay').classList.remove('on');
 }
 
-// ☰ na página Escala abre o drawer
 document.getElementById('btn-sb-escala').addEventListener('click', openDrawer);
-
-// ⚙ na página de Resultados também abre o drawer
 document.getElementById('btn-sb-filter').addEventListener('click', openDrawer);
-
 document.getElementById('btn-drawer-close').addEventListener('click', closeDrawer);
 document.getElementById('drawer-overlay').addEventListener('click', closeDrawer);
 
-// Aplicar filtro
 document.getElementById('btn-filter-apply').addEventListener('click', () => {
   activeMinFilter = document.getElementById('filter-min').value;
   activeMusFilter = document.getElementById('filter-mus').value;
@@ -545,7 +531,6 @@ document.getElementById('btn-filter-apply').addEventListener('click', () => {
   }
 });
 
-// Limpar filtro — fecha o drawer e volta para a escala
 document.getElementById('btn-filter-clear').addEventListener('click', () => {
   activeMinFilter = '';
   activeMusFilter = '';
@@ -556,7 +541,6 @@ document.getElementById('btn-filter-clear').addEventListener('click', () => {
   navigateTo('escala');
 });
 
-// Botão voltar — limpa filtros e volta para a escala
 document.getElementById('btn-back-filter').addEventListener('click', () => {
   activeMinFilter = '';
   activeMusFilter = '';
@@ -573,7 +557,6 @@ async function showFilterResultsView() {
   else if(musNome)       title = musNome;
   document.getElementById('filter-view-title').textContent = title;
 
-  // navega para a página de resultados
   document.querySelectorAll('.page').forEach(x => x.classList.remove('on'));
   document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('on'));
   document.getElementById('page-filter-results').classList.add('on');
@@ -581,12 +564,10 @@ async function showFilterResultsView() {
   const list = document.getElementById('filter-results-list');
   list.innerHTML = '<div class="loading-wrap"><span class="spin"></span> Carregando...</div>';
 
-  // busca o mês inteiro
   const start = Timestamp.fromDate(new Date(curYear, curMonth, 1));
   const end   = Timestamp.fromDate(new Date(curYear, curMonth+1, 0, 23, 59, 59));
   const snap  = await getDocs(query(collection(db,'escala'), where('data','>=',start), where('data','<=',end)));
 
-  // agrupa por dia
   const byDay = {};
   snap.docs.forEach(d => {
     const dat    = d.data();
@@ -608,31 +589,34 @@ async function showFilterResultsView() {
     const matching = daySlots.filter(e => {
       const mus = musF ? musicos.find(m => m.id === musF) : null;
 
-      // 1) Só ministério
       if(minF && !musF){
         return e.ministerioId === minF;
       }
-
-      // 2) Só músico — pelo campo nomeAvulso (sozinho ou em dupla)
       if(musF && !minF){
         if(!mus) return false;
         return musicianInNomeAvulso(e.nomeAvulso, mus.nome);
       }
-
-      // 3) Ministério + músico — tudo do ministério OU músico em nomeAvulso
       if(minF && musF){
         if(!mus) return false;
         return (e.ministerioId === minF) || musicianInNomeAvulso(e.nomeAvulso, mus.nome);
       }
-
       return true;
     }).filter(e => e.ministerioNome || e.nomeAvulso || e.observacoes);
 
     if(!matching.length) continue;
 
-    matching.sort((a,b) => toMin(a.horario)-toMin(b.horario));
+    // ── Deduplica: remove entradas com mesmo horário + ministério + nomeAvulso ──
+    const seen = new Set();
+    const deduped = matching.filter(e => {
+      const key = `${e.horario}|${e.ministerioId||''}|${e.nomeAvulso||''}`;
+      if(seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
 
-    const slotsHtml = matching.map(e => `
+    deduped.sort((a,b) => toMin(a.horario)-toMin(b.horario));
+
+    const slotsHtml = deduped.map(e => `
       <div class="filter-slot">
         <div class="filter-slot-hor">${e.horario}</div>
         ${e.ministerioNome ? `<span class="filter-slot-badge">${e.ministerioNome}</span>` : ''}
@@ -661,7 +645,6 @@ async function showFilterResultsView() {
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
 
-// Remove acentos e normaliza para comparação
 function normalizeName(s){
   return (s || '')
     .toString()
@@ -671,25 +654,22 @@ function normalizeName(s){
     .toLowerCase();
 }
 
-// Divide o campo nomeAvulso em tokens pelo separadores mais comuns
 function splitDuplaNames(nomeAvulso){
   return (nomeAvulso || '')
     .toString()
-    .replace(/\s+(e|com)\s+/gi, ',')   // "João e Maria" / "João com Maria"
-    .replace(/[\/+&;-]/g, ',')         // / + & ; -
+    .replace(/\s+(e|com)\s+/gi, ',')
+    .replace(/[\/+&;-]/g, ',')
     .split(',')
     .map(s => normalizeName(s))
     .filter(Boolean);
 }
 
-// Verifica se o músico está em nomeAvulso (sozinho ou em dupla)
 function musicianInNomeAvulso(nomeAvulso, musicianName){
   const target = normalizeName(musicianName);
   if(!target) return false;
   return splitDuplaNames(nomeAvulso).includes(target);
 }
 
-// Converte horário "07:30h" ou "12h" em minutos para ordenação
 function toMin(hor){
   const clean = hor.replace('h','').replace(':','.');
   const parts = clean.split('.');

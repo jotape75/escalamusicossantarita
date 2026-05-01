@@ -1,299 +1,499 @@
-Visual Studio Code 1.118
-
-Show release notes after an update
-
-Follow us on LinkedIn, X, Bluesky | View online | 
-
-Release date: April 29, 2026
-
-Welcome to the 1.118 release of Visual Studio Code. This release expands where you can work with Copilot agents and makes them more efficient. Here are the highlights for this release:
-
-Remote control: Track and control your ongoing Copilot CLI sessions remotely from GitHub.com or mobile.
-
-Codebase search: Find the code you need with semantic search in any workspace and text search across GitHub repos and orgs.
-
-Dedicated context for skills: Isolate skill execution to keep your main chat focused and answers sharper.
-
-Chat session insights: Turn your chat history into standup reports, tips, and answers about past work.
-
-Enterprise control: Restrict AI feature access to organizations your admin trusts.
-
-Improved token efficiency: Get more out of every request with lower token usage.
-
-Happy Coding!
-
-VS Code is rolling out gradually to all users. Use Check for Updates in VS Code to get the latest version immediately.
-
-To try new features as soon as possible, download the nightly Insiders build, which includes the latest updates as soon as they are available.
-
-In this update
-Agent experience
-Codebase search and context
-Chat performance and history
-Accessibility
-Editor Experience
-Languages
-Contributions to extensions
-Remote Development
-Engineering
-Deprecated features and settings
-Thank you
-Agent experience
-Visual Studio Code Agents (Insiders)
-Note: The Visual Studio Code Agents app is currently in preview and only available when installing VS Code Insiders.
-
-The Visual Studio Code Agents app is a companion app that ships alongside VS Code Insiders. It provides a focused, agent-native environment where you can run parallel sessions across repos and iterate on multi-step coding tasks. We first introduced the Agents app in 1.115 and continue to refine it based on user feedback.
-
-In this release, you can discover the Agents app directly from the VS Code Insiders title bar, making it easy to jump into an agent-powered workflow. We also published dedicated Agents documentation to help you get started.
-
-Recent feature highlights include:
-
-Shared state across VS Code and Agents: The Agents app shares more state with VS Code Insiders for a smoother transition between the two. This includes authentication (on Windows), AI customizations, workspace trust, recent folders, and keyboard shortcuts.
-
-Claude agent: The Claude Agent is available in the Agents app, so that you can use it alongside other agents like Copilot CLI or Copilot Cloud for your coding tasks.
-
-Web client: Access the Agents experience from the browser at insiders.vscode.dev/agents, bringing the agent-native workflow to any machine where you have a Dev Tunnel running (via code-insiders tunnel). To get started, download VS Code Insiders and run code-insiders tunnel to set up a Dev Tunnel. You can then connect to it from the web.
-
-Background browsers: The integrated browser persists across sessions, so it no longer refreshes when you return to a session. This makes context switching smoother when using the integrated browser to preview changes while the agent works.
-
-Layout controls for changes: When the agent makes changes, you can open the diff view side-by-side with the Chat view or open it in a modal window to focus on the changes. Use the layout controls in the diff view toolbar to toggle between different display modes.
-
-Dynamic title bar entry points: Switch between VS Code Insiders and the Agents app with a single click. Select Open in Agents from the VS Code Insiders title bar to jump into the Agents app, or select Open in VS Code from the Agents title bar to return to the Insiders editor.
-
-Your feedback helps us shape the Agents experience - please continue sharing it with us by filing issues on GitHub. You can also explore existing issues to see what others have reported and provide your feedback on specific topics.
-
-
-Remote control for Copilot CLI sessions (Experimental)
-Setting:   github.copilot.chat.cli.remote.enabled
-
-Previously, to engage with a Copilot CLI session, you had to be at the machine where you started it. If the agent paused for an approval or hit a question while you were away from your desk, the work stalled until you returned. With remote control, you can monitor and steer your ongoing Copilot CLI sessions from anywhere, giving you more flexibility to keep work moving without being tied to your machine.
-
-Remote control for Copilot CLI lets you check progress, respond to approvals, and steer work from another device (using GitHub.com or the GitHub mobile app), while your Copilot CLI session keeps running in the background.
-
-
-To try remote control:
-
-Enable the   github.copilot.chat.cli.remote.enabled setting.
-Enter /remote on in a Copilot CLI chat to get started.
-You can always run /remote to view remote control status, or /remote off to disable remote control.
-
-Synced session titles for Copilot CLI
-The chat session title is used across different chat surfaces like the chat sessions list, the chat editor tab and header, and the Copilot CLI terminal interface to provide a consistent identifier for the session. Depending on where you renamed a Copilot CLI session, other chat surfaces could still show the old title.
-
-VS Code adopts the Copilot SDK session title APIs as the source of truth and routes the sessions list and chat editor header through a single title resolver to keep the displayed title consistent across surfaces. The chat sessions list, the chat editor tab and header, and copilot --resume in the terminal now all stay in sync when you rename a session, regardless of where the rename originated.
-
-Renames performed in the terminal from Copilot CLI are also picked up by VS Code the next time the session metadata is read.
-
-Copilot added as a Git co-author by default
-VS Code now enables Git AI co-authoring by default for chat and agent workflows. When Copilot makes changes to your files, Copilot is automatically added as a co-author on that commit.
-
-You can change the default behavior using   git.addAICoAuthor .
-
-Codebase search and context
-Semantic indexing of non-GitHub repositories rolled out to all users
-When you ask Copilot a question like "where do we handle user authentication?", the agent has to translate your fuzzy intent into the exact files and symbols that matter. Plain text search only matches the literal words you typed, so it often misses the relevant code when your codebase uses different terminology. Semantic indexing lets agents search by meaning, surfacing files that use related terms like login, signIn, verifyCredentials, or OAuth token exchange, even if the word "authentication" never appears in the code. This gives the agent better grounding for answers and edits.
-
-Semantic indexing is now available in all workspaces. Previously, this capability was limited to workspaces that use GitHub or ADO repositories.
-
-The semantic index is built and maintained automatically. Workspaces that use a GitHub or ADO repository can typically use semantic search instantly, while other workspaces might require a few minutes to build up the initial index. You can also use the Build Codebase semantic index command to explicitly build the index for the current workspace.
-
-Semantic search is one of the many tools Copilot uses to understand your workspace when answering questions and generating edits. Copilot will pick the best tools for the job, so you generally do not have to micromanage how it searches. Check out the How Copilot understands your workspace docs for more details on semantic search and the other tools that Copilot uses.
-
-GitHub text search across repos or orgs
-When the agent needs to look up an exact string, API name, or error message in code outside your current workspace, semantic search isn't always the right fit. You want a precise match across a known repository or your entire organization, not a fuzzy one.
-
-To support this, Copilot now includes a built-in githubTextSearch agent tool that does a grep-style search through the code of a GitHub repository or an entire GitHub organization. This complements the existing githubRepo tool, which does semantic searches within a GitHub repo. Together, these tools give the agent a richer way to learn from codebases outside the one you are currently working on.
-
-For more advanced GitHub features such as searching and managing issues or pull requests, consider using the GitHub MCP server.
-
-Dedicated context for skills (Experimental)
-Setting:   github.copilot.chat.skillTool.enabled
-
-When you use a skill that performs multi-step tool calls or pulls in large reference material, that auxiliary content can crowd your main chat context and degrade the quality of follow-up responses.
-
-You can now run a skill in a dedicated subagent context that isolates its execution from the main conversation, so your primary context stays focused and skill responses remain higher quality.
-
-To run a skill in a dedicated subagent context, set the context attribute in the SKILL.md frontmatter:
-
----
-name: my-skill
-description: My skill description
-context: fork
----
-
-This feature is experimental and requires the   github.copilot.chat.skillTool.enabled setting to be enabled.
-
-Workspace .mcp.json files and server deduplication
-We've added support for workspace-level .mcp.json files to declare MCP servers, aligning with other tools such as the Copilot CLI.
-
-Additionally, we've introduced behavior to deduplicate MCP servers that share the same name. By default, only the most-specific MCP server will be enabled, and enabling a server will disable other servers by the same name. You can control which MCP servers are enabled by searching @mcp @installed in the extensions view, or via the Chat: Open Customizations window.
-
-Improving token efficiency
-On April 27, GitHub announced that Copilot is moving to usage-based billing on June 1, 2026. To help you get the most value out of your plan, we have been working on several initiatives to improve token efficiency without hindering the quality of the agent. Most of the improvements described below are already in place. Where an opt-in setting is available, it is noted in the relevant section.
-
-Prompt caching efficiency
-Over the past several iterations, we have improved cache reuse across system prompts, tools, conversation history, and summarization, without changing how the agent behaves. In practice, this means repeated context is billed at a much lower token rate (for example, about 10x lower for Anthropic models), which helps reduce cost in longer, multi-turn agent workflows.
-
-Strategic cache breakpoint placement. We audited where cache breakpoints are set so they are used efficiently and placed at stable boundaries: end of system prompt, end of tools, end of the most recent tool turn, and conversation turn boundaries. As a result, once an agent session is underway, more than 93% of each request is reused from cache instead of being charged as new input.
-
-A cache-stable system prompt and tools list. A cached prefix is only as good as the bytes that precede it. We reviewed the system prompt and tool registration paths to remove sources of byte drift across requests. For example, the new   chat.experimental.symbolTools.cacheStable registers vscode_renameSymbol and vscode_listCodeUsages with a static description instead of one that changes based on which languages are loaded. That way, when a language extension activates partway through a session, it no longer changes the request and resets the cache. We also re-ordered the tools list so deferred and non-deferred tools are grouped predictably, keeping the tools-array bytes identical across turns.
-
-Cache-friendly background compaction. As a session gets long, we summarize older turns in the background so the agent can keep working without running out of context. The model can still look up tool results and details from earlier turns when it needs them. These background summaries now reuse the same cached context as the main agent, making long, multi-turn sessions noticeably more efficient.
-
-Last-two-messages breakpoint strategy. In long agent sessions, older turns eventually fall out of the cacheable window. We now anchor cache breakpoints on System prompt, the Tools list, and the two most recent messages. This is currently available behind the   github.copilot.chat.anthropic.cacheBreakpoints.lastTwoMessages setting.
-
-Tool search tool
-The tool search tool keeps requests lean by splitting the agent's toolset into two groups. A compact always-available core of ~30 tools, which covers ~88% of tool calls, are always included. The remaining tools are deferred: their schemas are not loaded into the model's context until the model explicitly requests them. When the agent needs a deferred capability, it calls tool_search, which runs a client-side, embedding-based semantic search and returns the most relevant matches on demand.
-
-The result is a stable, cacheable prefix on every turn and a significantly smaller per-turn tool footprint, while the agent still has access to the full toolset.
-
-The tool search tool is already enabled by default for Anthropic models (Claude Sonnet 4.5+ and Opus 4.5+), where we observed up to 20% in token savings. In this release, we are rolling it out to supported OpenAI models (GPT-5.4 and GPT-5.5) via the Responses API, with early Insiders results showing similar or better savings. To use the tool search tool with GPT models, enable the   github.copilot.chat.responsesApi.toolSearchTool.enabled setting.
-
-New tools for search and execution
-This release brings two new specialized agentic tools: Search and Execution. Both are powered by small, purpose-built models that cost significantly less to run. After over a month of flighting, we are seeing promising results, with token savings of up to 20%.
-
-Agentic search tool
-The agentic search tool handles codebase exploration and context retrieval. When the main agent needs context, it describes what it's looking for in plain language, and the search tool takes over. The search tool then runs an independent process to search your workspace using grep, file search, semantic search, and file reading, then returns the most relevant results.
-
-Under the hood, this tool is powered by a fine-tuned small language model, trained to run many searches in parallel across a minimal number of turns. This tight scope keeps latency and cost low without sacrificing retrieval quality.
-
-Rollout continues over the coming month, bringing these savings to all Copilot Chat users.
-
-Agentic execution tool
-The agentic execution tool handles anything related to running terminal commands. When the agent has to run tests or check a build, it hands the task off to the execution tool, which runs the commands and reports back. To keep the scope tight, the execution tool can only run terminal commands, and it is capped at 10 terminal calls per invocation so it cannot loop indefinitely.
-
-Terminal output tends to be long and noisy. Once the task is done, the execution tool filters that output down to what a coding agent actually needs and passes only the relevant parts back. Offloading this work from the main model to a smaller, faster one keeps verbose output from eating into your token usage.
-
-Chat performance and history
-WebSockets supported for OpenAI models
-For OpenAI models that support it, chat requests now use WebSocket mode on the Responses API. Instead of opening a new HTTP request per turn, VS Code keeps a persistent WebSocket connection and sends only new input items along with the previous response ID. The server retains the conversation state, which reduces request size and latency on follow-up turns, particularly noticeable in agent workflows with many back-and-forth calls. Our measurements show that using WebSockets makes OpenAI models 12% faster.
-
-WebSocket mode is used automatically when the selected model supports it, with no configuration required.
-
-Chronicle (Experimental)
-Setting:   github.copilot.chat.localIndex.enabled
-
-As you rely more on Copilot, your chat history becomes a valuable record of what you worked on, which files you touched, and which PRs and issues you referenced. But that history is hard to revisit: scrolling through past sessions to remember what you did yesterday or to prepare for a standup is slow, and there's no easy way to ask questions across sessions or learn from your own usage patterns.
-
-Chronicle solves this by tracking your chat interactions in a local SQLite database. Every time you chat, it records session metadata (branch, repo, timestamps), conversation turns, files touched via tool calls, and external references (PRs, issues, commits), so you can search and summarize your coding activity on demand. Chronicle can also analyze your usage to give you personalized tips on how to improve your prompting and tool usage.
-
-Chronicle exposes a few commands you can use in chat to query your session history and get insights about your coding activity:
-
-/chronicle:standup: Generates a standup report from the last 24 hours of coding sessions, grouped by feature/branch, with summaries, file lists, and PR links.
-
-/chronicle:tips: Analyzes 7 days of usage to give personalized tips on prompting, tool usage, and workflow.
-
-/chronicle [query]: Free-form natural language queries against session history (for example, "what files did I edit yesterday?").
-
-This feature is experimental and requires the   github.copilot.chat.localIndex.enabled setting to be enabled.
-
-Trust and security
-Approved account organizations policy
-Enterprises can now gate chat and related AI feature activation on approved GitHub organization membership by using the ChatApprovedAccountOrganizations device policy.
-
-This policy helps organizations apply GitHub account-based policy consistently across chat entry points. Chat features are not activated until (1) the user is signed into a GitHub account with membership in an approved organization and (2) the account-based policy has been resolved. This fail-closed behavior is useful for enterprises that configure account-based policies on GitHub.com and need eligibility enforced before chat is shown.
-
-Learn more about enterprise policies.
-
-Sandboxing default read permissions
-Read access is no longer automatically enabled for all paths under the $HOME directory. This update strengthens sandbox isolation and ensures commands only access the files they explicitly need.
-
-Before any command runs in sandbox, read permissions are added based on the executing command only and all other paths in the $HOME directory are denied read access. Accessing any arbitrary paths results in failure due to denied read permissions.
-
-By default, workspace folders and the sandbox temporary folder (managing sandbox configuration at run time) are granted read access under $HOME dir.
-
-Accessibility
-Keyboard shortcut to focus terminal from question carousel
-Setting:   accessibility.verbosity.chatQuestionCarousel
-
-When Copilot asks a question via the question carousel triggered by a terminal interaction, you can now press Alt+T to quickly return focus to the terminal. Previously, the only way to navigate back was by selecting the Focus Terminal button.
-
-The button's aria label now also includes the keybinding hint to make it more discoverable for screen reader users. You can control whether navigation hints appear in the carousel's aria label with the   accessibility.verbosity.chatQuestionCarousel setting.
-
-Editor Experience
-Optimized loading of large local resources in webviews
-We've optimized how webviews load local resources to improve speed and reduce memory usage. This change benefits any extension that uses webviews or custom editors, as well as built-in VS Code features such as notebook rendering.
-
-Webviews in VS Code use a service worker to load resources from the workspace or host file system. The service worker intercepts the request for the local file and then proxies it through VS Code's file system calls. This enables us to not only load resources from the disk but also from virtual file systems contributed by extensions.
-
-Previously, for file system requests, VS Code would read the entire file into a buffer and then send it to the webview's service worker. This works for a few small JavaScript and image files, but not when you're loading 20 video files that are tens to hundreds of MB each.
-
-Now, we stream the file contents to the service worker in chunks. This approach improves responsiveness and also reduces the amount of data that VS Code has to accumulate before handing it off to the browser engine.
-
-We further optimized the streaming by adopting transferable streams. A file stream is created in the main VS Code renderer process and consumed directly by new Response(...) inside the webview's service worker. This bypasses what were previously multiple layers of postMessage calls.
-
-Languages
-TypeScript 7.0 Beta support
-We've continued working with the TypeScript team to improve VS Code's support for TypeScript 7. TypeScript 7 is a complete rewrite in native code and offers dramatically better performance.
-
-The TypeScript 7.0 beta continues to improve language features and also includes a number of editor quality-of-life improvements. We've also made it even easier to try out TS 7.0 and switch back and forth between it and the current stable TS 6.0 release.
-
-To try TS 7.0 in VS Code, you only have to install the TypeScript Native preview extension.
-
-Contributions to extensions
-Chat Customizations Evaluation extension
-We added a new extension, Chat Customizations Evaluations (extension ID ms-vscode.vscode-chat-customizations-evaluations) to help analyze and improve your chat customizations, like prompt files, custom agents, instructions, and skills. After analyzing a customization file, the extension generates diagnostics for issues it detects in the file and gives recommendations to improve it.
-
-Open a prompt, agent, instructions, or skill definition file and select Analyze to evaluate it. After the diagnostics appear, use the customization evaluations fix skill to apply the recommended changes.
-
-
-Remote Development
-The Remote Development extensions allow you to use a Dev Container, remote machine via SSH or Remote Tunnels, or the Windows Subsystem for Linux (WSL) as a full-featured development environment.
-
-Dev Container lockfile for Features enabled by default
-Setting: dev.containers.lockfile
-
-We are enabling the lockfile devcontainer-lock.json by default. The lockfile records the Dev Container Feature version and checksum the first time a Feature is installed and pins the Feature to that particular version and checksum to improve resilience against supply chain attacks.
-
-The editor shows a Code Lens on Dev Container Features in the devcontainer.json file when newer versions are available.
-
-
-Dependabot support is also available for automatically submitting PRs to update the lockfile.
-
-For more information, see Dev Container Feature Lockfile in the Dev Container specification.
-
-Engineering
-Faster development builds with TypeScript 7
-VS Code's development watch task now uses TypeScript 7 for type checking. This dramatically reduces the time to build and fully type check our codebase.
-
-Previously, typechecking the roughly 6,000 files in the main VS Code project took around 60 seconds. TypeScript 7 cuts this to around 10 seconds for a fresh build. From starting the watch build task to having VS Code and all of the built-in extensions built and fully typechecked now takes around 30 seconds.
-
-Deprecated features and settings
-New deprecations in this release
-None
-
-Upcoming deprecations
-Edit Mode is officially deprecated as of VS Code version 1.110. Users can temporarily re-enable Edit Mode via VS Code setting   chat.editMode.hidden . This setting will remain supported through version 1.125. Beginning with version 1.125, Edit Mode will be fully removed and can no longer be enabled via settings.
-Thank you
-Contributions to our issue tracking:
-
-@gjsjohnmurray (John Murray)
-@RedCMD (RedCMD)
-@IllusionMH (Andrii Dieiev)
-@albertosantini (Alberto Santini)
-Contributions to vscode:
-
-@AbhitejJohn (Abhitej John): Rename skillContentRead telemetry properties to use 'skill' prefix PR #311945
-@andrewkchan (Andrew Chan): aux window - fix setTimeout leak PR #311824
-@austinngan (Austin Ngan): Fix markdown preview scroll feedback loop (#303765) PR #312237
-@fishcharlie (Charlie Fish): Chat: Show provider instance name for duplicate BYOK models in model picker PR #312028
-@kevin-m-kent: Add cache-stable mode for vscode_renameSymbol and vscode_listCodeUsages (experimental) PR #312568
-@maruthang (Maruthan G)
-fix: handle heredoc/multiline commands in terminal tool execution PR #307960
-fix(chat): enable scrollbar for height-capped code blocks in tool confirmations (#283242) PR #310975
-fix: clear parent change listener before disposeContext in ScopedContextKeyService PR #307593
-@mossgowild (moss): terminal tools: detect prompts on the last output line PR #311765
-@ssg (Sedat Kapanoğlu): add Turkish DOS (CP 857) encoding support PR #300114
-@Tyriar (Daniel Imms): Move skip shell handling to service and optimize PR #311892
-@winjo: Fix memory leak in AutoRepliesPtyServiceContribution on process dispose PR #312150
-@xingsy97 (xingsy97): contextkey: fix scanner returning '>=' instead of '>' for greater-than operator PR #307059
-@yogeshwaran-c (Yogeshwaran C)
-fix: use setupDelayedHover for settings indicator hovers to support Ctrl+K I PR #304990
-Show detail field for all debug console completion items PR #310379
-Contributions to vscode-pull-request-github:
-
-@Will-hxw (Will-hxw): fix(reviewManager): use pr.base.ref instead of pr.base.name in hasBranch call PR #8698
-We really appreciate people trying our new features as soon as they are ready, so check back here often and learn what's new.
-
-If you'd like to read release notes for previous VS Code versions, go to Updates on code.visualstudio.com.
-
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <title>Escala Musical — Santa Rita de Cássia</title>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#9b2335"/>
+  <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/jotape75/escalamusicossantarita/main/logo_santarita.jpg"/>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --rose:    #9b2335;
+      --rose2:   #b8304a;
+      --bg:      #faf8f5;
+      --surface: #ffffff;
+      --surface2:#f3f0eb;
+      --border:  #e8e2da;
+      --text:    #0f0d0b;
+      --muted:   #6b6057;
+      --font:    'Geist', sans-serif;
+      --r:       10px;
+      --nav-h:   62px;
+    }
+    body { background:var(--bg); color:var(--text); font-family:var(--font); min-height:100vh; font-size:16px; -webkit-font-smoothing:antialiased; padding-bottom:var(--nav-h); }
+
+    /* ── BOTTOM NAV ── */
+    .bottom-nav { position:fixed; bottom:0; left:0; right:0; height:var(--nav-h); background:var(--surface); border-top:1px solid var(--border); display:flex; z-index:200; padding-bottom:env(safe-area-inset-bottom); }
+    .nav-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; cursor:pointer; color:var(--muted); transition:color .15s; border:none; background:none; font-family:var(--font); }
+    .nav-item.on { color:var(--rose); }
+    .nav-icon { font-size:20px; line-height:1; }
+    .nav-label { font-size:10px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; }
+
+    /* ── PAGES ── */
+    .page { display:none; animation:fadeUp .2s ease; }
+    .page.on { display:block; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+
+    /* ── HOME ── */
+    .home-header { background:var(--rose); padding:24px 20px 20px; display:flex; align-items:center; gap:14px; }
+    .home-header img { width:56px; height:56px; border-radius:50%; object-fit:cover; border:2px solid rgba(255,255,255,.3); flex-shrink:0; }
+    .home-title h1 { color:#fff; font-size:17px; font-weight:700; }
+    .home-title p  { color:rgba(255,255,255,.75); font-size:12px; margin-top:2px; }
+    .section { padding:16px; }
+    .section-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:10px; }
+    .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+    .stat-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px 18px; }
+    .stat-n { font-size:30px; font-weight:700; color:var(--rose); letter-spacing:-1px; line-height:1; }
+    .stat-l { font-size:12px; color:var(--muted); margin-top:3px; font-weight:500; }
+    .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+
+    /* hoje na escala */
+    .hoje-slot { padding:12px 16px; border-bottom:1px solid var(--border); }
+    .hoje-slot:last-child { border-bottom:none; }
+    .hoje-hor   { font-size:12px; font-weight:700; color:var(--muted); margin-bottom:4px; }
+    .hoje-badge { display:inline-block; padding:2px 9px; border-radius:20px; font-size:11px; font-weight:700; background:rgba(155,35,53,.1); color:var(--rose); border:1px solid rgba(155,35,53,.2); }
+    .hoje-livre { font-size:13px; color:var(--text); font-weight:700; margin-top:3px; }
+    .hoje-obs   { font-size:12px; color:var(--text); font-weight:700; margin-top:2px; font-style:italic; }
+
+    /* ── ESCALA PAGE ── */
+    .escala-topbar { background:var(--surface); border-bottom:1px solid var(--border); padding:12px 16px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
+    .month-nav { display:flex; align-items:center; gap:10px; }
+    .month-label { font-size:15px; font-weight:700; letter-spacing:-.3px; color:var(--text); }
+    .btn-icon { background:none; border:1px solid var(--border); border-radius:var(--r); width:32px; height:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; color:var(--muted); transition:all .15s; }
+    .btn-icon:hover { border-color:var(--rose); color:var(--rose); }
+    .btn-filter { background:none; border:1px solid var(--border); border-radius:var(--r); width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px; color:var(--muted); transition:all .15s; }
+    .btn-filter.active { border-color:var(--rose); color:var(--rose); background:rgba(155,35,53,.06); }
+
+    /* Day carousel */
+    .day-carousel-wrap { background:var(--surface); border-bottom:1px solid var(--border); padding:10px 0; overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+    .day-carousel-wrap::-webkit-scrollbar { display:none; }
+    .day-carousel { display:flex; gap:6px; padding:0 16px; min-width:max-content; }
+    .day-pill { display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 10px; border-radius:12px; cursor:pointer; border:1.5px solid var(--border); background:var(--surface2); min-width:46px; transition:all .15s; flex-shrink:0; }
+    .day-pill.today { border-color:var(--rose); }
+    .day-pill.selected { background:var(--rose); border-color:var(--rose); }
+    .day-pill-wkd { font-size:10px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); }
+    .day-pill-num { font-size:18px; font-weight:700; color:var(--text); line-height:1; }
+    .day-pill.today .day-pill-num { color:var(--rose); }
+    .day-pill.selected .day-pill-wkd,
+    .day-pill.selected .day-pill-num { color:#fff; }
+
+    /* Slots — só mostra preenchidos */
+    .slots-container { padding:12px 16px; display:flex; flex-direction:column; gap:8px; }
+    .slot-row { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px 14px; }
+    .slot-hor   { font-size:12px; font-weight:700; color:var(--muted); margin-bottom:6px; }
+    .slot-badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:700; background:rgba(155,35,53,.1); color:var(--rose); border:1px solid rgba(155,35,53,.2); }
+    .slot-livre { font-size:13px; color:var(--text); font-weight:700; margin-top:4px; }
+    .slot-obs   { font-size:12px; color:var(--text); font-weight:700; margin-top:3px; font-style:italic; }
+    .slot-empty { opacity:.55; background:var(--surface2); }
+
+    /* ── INFO PAGE ── */
+    .info-header { padding:32px 20px 24px; display:flex; flex-direction:column; align-items:center; gap:12px; }
+    .info-header img { width:80px; height:80px; border-radius:50%; object-fit:cover; border:2px solid var(--border); }
+    .info-header h1 { font-size:18px; font-weight:700; text-align:center; color:var(--text); }
+    .info-header p  { font-size:13px; color:var(--muted); text-align:center; }
+    .info-section { padding:0 16px 16px; display:flex; flex-direction:column; gap:10px; }
+    .info-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+    .info-card-head { padding:12px 16px; background:var(--surface2); border-bottom:1px solid var(--border); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); }
+    .info-row { padding:11px 16px; border-bottom:1px solid var(--border); display:flex; gap:10px; align-items:flex-start; }
+    .info-row:last-child { border-bottom:none; }
+    .info-icon { font-size:16px; flex-shrink:0; margin-top:1px; }
+    .info-text .lbl { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); margin-bottom:2px; }
+    .info-text .val { font-size:13px; font-weight:500; color:var(--text); }
+    .info-text a { color:var(--rose); text-decoration:none; }
+
+    /* Filter drawer */
+    .drawer-overlay { display:none; position:fixed; inset:0; background:rgba(15,13,11,.45); z-index:300; }
+    .drawer-overlay.on { display:block; }
+    .drawer { position:fixed; top:0; left:-320px; width:300px; max-width:90vw; height:100%; background:var(--surface); z-index:301; display:flex; flex-direction:column; transition:left .28s cubic-bezier(.4,0,.2,1); box-shadow:4px 0 24px rgba(0,0,0,.12); }
+    .drawer.on { left:0; }
+    .drawer-head { padding:18px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .drawer-head h2 { font-size:15px; font-weight:700; color:var(--text); }
+    .btn-close { background:none; border:none; font-size:22px; cursor:pointer; color:var(--muted); line-height:1; }
+    .drawer-body { flex:1; padding:16px; overflow-y:auto; display:flex; flex-direction:column; gap:14px; }
+    .filter-group label { display:block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); margin-bottom:6px; }
+    .filter-sel { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:var(--r); padding:10px 12px; font-size:13px; font-family:var(--font); color:var(--text); outline:none; appearance:none; cursor:pointer; }
+    .filter-sel:focus { border-color:var(--rose); }
+    .drawer-foot { padding:14px 16px; border-top:1px solid var(--border); display:flex; gap:8px; }
+    .btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:9px 16px; border-radius:var(--r); font-size:13px; font-family:var(--font); font-weight:600; cursor:pointer; border:none; transition:all .15s; }
+    .btn-rose  { background:var(--rose); color:#fff; }
+    .btn-rose:hover { background:var(--rose2); }
+    .btn-ghost { background:none; border:1px solid var(--border); color:var(--muted); }
+    .btn-block { width:100%; }
+    .version-badge { display:inline-block; padding:2px 9px; border-radius:20px; font-size:11px; font-weight:600; background:rgba(155,35,53,.1); color:var(--rose); border:1px solid rgba(155,35,53,.2); }
+
+    .spin { display:inline-block; width:14px; height:14px; border:2px solid var(--border); border-top-color:var(--rose); border-radius:50%; animation:spin .6s linear infinite; vertical-align:middle; }
+    @keyframes spin { to{transform:rotate(360deg)} }
+    .loading-wrap { padding:30px; text-align:center; color:var(--muted); font-size:13px; display:flex; align-items:center; justify-content:center; gap:8px; }
+    .empty-msg { text-align:center; padding:30px 20px; color:var(--muted); font-size:13px; }
+  </style>
+</head>
+<body>
+
+<!-- HOME -->
+<div class="page on" id="page-home">
+  <div class="home-header">
+    <img src="https://raw.githubusercontent.com/jotape75/escalamusicossantarita/main/logo_santarita.jpg" alt="Santa Rita"/>
+    <div class="home-title">
+      <h1>Santa Rita de Cássia</h1>
+      <p>Ministério Musical</p>
+    </div>
+  </div>
+  <div class="section">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-n" id="st-min">—</div><div class="stat-l">Ministérios</div></div>
+      <div class="stat-card"><div class="stat-n" id="st-mus">—</div><div class="stat-l">Músicos</div></div>
+    </div>
+    <div class="section-title">Hoje na Escala</div>
+    <div class="card" id="hoje-card">
+      <div class="loading-wrap"><span class="spin"></span> Carregando...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ESCALA -->
+<div class="page" id="page-escala">
+  <div class="escala-topbar">
+    <div class="month-nav">
+      <button class="btn-icon" id="btn-prev">‹</button>
+      <span class="month-label" id="month-label">—</span>
+      <button class="btn-icon" id="btn-next">›</button>
+    </div>
+    <button class="btn-filter" id="btn-filter-open">⚙</button>
+  </div>
+  <div class="day-carousel-wrap">
+    <div class="day-carousel" id="day-carousel"></div>
+  </div>
+  <div class="slots-container" id="escala-results">
+    <div class="loading-wrap"><span class="spin"></span> Carregando...</div>
+  </div>
+</div>
+
+<!-- INFO -->
+<div class="page" id="page-info">
+  <div class="info-header">
+    <img src="https://raw.githubusercontent.com/jotape75/escalamusicossantarita/main/logo_santarita.jpg" alt="Santa Rita"/>
+    <h1>Paróquia Santa Rita de Cássia</h1>
+    <p>Indaiatuba — SP</p>
+  </div>
+  <div class="info-section">
+    <div class="info-card">
+      <div class="info-card-head">Informações</div>
+      <div class="info-row">
+        <div class="info-icon">📍</div>
+        <div class="info-text">
+          <div class="lbl">Endereço</div>
+          <div class="val">Av. Maj. Alfredo Camargo Fonseca, 399 - Cidade Nova I, Indaiatuba</div>
+        </div>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-head">Sobre o App</div>
+      <div class="info-row">
+        <div class="info-icon">👨‍💻</div>
+        <div class="info-text">
+          <div class="lbl">Desenvolvedor</div>
+          <div class="val"><a href="https://www.instagram.com/jotape_1980" target="_blank" rel="noopener">@jotape_1980</a></div>
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon">🔢</div>
+        <div class="info-text">
+          <div class="lbl">Versão</div>
+          <div class="val"><span class="version-badge">v1.1.0</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FILTER DRAWER -->
+<div class="drawer-overlay" id="drawer-overlay"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <h2>Filtros</h2>
+    <button class="btn-close" id="btn-drawer-close">×</button>
+  </div>
+  <div class="drawer-body">
+    <div class="filter-group">
+      <label>Ministério</label>
+      <select class="filter-sel" id="filter-min"><option value="">Todos</option></select>
+    </div>
+    <div class="filter-group">
+      <label>Músico</label>
+      <select class="filter-sel" id="filter-mus"><option value="">Todos</option></select>
+    </div>
+  </div>
+  <div class="drawer-foot">
+    <button class="btn btn-ghost btn-block" id="btn-filter-clear">Limpar</button>
+    <button class="btn btn-rose btn-block" id="btn-filter-apply">Aplicar</button>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-item on" data-page="home"><span class="nav-icon">🏠</span><span class="nav-label">Início</span></button>
+  <button class="nav-item" data-page="escala"><span class="nav-icon">📅</span><span class="nav-label">Escala</span></button>
+  <button class="nav-item" data-page="info"><span class="nav-icon">ℹ️</span><span class="nav-label">Info</span></button>
+</nav>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore, collection, getDocs, query, orderBy, where, Timestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const fb = initializeApp({
+  apiKey:"AIzaSyCkLu7SEJ76-SrmEYBCFewG6YQCnOW1z7k",
+  authDomain:"escala-santa-rita.firebaseapp.com",
+  projectId:"escala-santa-rita",
+  storageBucket:"escala-santa-rita.firebasestorage.app",
+  messagingSenderId:"931972149605",
+  appId:"1:931972149605:web:fa716dff0bf0a8abde318c"
+});
+const db = getFirestore(fb);
+
+// ── HORÁRIOS FIXOS (corrigidos) ───────────────────────────────────────────────
+const HORARIOS = {
+  week: ['07:30h','12h','15h','17:30h','19:30h'],
+  sat:  ['07h','12h','17h','19:30h'],
+  sun:  ['07h','08:30h','10h','12h','17h','18:30h']
+};
+
+const WKDAYS  = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const MONTHS  = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const MONTHS_S= ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+let ministerios=[], musicos=[];
+let curYear, curMonth, selectedDay;
+let activeMinFilter='', activeMusFilter='';
+const now = new Date();
+curYear=now.getFullYear(); curMonth=now.getMonth(); selectedDay=now.getDate();
+
+function getDayType(date) {
+  const dow=date.getDay(); return dow===0?'sun':dow===6?'sat':'week';
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+async function init() {
+  const [minSnap, musSnap] = await Promise.all([
+    getDocs(query(collection(db,'ministerios'),orderBy('nome'))),
+    getDocs(query(collection(db,'musicos'),orderBy('nome')))
+  ]);
+  ministerios=minSnap.docs.map(d=>({id:d.id,...d.data()}));
+  musicos=musSnap.docs.map(d=>({id:d.id,...d.data()}));
+  document.getElementById('st-min').textContent=ministerios.length;
+  document.getElementById('st-mus').textContent=musicos.length;
+  populateFilterDropdowns();
+  loadDashboard();
+}
+init();
+
+// ── DASHBOARD ────────────────────────────────────────────────────────────────
+async function loadDashboard() {
+  const today=new Date(); today.setHours(0,0,0,0);
+  const tomorrow=new Date(today); tomorrow.setDate(tomorrow.getDate()+1);
+  const snap=await getDocs(query(
+    collection(db,'escala'),
+    where('data','>=',Timestamp.fromDate(today)),
+    where('data','<',Timestamp.fromDate(tomorrow))
+  ));
+  const byH={};
+  snap.docs.forEach(d=>{byH[d.data().horario]=d.data();});
+
+  // Todos os horários do dia (fixos + extras)
+  const type=getDayType(today);
+  const fixed=[...HORARIOS[type]];
+  Object.keys(byH).forEach(h=>{ if(!fixed.includes(h)) fixed.push(h); });
+  fixed.sort((a,b)=>toMin(a)-toMin(b));
+
+  const hojeSlots=fixed.map(h=>({h,e:byH[h]})).filter(({e})=>e&&(e.ministerioNome||e.nomeAvulso||e.observacoes));
+  const el=document.getElementById('hoje-card');
+  if(!hojeSlots.length){el.innerHTML='<div class="empty-msg">Nenhuma missa escalada para hoje.</div>';return;}
+  el.innerHTML=hojeSlots.map(({h,e})=>`
+    <div class="hoje-slot">
+      <div class="hoje-hor">${h}</div>
+      ${e.ministerioNome?`<span class="hoje-badge">${e.ministerioNome}</span>`:''}
+      ${e.nomeAvulso?`<div class="hoje-livre">${e.nomeAvulso}</div>`:''}
+      ${e.observacoes?`<div class="hoje-obs">${e.observacoes}</div>`:''}
+    </div>`).join('');
+}
+
+// ── NAV ───────────────────────────────────────────────────────────────────────
+function navigateTo(p) {
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('on'));
+  document.getElementById('page-'+p).classList.add('on');
+  document.querySelector(`.nav-item[data-page="${p}"]`)?.classList.add('on');
+  if(p==='escala') renderEscala();
+}
+document.querySelectorAll('.nav-item').forEach(btn=>{
+  btn.addEventListener('click',()=>navigateTo(btn.dataset.page));
+});
+
+// ── ESCALA ────────────────────────────────────────────────────────────────────
+document.getElementById('btn-prev').addEventListener('click',()=>{
+  curMonth--; if(curMonth<0){curMonth=11;curYear--;} selectedDay=1; loadEscala();
+});
+document.getElementById('btn-next').addEventListener('click',()=>{
+  curMonth++; if(curMonth>11){curMonth=0;curYear++;} selectedDay=1; loadEscala();
+});
+
+function renderEscala() {
+  if(curYear===now.getFullYear()&&curMonth===now.getMonth()) selectedDay=now.getDate();
+  else selectedDay=1;
+  document.getElementById('month-label').textContent=`${MONTHS_S[curMonth]} ${curYear}`;
+  renderCarousel();
+  renderDaySlots(selectedDay);
+}
+
+async function loadEscala() {
+  document.getElementById('month-label').textContent=`${MONTHS_S[curMonth]} ${curYear}`;
+  renderCarousel();
+  renderDaySlots(selectedDay);
+}
+
+function renderCarousel() {
+  const dim=new Date(curYear,curMonth+1,0).getDate();
+  const todayD=now.getDate(),todayM=now.getMonth(),todayY=now.getFullYear();
+  const carousel=document.getElementById('day-carousel');
+  carousel.innerHTML='';
+  for(let d=1;d<=dim;d++){
+    const dt=new Date(curYear,curMonth,d);
+    const pill=document.createElement('div');
+    pill.className='day-pill';
+    if(d===selectedDay) pill.classList.add('selected');
+    if(d===todayD&&curMonth===todayM&&curYear===todayY) pill.classList.add('today');
+    pill.innerHTML=`<span class="day-pill-wkd">${WKDAYS[dt.getDay()]}</span><span class="day-pill-num">${d}</span>`;
+    pill.addEventListener('click',()=>{
+      selectedDay=d;
+      document.querySelectorAll('.day-pill').forEach(p=>p.classList.remove('selected'));
+      pill.classList.add('selected');
+      renderDaySlots(d);
+    });
+    carousel.appendChild(pill);
+  }
+  setTimeout(()=>{
+    const pills=carousel.querySelectorAll('.day-pill');
+    if(pills[selectedDay-1]) pills[selectedDay-1].scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  },50);
+}
+
+async function renderDaySlots(day) {
+  const container=document.getElementById('escala-results');
+  container.innerHTML='<div class="loading-wrap"><span class="spin"></span></div>';
+
+  const dt=new Date(curYear,curMonth,day);
+  const start=Timestamp.fromDate(new Date(curYear,curMonth,day,0,0,0));
+  const end=Timestamp.fromDate(new Date(curYear,curMonth,day,23,59,59));
+  const snap=await getDocs(query(collection(db,'escala'),where('data','>=',start),where('data','<=',end)));
+
+  const byH={};
+  snap.docs.forEach(d=>{byH[d.data().horario]=d.data();});
+
+  // Todos os horários: fixos + extras do dia
+  const type=getDayType(dt);
+  const allHors=[...HORARIOS[type]];
+  Object.keys(byH).forEach(h=>{ if(!allHors.includes(h)) allHors.push(h); });
+  allHors.sort((a,b)=>toMin(a)-toMin(b));
+
+  const minF=activeMinFilter, musF=activeMusFilter;
+  const hasFilter=!!(minF||musF);
+
+  // Filtra slots com alguma informação preenchida
+  const rows=[];
+  for(const h of allHors){
+    const e=byH[h];
+    const hasMin=e?.ministerioNome;
+    const hasLivre=e?.nomeAvulso;
+    const hasObs=e?.observacoes;
+    const hasAny=hasMin||hasLivre||hasObs;
+
+    // Com filtro: só mostra se bate o filtro
+    if(hasFilter){
+      if(!e) continue;
+      // Filtro por ministério
+      if(minF && e.ministerioId!==minF) continue;
+      // Filtro por músico: aparece pelo ministério dele OU pelo campo dupla/convidado
+      if(musF){
+        const mus=musicos.find(m=>m.id===musF);
+        if(!mus) continue;
+        const inMinisterio = e.ministerioId && e.ministerioId===mus.ministerioId;
+        const inNomes      = e.musicosNomes&&e.musicosNomes.includes(mus.nome);
+        const inAvulso     = e.nomeAvulso&&e.nomeAvulso.toLowerCase().includes(mus.nome.toLowerCase());
+        if(!inMinisterio&&!inNomes&&!inAvulso) continue;
+      }
+    } // sem filtro: mostra todos os horários
+
+    const isEmpty=!hasMin&&!hasLivre&&!hasObs;
+    rows.push(`<div class="slot-row${isEmpty?' slot-empty':''}">
+      <div class="slot-hor">${h}</div>
+      ${hasMin?`<span class="slot-badge">${e?.ministerioNome}</span>`:''}
+      ${hasLivre?`<div class="slot-livre">${e?.nomeAvulso}</div>`:''}
+      ${hasObs?`<div class="slot-obs">${e?.observacoes}</div>`:''}
+      ${isEmpty?`<div style="font-size:12px;color:var(--muted);font-style:italic">Sem escala</div>`:''}
+    </div>`);
+  }
+
+  if(!rows.length){
+    container.innerHTML='<div class="empty-msg">Nenhuma missa escalada para este dia.</div>';
+    return;
+  }
+  container.innerHTML=rows.join('');
+}
+
+// ── FILTROS ───────────────────────────────────────────────────────────────────
+function populateFilterDropdowns(){
+  const minSel=document.getElementById('filter-min');
+  minSel.innerHTML='<option value="">Todos</option>'+
+    ministerios.map(m=>`<option value="${m.id}">${m.nome}</option>`).join('');
+  updateMusDropdown('');
+}
+function updateMusDropdown(minId){
+  const musSel=document.getElementById('filter-mus');
+  const list=minId?musicos.filter(m=>m.ministerioId===minId):musicos;
+  musSel.innerHTML='<option value="">Todos</option>'+
+    list.map(m=>`<option value="${m.id}">${m.nome}</option>`).join('');
+}
+document.getElementById('filter-min').addEventListener('change',function(){updateMusDropdown(this.value);});
+
+document.getElementById('btn-filter-open').addEventListener('click',()=>{
+  document.getElementById('filter-min').value=activeMinFilter;
+  updateMusDropdown(activeMinFilter);
+  document.getElementById('filter-mus').value=activeMusFilter;
+  document.getElementById('drawer').classList.add('on');
+  document.getElementById('drawer-overlay').classList.add('on');
+});
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('on');
+  document.getElementById('drawer-overlay').classList.remove('on');
+}
+document.getElementById('btn-drawer-close').addEventListener('click',closeDrawer);
+document.getElementById('drawer-overlay').addEventListener('click',closeDrawer);
+document.getElementById('btn-filter-apply').addEventListener('click',()=>{
+  activeMinFilter=document.getElementById('filter-min').value;
+  activeMusFilter=document.getElementById('filter-mus').value;
+  document.getElementById('btn-filter-open').classList.toggle('active',!!(activeMinFilter||activeMusFilter));
+  closeDrawer();
+  renderDaySlots(selectedDay);
+});
+document.getElementById('btn-filter-clear').addEventListener('click',()=>{
+  activeMinFilter=''; activeMusFilter='';
+  document.getElementById('filter-min').value='';
+  updateMusDropdown('');
+  document.getElementById('filter-mus').value='';
+});
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function toMin(hor){
+  const clean=hor.replace('h','').replace(':','.');
+  const parts=clean.split('.');
+  return parseInt(parts[0])*60+(parts[1]?parseInt(parts[1]):0);
+}
+
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(console.error);
+</script>
+</body>
+</html>

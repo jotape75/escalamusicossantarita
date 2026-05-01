@@ -478,9 +478,9 @@ async function loadEscala() {
 
 function renderEscala() {
   // Set selectedDay to today if we are in the current month
-  const now2 = new Date();
-  if (curYear === now2.getFullYear() && curMonth === now2.getMonth()) {
-    selectedDay = now2.getDate();
+  const currentDate = new Date();
+  if (curYear === currentDate.getFullYear() && curMonth === currentDate.getMonth()) {
+    selectedDay = currentDate.getDate();
   } else {
     selectedDay = 1;
   }
@@ -502,7 +502,7 @@ function getDayType(date) {
 
 function renderCarousel() {
   const daysInMonth = new Date(curYear, curMonth + 1, 0).getDate();
-  const todayD = now.getDate(), todayM = now.getMonth(), todayY = now.getFullYear();
+  const todayDay = now.getDate(), todayMonth = now.getMonth(), todayYear = now.getFullYear();
   const carousel = document.getElementById('day-carousel');
 
   carousel.innerHTML = '';
@@ -511,7 +511,7 @@ function renderCarousel() {
     const pill = document.createElement('div');
     pill.className = 'day-pill';
     if (d === selectedDay) pill.classList.add('selected');
-    if (d === todayD && curMonth === todayM && curYear === todayY) pill.classList.add('today');
+    if (d === todayDay && curMonth === todayMonth && curYear === todayYear) pill.classList.add('today');
     pill.innerHTML = `<span class="day-pill-wkd">${WKDAYS[dt.getDay()]}</span><span class="day-pill-num">${d}</span>`;
     pill.addEventListener('click', () => {
       selectedDay = d;

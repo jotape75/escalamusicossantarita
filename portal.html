@@ -59,9 +59,9 @@
     .content { padding:16px; }
 
     /* ── BOTTOM NAV ── */
-    .bottom-nav { position:fixed; bottom:0; left:0; right:0; height:var(--nav-h); background:var(--surface); border-top:1px solid var(--border); display:flex; z-index:200; padding-bottom:env(safe-area-inset-bottom); }
-    .nav-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; cursor:pointer; color:var(--muted); transition:color .15s; border:none; background:none; font-family:var(--font); }
-    .nav-item.on { color:var(--rose); }
+    .bottom-nav { position:fixed; bottom:0; left:0; right:0; height:var(--nav-h); background:#0f0d0b; border-top:1px solid rgba(255,255,255,.08); display:flex; z-index:200; padding-bottom:env(safe-area-inset-bottom); }
+    .nav-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; cursor:pointer; color:rgba(255,255,255,0.6); transition:color .15s; border:none; background:none; font-family:var(--font); }
+    .nav-item.on { color:#ffffff; }
     .nav-icon  { font-size:20px; line-height:1; }
     .nav-label { font-size:10px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; }
 
@@ -78,13 +78,13 @@
     .sb-user-lbl  { font-size:10px; color:rgba(255,255,255,.28); text-transform:uppercase; letter-spacing:.08em; margin-bottom:2px; }
     .sb-user-name { font-size:13px; font-weight:600; color:#fff; }
     .sb-nav  { flex:1; overflow-y:auto; padding:8px 0; }
-    .sb-section { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.09em; color:rgba(255,255,255,.25); padding:10px 20px 4px; }
-    .sb-item { display:flex; align-items:center; gap:10px; padding:10px 20px; cursor:pointer; color:rgba(255,255,255,.48); font-size:13px; font-weight:500; border-left:3px solid transparent; transition:all .15s; }
-    .sb-item:hover { background:rgba(255,255,255,.05); color:rgba(255,255,255,.85); }
-    .sb-item.on { background:rgba(155,35,53,.18); border-left-color:#9b2335; color:#fff; }
+    .sb-section { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.09em; color:rgba(255,255,255,.55); padding:10px 20px 4px; }
+    .sb-item { display:flex; align-items:center; gap:10px; padding:10px 20px; cursor:pointer; color:rgba(255,255,255,.85); font-size:13px; font-weight:500; border-left:3px solid transparent; transition:all .15s; }
+    .sb-item:hover { background:rgba(255,255,255,.05); color:rgba(255,255,255,.95); }
+    .sb-item.on { background:rgba(155,35,53,.25); border-left-color:#9b2335; color:#ffffff; }
     .sb-item-icon { font-size:15px; width:20px; text-align:center; flex-shrink:0; }
     .sb-foot { padding:14px 20px; border-top:1px solid rgba(255,255,255,.07); margin-top:auto; }
-    .btn-sair { width:100%; padding:10px 14px; background:none; border:1px solid rgba(255,255,255,.1); border-radius:var(--r); color:rgba(255,255,255,.85); font-size:13px; font-weight:600; cursor:pointer; font-family:var(--font); text-align:left; transition:all .15s; }
+    .btn-sair { width:100%; padding:10px 14px; background:none; border:1px solid rgba(255,255,255,0.3); border-radius:var(--r); color:#ffffff; font-size:13px; font-weight:600; cursor:pointer; font-family:var(--font); text-align:left; transition:all .15s; }
     .btn-sair:hover { border-color:rgba(155,35,53,.5); color:rgba(255,120,120,.8); }
 
     /* ── CARDS / STATS ── */
@@ -187,6 +187,14 @@
     @keyframes spin { to{transform:rotate(360deg)} }
     .loading-wrap { padding:30px; text-align:center; color:var(--muted); font-size:13px; display:flex; align-items:center; justify-content:center; gap:8px; }
 
+    /* ── HOJE NA ESCALA ── */
+    .hoje-slot { padding:12px 16px; border-bottom:1px solid var(--border); }
+    .hoje-slot:last-child { border-bottom:none; }
+    .hoje-hor  { font-size:12px; font-weight:700; color:var(--muted); margin-bottom:4px; }
+    .hoje-badge { display:inline-block; padding:2px 9px; border-radius:20px; font-size:11px; font-weight:600; background:rgba(155,35,53,.1); color:var(--rose); border:1px solid rgba(155,35,53,.2); }
+    .hoje-livre { font-size:12px; color:var(--text); font-weight:600; margin-top:3px; }
+    .hoje-obs   { font-size:11px; color:var(--muted); margin-top:2px; font-style:italic; }
+
     @media (max-width:400px) { .stats-grid { grid-template-columns:1fr 1fr; } }
   </style>
 </head>
@@ -255,8 +263,8 @@
         <div class="stat-card"><div class="stat-n" id="st-mus">—</div><div class="stat-l">Músicos</div></div>
         <div class="stat-card"><div class="stat-n" id="st-esc">—</div><div class="stat-l">Escalas</div></div>
       </div>
-      <div class="section-title">Próximas escalas</div>
-      <div class="card" id="home-prox">
+      <div class="section-title">Hoje na Escala</div>
+      <div class="card" id="home-hoje">
         <div class="loading-wrap"><span class="spin"></span> Carregando...</div>
       </div>
     </div>
@@ -428,26 +436,36 @@ async function loadDashboard() {
   const sm = await getDocs(query(collection(db,'escala'), where('data','>=',s), where('data','<=',e)));
   document.getElementById('st-esc').textContent = sm.docs.filter(d => d.data().ministerioId).length;
 
-  // Próximas escalas
-  const today = Timestamp.fromDate(new Date());
-  const sp = await getDocs(query(collection(db,'escala'), where('data','>=',today), orderBy('data')));
-  const items = sp.docs.map(d => d.data()).filter(e => e.ministerioNome).slice(0, 8);
+  // Hoje na Escala
+  const today = new Date(); today.setHours(0,0,0,0);
+  const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate()+1);
+  const snap = await getDocs(query(
+    collection(db,'escala'),
+    where('data','>=',Timestamp.fromDate(today)),
+    where('data','<',Timestamp.fromDate(tomorrow))
+  ));
 
-  const el = document.getElementById('home-prox');
-  if (!items.length) { el.innerHTML='<div class="empty-msg">Nenhuma escala futura.</div>'; return; }
-  el.innerHTML = items.map(e => {
-    const d = e.data.toDate();
-    return `<div class="prox-item">
-      <div class="prox-date-box">
-        <div class="d">${String(d.getDate()).padStart(2,'0')}</div>
-        <div class="m">${MONTHS_S[d.getMonth()]}</div>
-      </div>
-      <div class="prox-info">
-        <div class="prox-hor">${WKDAYS[d.getDay()]} · ${e.horario}</div>
-        <div class="prox-min">${e.ministerioNome}</div>
-      </div>
-    </div>`;
-  }).join('');
+  const byHorario = {};
+  snap.docs.forEach(d => { byHorario[d.data().horario] = d.data(); });
+
+  const dow  = today.getDay();
+  const type = dow === 0 ? 'sun' : dow === 6 ? 'sat' : 'week';
+  const hors = HORARIOS[type];
+
+  const hojeSlots = hors
+    .map(h => ({ h, e: byHorario[h] }))
+    .filter(({ e }) => e && (e.ministerioNome || e.nomeAvulso || e.observacoes));
+
+  const el = document.getElementById('home-hoje');
+  if (!hojeSlots.length) { el.innerHTML='<div class="empty-msg">Nenhuma missa escalada para hoje.</div>'; return; }
+  el.innerHTML = hojeSlots.map(({ h, e }) => `
+    <div class="hoje-slot">
+      <div class="hoje-hor">${h}</div>
+      ${e.ministerioNome ? `<span class="hoje-badge">${e.ministerioNome}</span>` : ''}
+      ${e.nomeAvulso  ? `<div class="hoje-livre">${e.nomeAvulso}</div>`  : ''}
+      ${e.observacoes ? `<div class="hoje-obs">${e.observacoes}</div>`   : ''}
+    </div>
+  `).join('');
 }
 
 // ── SIDEBAR ───────────────────────────────────────────────────────────────────

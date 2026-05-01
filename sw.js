@@ -1,4 +1,4 @@
-const CACHE = "escala-sr-v20260501172255";
+const CACHE = "escala-sr-v20260501173234";
 const STATIC_ASSETS = [
   '/escalamusicossantarita/',
   '/escalamusicossantarita/index.html',

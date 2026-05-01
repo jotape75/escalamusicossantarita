@@ -59,8 +59,8 @@
     .hoje-obs   { font-size:12px; color:var(--text); font-weight:700; margin-top:2px; font-style:italic; }
 
     /* ── ESCALA PAGE ── */
-    .escala-topbar { background:var(--surface); border-bottom:1px solid var(--border); padding:12px 16px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
-    .month-nav { display:flex; align-items:center; gap:10px; }
+    .escala-topbar { background:var(--surface); border-bottom:1px solid var(--border); padding:10px 16px; display:flex; align-items:center; gap:10px; position:sticky; top:0; z-index:100; }
+    .month-nav { display:flex; align-items:center; gap:8px; flex:1; justify-content:center; }
     .month-label { font-size:15px; font-weight:700; letter-spacing:-.3px; color:var(--text); }
     .btn-icon { background:none; border:1px solid var(--border); border-radius:var(--r); width:32px; height:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; color:var(--muted); transition:all .15s; }
     .btn-icon:hover { border-color:var(--rose); color:var(--rose); }
@@ -88,6 +88,26 @@
     .slot-livre { font-size:13px; color:var(--text); font-weight:700; margin-top:4px; }
     .slot-obs   { font-size:12px; color:var(--text); font-weight:700; margin-top:3px; font-style:italic; }
     .slot-empty { opacity:.55; background:var(--surface2); }
+
+    /* Filter results view */
+    .filter-results { padding:12px 16px; display:flex; flex-direction:column; gap:8px; }
+    .filter-day-group { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+    .filter-day-head { padding:10px 14px; background:var(--surface2); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; }
+    .filter-day-head .fday-num { font-size:22px; font-weight:700; color:var(--rose); line-height:1; min-width:32px; }
+    .filter-day-head .fday-info { flex:1; }
+    .filter-day-head .fday-wkd { font-size:12px; font-weight:700; color:var(--muted); text-transform:uppercase; }
+    .filter-day-head .fday-full { font-size:11px; color:var(--muted); }
+    .filter-slot { padding:10px 14px; border-bottom:1px solid var(--border); }
+    .filter-slot:last-child { border-bottom:none; }
+    .filter-slot-hor   { font-size:11px; font-weight:700; color:var(--muted); margin-bottom:4px; text-transform:uppercase; }
+    .filter-slot-badge { display:inline-block; padding:2px 9px; border-radius:20px; font-size:12px; font-weight:700; background:rgba(155,35,53,.1); color:var(--rose); border:1px solid rgba(155,35,53,.2); }
+    .filter-slot-livre { font-size:13px; color:var(--text); font-weight:700; margin-top:3px; }
+    .filter-slot-obs   { font-size:12px; color:var(--text); font-weight:700; margin-top:2px; font-style:italic; }
+    .filter-empty { text-align:center; padding:40px 20px; color:var(--muted); font-size:13px; }
+    .filter-view-head { background:var(--surface); border-bottom:1px solid var(--border); padding:12px 16px; display:flex; align-items:center; gap:10px; position:sticky; top:0; z-index:100; }
+    .filter-view-head h2 { font-size:15px; font-weight:700; flex:1; color:var(--text); }
+    .btn-back { background:none; border:none; font-size:20px; cursor:pointer; color:var(--muted); padding:4px; line-height:1; }
+    .btn-back:hover { color:var(--text); }
 
     /* ── INFO PAGE ── */
     .info-header { padding:32px 20px 24px; display:flex; flex-direction:column; align-items:center; gap:12px; }
@@ -168,6 +188,18 @@
   </div>
   <div class="slots-container" id="escala-results">
     <div class="loading-wrap"><span class="spin"></span> Carregando...</div>
+  </div>
+</div>
+
+<!-- FILTRO RESULTADOS -->
+<div class="page" id="page-filter-results">
+  <div class="filter-view-head">
+    <button class="btn-back" id="btn-back-filter">←</button>
+    <h2 id="filter-view-title">Resultados</h2>
+    <button class="btn-filter active" id="btn-filter-open2">⚙</button>
+  </div>
+  <div class="filter-results" id="filter-results-list">
+    <div class="loading-wrap"><span class="spin"></span></div>
   </div>
 </div>
 
@@ -475,9 +507,15 @@ document.getElementById('drawer-overlay').addEventListener('click',closeDrawer);
 document.getElementById('btn-filter-apply').addEventListener('click',()=>{
   activeMinFilter=document.getElementById('filter-min').value;
   activeMusFilter=document.getElementById('filter-mus').value;
-  document.getElementById('btn-filter-open').classList.toggle('active',!!(activeMinFilter||activeMusFilter));
+  const hasFilter=!!(activeMinFilter||activeMusFilter);
+  document.getElementById('btn-filter-open').classList.toggle('active', hasFilter);
   closeDrawer();
-  renderDaySlots(selectedDay);
+  if(hasFilter) {
+    showFilterResultsView();
+  } else {
+    // sem filtro: volta para escala normal
+    navigateTo('escala');
+  }
 });
 document.getElementById('btn-filter-clear').addEventListener('click',()=>{
   activeMinFilter=''; activeMusFilter='';
@@ -485,6 +523,109 @@ document.getElementById('btn-filter-clear').addEventListener('click',()=>{
   updateMusDropdown('');
   document.getElementById('filter-mus').value='';
 });
+
+// Botão filtro na view de resultados
+document.getElementById('btn-filter-open2').addEventListener('click',()=>{
+  document.getElementById('filter-min').value=activeMinFilter;
+  updateMusDropdown(activeMinFilter);
+  document.getElementById('filter-mus').value=activeMusFilter;
+  document.getElementById('drawer').classList.add('on');
+  document.getElementById('drawer-overlay').classList.add('on');
+});
+
+// Botão voltar da view de resultados
+document.getElementById('btn-back-filter').addEventListener('click',()=>{
+  activeMinFilter=''; activeMusFilter='';
+  document.getElementById('btn-filter-open').classList.remove('active');
+  navigateTo('escala');
+});
+
+async function showFilterResultsView() {
+  // Título
+  const minNome = activeMinFilter ? ministerios.find(m=>m.id===activeMinFilter)?.nome : null;
+  const musNome = activeMusFilter ? musicos.find(m=>m.id===activeMusFilter)?.nome : null;
+  let title = 'Resultados';
+  if(minNome && musNome) title = `${musNome} · ${minNome}`;
+  else if(minNome) title = minNome;
+  else if(musNome) title = musNome;
+  document.getElementById('filter-view-title').textContent = title;
+
+  // Navega para a view
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('on'));
+  document.getElementById('page-filter-results').classList.add('on');
+
+  const list = document.getElementById('filter-results-list');
+  list.innerHTML='<div class="loading-wrap"><span class="spin"></span> Carregando...</div>';
+
+  // Busca o mês inteiro
+  const start = Timestamp.fromDate(new Date(curYear,curMonth,1));
+  const end   = Timestamp.fromDate(new Date(curYear,curMonth+1,0,23,59,59));
+  const snap  = await getDocs(query(collection(db,'escala'),where('data','>=',start),where('data','<=',end)));
+
+  // Agrupa por dia
+  const byDay = {};
+  snap.docs.forEach(d=>{
+    const dat=d.data(), dt=dat.data.toDate();
+    const dayKey=dt.getDate();
+    if(!byDay[dayKey]) byDay[dayKey]=[];
+    byDay[dayKey].push({...dat, _date:dt});
+  });
+
+  const WKDAYS_FULL=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+  const minF=activeMinFilter, musF=activeMusFilter;
+  const groups=[];
+
+  const daysInMonth=new Date(curYear,curMonth+1,0).getDate();
+  for(let d=1;d<=daysInMonth;d++){
+    const daySlots=(byDay[d]||[]);
+    const dt=new Date(curYear,curMonth,d);
+
+    // Filtra slots do dia que batem o filtro
+    const matching=daySlots.filter(e=>{
+      if(minF && e.ministerioId!==minF) return false;
+      if(musF){
+        const mus=musicos.find(m=>m.id===musF);
+        if(!mus) return false;
+        const inMin=e.ministerioId&&e.ministerioId===mus.ministerioId;
+        const inNomes=e.musicosNomes&&e.musicosNomes.includes(mus.nome);
+        const inAvulso=e.nomeAvulso&&e.nomeAvulso.toLowerCase().includes(mus.nome.toLowerCase());
+        return inMin||inNomes||inAvulso;
+      }
+      return true;
+    }).filter(e=>e.ministerioNome||e.nomeAvulso||e.observacoes);
+
+    if(!matching.length) continue;
+
+    // Ordena por horário
+    matching.sort((a,b)=>toMin(a.horario)-toMin(b.horario));
+
+    const slotsHtml=matching.map(e=>`
+      <div class="filter-slot">
+        <div class="filter-slot-hor">${e.horario}</div>
+        ${e.ministerioNome?`<span class="filter-slot-badge">${e.ministerioNome}</span>`:''}
+        ${e.nomeAvulso?`<div class="filter-slot-livre">${e.nomeAvulso}</div>`:''}
+        ${e.observacoes?`<div class="filter-slot-obs">${e.observacoes}</div>`:''}
+      </div>`).join('');
+
+    groups.push(`<div class="filter-day-group">
+      <div class="filter-day-head">
+        <div class="fday-num">${String(d).padStart(2,'0')}</div>
+        <div class="fday-info">
+          <div class="fday-wkd">${WKDAYS[dt.getDay()]} · ${MONTHS_S[dt.getMonth()]} ${curYear}</div>
+          <div class="fday-full">${WKDAYS_FULL[dt.getDay()]}</div>
+        </div>
+      </div>
+      ${slotsHtml}
+    </div>`);
+  }
+
+  if(!groups.length){
+    list.innerHTML='<div class="filter-empty">Nenhuma escala encontrada para este filtro.</div>';
+    return;
+  }
+  list.innerHTML=groups.join('');
+}
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
 function toMin(hor){

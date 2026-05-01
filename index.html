@@ -356,7 +356,6 @@ const MONTHS_S= ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','No
 let ministerios = [], musicos = [];
 let curYear, curMonth, selectedDay;
 let activeMinFilter = '', activeMusFilter = '';
-let escalaCache = {}; // key: "YYYY-MM-DD" → [{horario, ministerioId, ministerioNome, nomeAvulso, observacoes}]
 
 const HORARIOS = {
   week: ['07h','08:30h','10h','12h','19:30h'],
@@ -470,27 +469,6 @@ document.getElementById('btn-next-month').addEventListener('click', () => {
 
 async function loadEscala() {
   document.getElementById('month-label').textContent = `${MONTHS_S[curMonth]} ${curYear}`;
-  document.getElementById('escala-results').innerHTML = '<div class="loading-wrap"><span class="spin"></span> Carregando...</div>';
-  const start = Timestamp.fromDate(new Date(curYear, curMonth, 1));
-  const end   = Timestamp.fromDate(new Date(curYear, curMonth + 1, 0, 23, 59, 59));
-  const snap  = await getDocs(query(collection(db, 'escala'), where('data', '>=', start), where('data', '<=', end)));
-
-  escalaCache = {};
-  snap.docs.forEach(d => {
-    const dat = d.data();
-    const dt  = dat.data.toDate();
-    const dateKey = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
-    if (!escalaCache[dateKey]) escalaCache[dateKey] = [];
-    escalaCache[dateKey].push({
-      horario: dat.horario,
-      ministerioId: dat.ministerioId || '',
-      ministerioNome: dat.ministerioNome || '',
-      nomeAvulso: dat.nomeAvulso || '',
-      observacoes: dat.observacoes || '',
-      musicosNomes: dat.musicosNomes || []
-    });
-  });
-
   renderCarousel();
   renderDaySlots(selectedDay);
 }
@@ -504,12 +482,8 @@ function renderEscala() {
     selectedDay = 1;
   }
   document.getElementById('month-label').textContent = `${MONTHS_S[curMonth]} ${curYear}`;
-  if (Object.keys(escalaCache).length === 0) {
-    loadEscala();
-  } else {
-    renderCarousel();
-    renderDaySlots(selectedDay);
-  }
+  renderCarousel();
+  renderDaySlots(selectedDay);
 }
 
 function getDayType(date) {
@@ -562,19 +536,42 @@ function slotMatchesFilter(slot, minF, musF) {
   return true;
 }
 
-function renderDaySlots(day) {
+async function renderDaySlots(day) {
   const container = document.getElementById('escala-results');
   const dt        = new Date(curYear, curMonth, day);
   const type      = getDayType(dt);
   const hors      = HORARIOS[type];
-  const dateKey   = `${curYear}-${String(curMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-  const daySlots  = escalaCache[dateKey] || [];
+
+  container.innerHTML = '<div class="loading-wrap"><span class="spin"></span> Carregando...</div>';
+
+  const dayStart = new Date(curYear, curMonth, day, 0, 0, 0);
+  const dayEnd   = new Date(curYear, curMonth, day, 23, 59, 59);
+  const start    = Timestamp.fromDate(dayStart);
+  const end      = Timestamp.fromDate(dayEnd);
+
+  const snap = await getDocs(query(
+    collection(db, 'escala'),
+    where('data', '>=', start),
+    where('data', '<=', end)
+  ));
+
+  const byHorario = {};
+  snap.docs.forEach(d => { byHorario[d.data().horario] = d.data(); });
+
   const minF = activeMinFilter;
   const musF = activeMusFilter;
   const hasFilter = !!(minF || musF);
 
   const rows = hors.map(h => {
-    const slot = daySlots.find(s => s.horario === h);
+    const raw  = byHorario[h];
+    const slot = raw ? {
+      horario:       h,
+      ministerioId:  raw.ministerioId  || '',
+      ministerioNome:raw.ministerioNome || '',
+      nomeAvulso:    raw.nomeAvulso    || '',
+      observacoes:   raw.observacoes   || '',
+      musicosNomes:  raw.musicosNomes  || []
+    } : null;
     if (hasFilter) {
       if (!slot || !slotMatchesFilter(slot, minF, musF)) return '';
     }

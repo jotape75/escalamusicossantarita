@@ -3,7 +3,7 @@ const STATIC_ASSETS = [
   '/escalamusicossantarita/',
   '/escalamusicossantarita/index.html',
   '/escalamusicossantarita/manifest.json',
-  '/escalamusicossantarita/logo_santarita.jpg'
+  '/escalamusicossantarita/logo_santarita.png'
 ];
 
 self.addEventListener('install', event => {
